@@ -1,19 +1,18 @@
 <script setup lang="ts">
 
-import {CodeEditor} from "magic-code-editor";
-// https://vuejs.org/guide/essentials/class-and-style
 </script>
 
 <template>
   <ContentDoc v-slot="{ doc }">
     <article>
-        <header class="my-5 px-5 pt-5 elevation-4" style="background: rgba(52,56,65,0.39); border-radius: 20px">
-        <h1 class="text-h3 font-weight-medium mb-3 ms-n1">{{ doc.title }}</h1>
-        <h2>{{ doc.description }}</h2>
+      <header class="my-5 px-5 pt-5 elevation-4"
+              style="background: rgba(52,56,65,0.39); border-top: 15px solid #EF5350">
+        <h1 class="text-h3 font-weight-medium ms-n1">{{ doc.title }}</h1>
+        <v-label class="text-h5">{{ doc.description }}</v-label>
         <v-row class="my-1" dense no-gutters>
           <v-col cols="auto">
             <h2>
-              <v-btn variant="outlined"
+              <v-btn variant="text"
                      prepend-icon="mdi-github"
                      href="https://github.com/surister"
                      target="_blank">Surister
@@ -36,7 +35,19 @@ import {CodeEditor} from "magic-code-editor";
         <ContentRenderer :value="doc"/>
       </main>
     </article>
+
+  <div class="mt-5">
+    <div class="text-h4 mb-2">React to this article.</div>
+    <span class="">
+      <v-chip class="text-h4" style="background-color: rgba(239,83,80,0.13)" variant="text" size="x-large"
+              @click="console.log('yo')">🦧</v-chip>
+      <v-chip class="text-h4" variant="text" size="x-large" @click="console.log('yo')">🗣🔥🔥</v-chip>
+      <v-chip class="text-h4" variant="text" size="x-large" @click="console.log('yo')">🤔</v-chip>
+      <v-chip class="text-h4" variant="text" size="x-large" @click="console.log('yo')">🖕</v-chip>
+    </span>
+  </div>
   </ContentDoc>
+
 </template>
 
 <style>
