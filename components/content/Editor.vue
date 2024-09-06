@@ -34,7 +34,7 @@ function copyToClipboard(text){
               read-only
               :highlight="(text) => hljs.highlight(value, {language: 'python'}).value">
     <template #appendText>
-      <v-btn variant="outlined" :color="copied ? 'success' : ''"
+      <v-btn variant="outlined" :color="copied ? 'success' : ''" style="border-radius: 5px"
              :icon="copied ? 'mdi-check' : 'mdi-content-copy'" size="x-small"
              @click="copyToClipboard(value)">
       </v-btn>
