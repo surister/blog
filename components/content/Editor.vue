@@ -27,11 +27,14 @@ function copyToClipboard(text){
               border-radius="0"
               highlight-row-background-color="red"
               header-background-color="#EF5350"
-              header-text=""
+
               :show-border-top="false"
               background-color="#1f2024"
+              padding-bottom="10"
+              padding-top="10"
               show-header
               read-only
+              :prepend-inline="true"
               :highlight="(text) => hljs.highlight(value, {language: 'python'}).value">
     <template #appendText>
       <v-btn variant="outlined" :color="copied ? 'success' : ''" style="border-radius: 5px"
