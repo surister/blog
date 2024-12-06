@@ -10,8 +10,8 @@
                  border-top: 15px solid #EF5350">
         <v-container max-width="60%">
           <v-row>
-            <v-col cols="6" align-self="end">
-              <h1 class="text-h3 font-weight-medium ms-n1">{{ doc.title }}</h1>
+            <v-col cols="6" align-self="center">
+              <h1 class="text-h2 font-weight-medium ms-n1">{{ doc.title }}</h1>
               <v-row class="position-sticky bottom-0 mt-5" dense no-gutters>
                 <v-col cols="auto">
                   <v-btn variant="text"
@@ -57,16 +57,23 @@
 </template>
 
 <style>
+a {
+  /* Removes link color and underline */
+  color: inherit;
+  text-decoration: inherit;
+}
 main p {
   font-size: 25px;
   margin-top: 20px;
   line-height: 30px;
 }
 
+
 main h2 {
   margin-top: 30px;
   margin-bottom: 30px;
 }
+
 
 main ul {
   font-size: 25px;
@@ -78,9 +85,7 @@ main ul {
 .h {
   font-size: 20px;
   background: rgb(52, 56, 65);
-  padding: .20rem .25rem;
+  padding: .25rem .30rem;
   border-radius: 10px;
-  margin-right: 1px;
-  margin-left: 1px;
 }
 </style>
