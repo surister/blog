@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import hljs from 'highlight.js/lib/core';
-import json from 'highlight.js/lib/languages/json';
+import bash from 'highlight.js/lib/languages/bash';
 
-hljs.registerLanguage('json', json);
+hljs.registerLanguage('bash', bash);
 
 const slots = useSlots();
 const value = slots.default()[0].children.default()[0].children;
@@ -10,20 +10,15 @@ const value = slots.default()[0].children.default()[0].children;
 
 <template>
   <v-divider thickness="3" style="color:white"/>
-
-  <span class="t bg-gray" style="position: relative">
-         <code><pre class="pa-5"><span
-             v-html="hljs.highlight(value, {language: 'json'}).value"></span></pre>
+  <span class="bg-gray">
+         <code><pre class="pa-4" style="overflow: scroll"><span
+             v-html="hljs.highlight(value, {language: 'bash'}).value"></span></pre>
          </code>
   </span>
 </template>
 
 <style>
-.bg-gray {
-  background-color: #1f2024
-}
-
-.t pre {
+.bg-gray pre {
   background-color: #1f2024;
 }
 </style>

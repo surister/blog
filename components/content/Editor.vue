@@ -5,9 +5,10 @@ import 'magic-code-editor/style.css'
 const slots = useSlots();
 const value = slots.default()[0].children.default()[0].children;
 import hljs from 'highlight.js/lib/core';
-import python from 'highlight.js/lib/languages/python';
+import shell from 'highlight.js/lib/languages/shell';
 
-hljs.registerLanguage('python', python)
+hljs.registerLanguage('shell', shell)
+
 const copied = ref(false)
 
 function copyToClipboard(text){
@@ -18,6 +19,7 @@ function copyToClipboard(text){
     }, 2500)
   })
 }
+
 </script>
 
 <template>
@@ -35,7 +37,7 @@ function copyToClipboard(text){
               show-header
               read-only
               :prepend-inline="true"
-              :highlight="(text) => hljs.highlight(value, {language: 'python'}).value">
+              :highlight="(text) => text">
     <template #appendText>
       <v-btn variant="outlined" :color="copied ? 'success' : ''" style="border-radius: 5px"
              :icon="copied ? 'mdi-check' : 'mdi-content-copy'" size="x-small"
