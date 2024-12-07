@@ -14,9 +14,14 @@
     "@nuxt/fonts": "^0.7.2",
     "@nuxt/image": "^1.7.1",
     "highlight.js": "^11.10.0",
+    "katex": "^0.16.11",
     "magic-code-editor": "^0.0.4",
     "nuxt": "^3.13.0",
     "vue": "latest",
+    "vue3-katex": "^0.7.0",
     "vuetify-nuxt-module": "^0.17.1"
+  },
+  "devDependencies": {
+    "@types/katex": "^0.16.7"
   }
 }
