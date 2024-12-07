@@ -3,7 +3,7 @@
 </script>
 
 <template>
-<v-divider class="my-5"></v-divider>
+  <v-divider thickness="3" style="color:white"/>
 </template>
 
 <style scoped>

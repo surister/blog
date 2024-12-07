@@ -9,7 +9,6 @@ const value = slots.default()[0].children.default()[0].children;
 </script>
 
 <template>
-  <v-divider thickness="3" style="color:white"/>
   <span class="bg-gray">
          <code><pre class="pa-4" style="overflow: scroll"><span
              v-html="hljs.highlight(value, {language: 'bash'}).value"></span></pre>
@@ -19,6 +18,6 @@ const value = slots.default()[0].children.default()[0].children;
 
 <style>
 .bg-gray pre {
-  background-color: #1f2024;
+  background-color: #212121;
 }
 </style>

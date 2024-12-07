@@ -29,15 +29,14 @@ function copyToClipboard(text){
               border-radius="0"
               highlight-row-background-color="red"
               header-background-color="#EF5350"
-
               :show-border-top="false"
-              background-color="#1f2024"
+              background-color="#212121"
               padding-bottom="10"
               padding-top="10"
               show-header
               read-only
               :prepend-inline="true"
-              :highlight="(text) => text">
+              :highlight="(text) => hljs.highlight(text, {language: 'shell'}).value">
     <template #appendText>
       <v-btn variant="outlined" :color="copied ? 'success' : ''" style="border-radius: 5px"
              :icon="copied ? 'mdi-check' : 'mdi-content-copy'" size="x-small"
