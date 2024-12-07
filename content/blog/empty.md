@@ -9,6 +9,43 @@ tags: [ 'python', 'Antlr4', 'software' ]
 
 [Big text]{.text-h1}
 
+## Markdown tables (input has to be a valid markdown table)
+
+<h3>Text table</h3>
+
+::MarkdownTable{type="text" .my-5}
+<pre>
+| schema_name | table_name                                          | sum(num_docs) | (sum(size) / 1000000::bigint) | avg_size_in_bytes  |
+|-------------|-----------------------------------------------------|---------------|-------------------------------|--------------------| 
+| "doc"       | "taxi_january"                                      | 5929248       | 775                           | 130.74343390595232 |
+| "doc"       | "taxi_january_bestcompresion"                       | 5929248       | 581                           | 98.15085909714014  |
+| "doc"       | "taxi_january_nocolumnstore_bestcompression"        | 5929248       | 411                           | 69.34966845711294  |
+| "doc"       | "taxi_january_nocolumnstore_noindex_bestcompresion" | 5929248       | 244                           | 41.172756140407685 |
+| "doc"       | "taxi_january_noindex_bestcompression"              | 5929248       | 423                           | 71.48468304918264  |
+| "doc"       | "taxi_january_nocolumnstore"                        | 5929248       | 639                           | 107.92968315712211 |
+| "doc"       | "taxi_january_nocolumnstore_noindex"                | 5929248       | 474                           | 80.03273905898354  |
+| "doc"       | "taxi_january_noindex"                              | 5929248       | 635                           | 107.13091457803755 |
+</pre>
+::
+
+<h3>Normal table</h3>
+
+::MarkdownTable{hasTop="true" type="table" .mt-5 }
+<pre>
+| schema_name | table_name                                          | sum(num_docs) | (sum(size) / 1000000::bigint) | avg_size_in_bytes  |
+|-------------|-----------------------------------------------------|---------------|-------------------------------|--------------------| 
+| "doc"       | "taxi_january"                                      | 5929248       | 775                           | 130.74343390595232 |
+| "doc"       | "taxi_january_bestcompresion"                       | 5929248       | 581                           | 98.15085909714014  |
+| "doc"       | "taxi_january_nocolumnstore_bestcompression"        | 5929248       | 411                           | 69.34966845711294  |
+| "doc"       | "taxi_january_nocolumnstore_noindex_bestcompresion" | 5929248       | 244                           | 41.172756140407685 |
+| "doc"       | "taxi_january_noindex_bestcompression"              | 5929248       | 423                           | 71.48468304918264  |
+| "doc"       | "taxi_january_nocolumnstore"                        | 5929248       | 639                           | 107.92968315712211 |
+| "doc"       | "taxi_january_nocolumnstore_noindex"                | 5929248       | 474                           | 80.03273905898354  |
+| "doc"       | "taxi_january_noindex"                              | 5929248       | 635                           | 107.13091457803755 |
+</pre>
+::
+
+
 ## Images
 
 ::CustomImage{src="https://i.redd.it/cm3tsne35a5e1.jpeg" label="Label of meme" width="400" marginTop="15"}
@@ -24,15 +61,39 @@ type is mdi icon, type="star" is mdi-star<br>
 ## Editor with output
 ::Editor
 <pre>
-pip install antlr4-tools</pre>
+SELECT * FROM sometable</pre>
+::
+
+::Sep
+::
+
+::MarkdownTable{type="table"}
+<pre>
+| schema_name | table_name                                          | sum(num_docs) | (sum(size) / 1000000::bigint) | avg_size_in_bytes  |
+|-------------|-----------------------------------------------------|---------------|-------------------------------|--------------------| 
+| "doc"       | "taxi_january"                                      | 5929248       | 775                           | 130.74343390595232 |
+| "doc"       | "taxi_january_bestcompresion"                       | 5929248       | 581                           | 98.15085909714014  |
+| "doc"       | "taxi_january_nocolumnstore_bestcompression"        | 5929248       | 411                           | 69.34966845711294  |
+| "doc"       | "taxi_january_nocolumnstore_noindex_bestcompresion" | 5929248       | 244                           | 41.172756140407685 |
+| "doc"       | "taxi_january_noindex_bestcompression"              | 5929248       | 423                           | 71.48468304918264  |
+| "doc"       | "taxi_january_nocolumnstore"                        | 5929248       | 639                           | 107.92968315712211 |
+| "doc"       | "taxi_january_nocolumnstore_noindex"                | 5929248       | 474                           | 80.03273905898354  |
+| "doc"       | "taxi_january_noindex"                              | 5929248       | 635                           | 107.13091457803755 |
+</pre>
+::
+
+::Editor
+<pre>
+antrl4</pre>
+::
+::Sep
 ::
 ::EditorResult
-<pre>Collecting antlr4-tools
-  Downloading antlr4_tools-0.2.1-py3-none-any.whl (4.3 kB)
-Collecting install-jdk
-  Downloading install_jdk-1.1.0-py3-none-any.whl (15 kB)
-Installing collected packages: install-jdk, antlr4-tools
-Successfully installed antlr4-tools-0.2.1 install-jdk-1.1.0</pre>
+<pre>
+Downloading antlr4-4.13.2-complete.jar
+ANTLR tool needs Java to run; install Java JRE 11 yes/no (default yes)? yes
+Installed Java in /root/.jre/jdk-11.0.24+8-jre; remove that dir to uninstall
+ANTLR Parser Generator  Version 4.13.2</pre>
 ::
 
 ## Math equations:
