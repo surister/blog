@@ -9,10 +9,19 @@ import shell from 'highlight.js/lib/languages/shell';
 
 hljs.registerLanguage('shell', shell)
 
+const props = defineProps(
+    {
+      'hasResult': {
+        'type': Boolean,
+        'default': false
+      },
+    }
+)
+
 const copied = ref(false)
 
 function copyToClipboard(text){
-  navigator.clipboard.writeText(text).then((res) => {
+  navigator.clipboard.writeText(text).then((_) => {
     copied.value = true
     setTimeout(()=>{
       copied.value = false
@@ -25,15 +34,11 @@ function copyToClipboard(text){
 <template>
   <CodeEditor :text="value"
               :show-line-number="false"
-              class="mt-5"
-              border-radius="0"
+              :class="['mt-5', 'rounded-t-lg', hasResult ? '' : 'rounded-b-lg']"
               highlight-row-background-color="red"
-              header-background-color="#EF5350"
-              :show-border-top="false"
               background-color="#212121"
               padding-bottom="10"
               padding-top="10"
-              show-header
               read-only
               :prepend-inline="true"
               :highlight="(text) => hljs.highlight(text, {language: 'shell'}).value">
