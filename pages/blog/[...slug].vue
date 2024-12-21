@@ -8,7 +8,7 @@
       <header class="elevation-4"
               style="background: rgba(52,56,65,0.39);
                  border-top: 15px solid #EF5350">
-        <v-container max-width="60%">
+        <v-container>
           <v-row>
             <v-col cols="6" align-self="center">
               <h1 class="text-h2 font-weight-medium ms-n1">{{ doc.title }}</h1>
@@ -32,13 +32,13 @@
           </v-row>
         </v-container>
       </header>
-      <v-container max-width="60%">
+      <v-container>
         <main>
           <ContentRenderer :value="doc"/>
         </main>
       </v-container>
     </article>
-    <v-container max-width="60%">
+    <v-container>
       <div class="mt-5">
           <span>
       <v-chip class="text-h4"
@@ -62,6 +62,7 @@ a {
   color: inherit;
   text-decoration: inherit;
 }
+
 main p {
   font-size: 25px;
   margin-top: 20px;
