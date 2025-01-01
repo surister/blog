@@ -21,7 +21,7 @@ jobs:
   
               docker compose down
               docker run -v $PWD:/build --workdir /build node npm run generate
-              docker compose up -d
+              docker compose -f ./deploy/docker-compose.yml up -d
 
             host: ${{ secrets.DEPLOYMENT_HOST }}
             port: ${{ secrets.DEPLOYMENT_PORT }}
