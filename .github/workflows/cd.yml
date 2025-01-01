@@ -18,10 +18,9 @@ jobs:
             command: |
               cd ${{ secrets.DEPLOYMENT_PROJECT_PATH }} 
               git pull origin master
-
+  
               docker compose down
-              npm install
-              nuxt generate
+              docker run -v $PWD:/build --workdir /build node npm run generate
               docker compose up -d
 
             host: ${{ secrets.DEPLOYMENT_HOST }}
