@@ -14,7 +14,8 @@ const icon = computed(() => `mdi-${props.type}`)
 </script>
 
 <template>
-  <v-btn :prepend-icon="icon"
+  <v-btn :prepend-icon="type ? icon : ''"
+         slim
          variant="text"
          color="red"
          target="_blank"
