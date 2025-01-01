@@ -1,5 +1,4 @@
-name: Deploy backend to dev server
-
+name: CD to server
 on:
   push:
     branches:
