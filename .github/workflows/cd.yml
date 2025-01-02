@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - components
+      - README.md
+      - .gitignore
   workflow_dispatch:
 
 jobs:
