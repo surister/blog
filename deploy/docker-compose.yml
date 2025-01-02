@@ -1,17 +1,19 @@
 services:
   static:
     container_name: blog.surister.dev
-    image: nginx
+    image: node
     restart: unless-stopped
     networks:
       - proxy
     ports:
       - 80
+    command: node /dist/index.mjs
     environment:
       - VIRTUAL_HOST=blog.surister.dev
       - NGINX_HOST=blog.surister.dev
+      - NITRO_PORT=80
     volumes:
-      - ./dist/:/usr/share/nginx/html
+      - .dist/:/dist
 
 networks:
   proxy:
