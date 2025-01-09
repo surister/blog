@@ -32,10 +32,23 @@
           </v-row>
         </v-container>
       </header>
-      <v-container>
-        <main>
-          <ContentRenderer :value="doc"/>
-        </main>
+      <v-container fluid>
+        <v-row>
+          <v-col cols="3">
+            <div style="position: sticky; top: 50px">
+              <TableOfContents style="position: fixed"></TableOfContents>
+            </div>
+
+          </v-col>
+          <v-col>
+           <main>
+              <ContentRenderer :value="doc"/>
+           </main>
+          </v-col>
+          <v-col cols="3"></v-col>
+        </v-row>
+
+
       </v-container>
     </article>
     <v-container>

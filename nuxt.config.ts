@@ -19,7 +19,8 @@ export default defineNuxtConfig({
     '@nuxt/content',
     'vuetify-nuxt-module',
     '@nuxt/fonts',
-    '@nuxt/image'
+    '@nuxt/image',
+    'nuxt-toc'
   ],
   vuetify: {
     vuetifyOptions: {
