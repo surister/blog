@@ -3,15 +3,18 @@ title: 'Blueprint /  Demo'
 image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-photo-of-a-cat-sitting-on-top-of-some-rocks.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
 description: 'Blueprint showcasing available components'
 tags: [ 'python', 'Antlr4', 'software' ]
+authors: [{'name': 'Ivan', 'job_title': 'Monologue Expert'}, {'name': 'Anon'}]
+comment_links: [{'name': 'reddit', 'href': ''}, {'name': 'hacker news', 'href': ''}]
 ---
-## [Text spices]{.text-red .text-h2}
+## [- Text]{.text-red .text-h2}
+
 [Antlr4]{.h} highlighted
 
 [Big text]{.text-h1}
 
-## Markdown tables (input has to be a valid markdown table)
+## [- Tables]{.text-red .text-h2}
 
-<h3>Text table</h3>
+Markdown Table
 
 ::MarkdownTable{type="text" .my-5}
 <pre>
@@ -28,7 +31,9 @@ tags: [ 'python', 'Antlr4', 'software' ]
 </pre>
 ::
 
-<h3>Normal table</h3>
+Normal table
+
+<br>
 
 ::MarkdownTable{hasTop="true" type="table" .mt-5 }
 <pre>
@@ -46,20 +51,27 @@ tags: [ 'python', 'Antlr4', 'software' ]
 ::
 
 
-## Images
+## [- Images]{.text-red .text-h2}
 
-::CustomImage{src="https://i.redd.it/cm3tsne35a5e1.jpeg" label="Label of meme" width="400" marginTop="15"}
+::CustomImage{src="https://deadline.com/wp-content/uploads/2024/07/MCDSHRE_EC025.jpg?w=681&h=383&crop=1" label="Label of meme" width="400" marginTop="15"}
 
 ::
 
-## External link
-type is mdi icon, type="star" is mdi-star<br>
+::CustomImage
+---
+"src": "https://deadline.com/wp-content/uploads/2024/07/MCDSHRE_EC025.jpg?w=681&h=383&crop=1"
+"label": "Better to read"
+"width": "400"
+"marginTop": "15"
+---
+::
 
+## [- External link]{.text-red .text-h2}
 :elink{type="language-python" text="antlr4-tools" url="https://github.com/antlr/antlr4/blob/master/doc/getting-started.md" .mt-5}
 
-:elink{type="star" text="Nasa" url="https://nasa.gov" .ml-5 .mt-5}
+:elink{type="star" text="Nasa" url="https://nasa.gov" .ml-5 .mt-5 color="yellow"}
 
-## Editor with output
+## [- Editor with output]{.text-red .text-h2}
 ::Editor{hasResult="true"}
 <pre>
 SELECT * FROM sometable</pre>
@@ -97,7 +109,7 @@ Installed Java in /root/.jre/jdk-11.0.24+8-jre; remove that dir to uninstall
 ANTLR Parser Generator  Version 4.13.2</pre>
 ::
 
-## Math equations:
+## [- Math equations]{.text-red .text-h2}
 
 ::Mathshy{.text-h3 .mt-5}
 <pre>
@@ -109,7 +121,7 @@ RRF(d) =
 </pre>
 ::
 
-## References
+## [- References]{.text-red .text-h2}
 
 My first reference :Ref{r="1"}<br>
 My second reference :Ref{r="2"}<br>
@@ -121,11 +133,11 @@ I'm on a strike! :Ref{r="4"}
 :Der{r="3" link="https://github.com/antlr/antlr4/blob/master/doc/targets.md"}
 :Der{r="4" link="https://github.com/antlr/antlr4/blob/master/doc/targets.md"}
 
-## Separator
+## [- Separator]{.text-red .text-h2}
 ::Sep
 ::
 
-## Alerts and quotes
+## [- Alerts and quotes]{.text-red .text-h2}
 
 ::Alert
 ---
@@ -138,7 +150,7 @@ I'm on a strike! :Ref{r="4"}
 ---
 ::
 
-## Charts
+## [- Charts]{.text-red .text-h2}
 
 ::line{.pt-5}
 ---
@@ -146,7 +158,9 @@ I'm on a strike! :Ref{r="4"}
 ---
 ::
 
-::RustEditor
+## [- Code]{.text-red .text-h2}
+
+::Editor{lang='rust' codeFontSize=13}
 <pre>    async fn send_batch(&amp;self, schema: &amp;str, table_name: &amp;str, columns: &amp;Vec&lt;String&gt;, buffer: Vec&lt;Vec&lt;CValue&gt;&gt;) {
         let mut query_builder = self.build_insert_values_statement(&amp;schema, &amp;table_name, &amp;columns);
         query_builder.push_values(&amp;buffer, |mut separated, x| {
@@ -178,10 +192,8 @@ I'm on a strike! :Ref{r="4"}
     }</pre>
 ::
 
-+ hola
-* asf
-* asdf
-+ asdfasdf
-+ jjj
-- asdfasd
-- 234234
+## [- Lists]{.text-red .text-h2}
+
+* One
+* Two
+* Third
