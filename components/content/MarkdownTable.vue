@@ -9,6 +9,10 @@ const props = defineProps({
   hasTop: {
     type: Boolean,
     default: false
+  },
+  hasBottom: {
+    type: Boolean,
+    default: false
   }
 })
 function unpack_row(row){
@@ -26,7 +30,8 @@ function get_rows(){
   <template v-else-if="type === 'table'">
     <div style="height: 13px; background: #EF5350" v-if="hasTop"></div>
     <v-table height="300px"
-        fixed-header>
+             :class="[hasBottom ? 'rounded-b-lg' : '']"
+             fixed-header>
       <thead>
       <tr>
         <th v-for="header in unpack_row(value.split('\n')[0])" class="text-left">

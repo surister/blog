@@ -51,7 +51,6 @@ function copyToClipboard(text) {
               background-color="#212121"
               padding-bottom="10"
               padding-top="10"
-              :border-radius="!!header_text ? 0 : 10"
               read-only
               :prepend-inline="true"
               :highlight="(text) => hljs.highlight(text, {language: lang}).value">

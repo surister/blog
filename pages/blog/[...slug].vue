@@ -1,68 +1,43 @@
 <script setup lang="ts">
-
+import Header from "~/components/slug/Header.vue";
 </script>
 
 <template>
   <ContentDoc v-slot="{ doc }">
     <article>
-      <header class="elevation-4"
-              style="background: rgba(52,56,65,0.39);
-                 border-top: 15px solid #EF5350">
-        <v-container>
-          <v-row>
-            <v-col cols="6" align-self="center">
-              <h1 class="text-h2 font-weight-medium ms-n1">{{ doc.title }}</h1>
-              <v-row class="position-sticky bottom-0 mt-5" dense no-gutters>
-                <v-col cols="auto">
-                  <v-btn variant="text"
-                         prepend-icon="mdi-github"
-                         href="https://github.com/surister"
-                         target="_blank">Surister
-                  </v-btn>
-                  <span class="text-subtitle-1 font-weight-bold text-grey-lighten-1"><span
-                      class="mr-4">·</span>29/02/2024</span>
-                </v-col>
-                <v-spacer></v-spacer>
-              </v-row>
-              <v-label class="text-h5 text-wrap mt-3">{{ doc.description }}</v-label>
-            </v-col>
-            <v-col cols="6" align-self="center">
-              <v-img :src="doc.image"/>
-            </v-col>
-          </v-row>
-        </v-container>
-      </header>
       <v-container fluid>
-        <v-row>
-          <v-col cols="3">
-            <div style="position: sticky; top: 50px">
-              <TableOfContents style="position: fixed"></TableOfContents>
+        <Header :doc="doc"></Header>
+      </v-container>
+      <v-container fluid>
+        <v-row no-gutters>
+          <v-col class="v-col-lg-3 v-col-xl-3 v-col-xxl-3">
+            <div style="top: 50px" class="position-sticky">
+              <v-container>
+                <Toc></Toc>
+              </v-container>
             </div>
-
           </v-col>
-          <v-col>
-           <main>
+          <v-col class="v-col-lg-6 v-col-auto">
+            <main>
               <ContentRenderer :value="doc"/>
-           </main>
+            </main>
           </v-col>
-          <v-col cols="3"></v-col>
+
         </v-row>
-
-
       </v-container>
     </article>
     <v-container>
       <div class="mt-5">
-          <span>
-      <v-chip class="text-h4"
-              style="background-color: rgba(239, 83, 80, 0.13)"
-              variant="text"
-              size="x-large"
-              @click="console.log('yo')">🦧</v-chip>
-      <v-chip class="text-h4" variant="text" size="x-large" @click="console.log('yo')">🗣🔥🔥</v-chip>
-      <v-chip class="text-h4" variant="text" size="x-large" @click="console.log('yo')">🤔</v-chip>
-      <v-chip class="text-h4" variant="text" size="x-large" @click="console.log('yo')">🖕</v-chip>
-    </span>
+<!--        <span>-->
+<!--      <v-chip class="text-h4"-->
+<!--              style="background-color: rgba(239, 83, 80, 0.13)"-->
+<!--              variant="text"-->
+<!--              size="x-large"-->
+<!--              @click="console.log('yo')">🦧</v-chip>-->
+<!--          <v-chip class="text-h4" variant="text" size="x-large" @click="console.log('yo')">🗣🔥🔥</v-chip>-->
+<!--          <v-chip class="text-h4" variant="text" size="x-large" @click="console.log('yo')">🤔</v-chip>-->
+<!--          <v-chip class="text-h4" variant="text" size="x-large" @click="console.log('yo')">🖕</v-chip>-->
+<!--        </span>-->
       </div>
     </v-container>
   </ContentDoc>
@@ -101,5 +76,10 @@ main ul {
   background: rgb(52, 56, 65);
   padding: .25rem .30rem;
   border-radius: 10px;
+}
+
+#toc-title {
+  font-size: 20px;
+  font-weight: bold;
 }
 </style>
