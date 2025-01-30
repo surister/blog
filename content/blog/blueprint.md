@@ -3,9 +3,10 @@ title: 'Blueprint /  Demo'
 image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-photo-of-a-cat-sitting-on-top-of-some-rocks.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
 description: 'Blueprint showcasing available components'
 tags: [ 'python', 'Antlr4', 'software' ]
-authors: [{'name': 'Ivan', 'job_title': 'Monologue Expert'}, {'name': 'Anon'}]
-comment_links: [{'name': 'reddit', 'href': ''}, {'name': 'hacker news', 'href': ''}]
+authors: [ { 'name': 'Ivan', 'job_title': 'Monologue Expert' }, { 'name': 'Anon' } ]
+comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
 ---
+
 ## [- Text]{.text-red .text-h2}
 
 [Antlr4]{.h} highlighted
@@ -50,12 +51,23 @@ Normal table
 </pre>
 ::
 
+:MaT{text="R(\name, \age, \isalive)" .text-h6 .mt-5}
+
+<div class="text-h6 ct">
+
+| Syntax                                   | SQL          | EXAMPLE                                          | Example SQL                          |
+|------------------------------------------|--------------|--------------------------------------------------|--------------------------------------|
+| :MaT{text="\sigma_{predicate}(R)"}       | WHERE        | :MaT{text="\sigma_{{age > 20} ∧ name=json}(R)"}  | ... WHERE age > 20 AND name = 'JSON' |
+| :MaT{text="\pi_{a_i, a_2, ..., a_n}(R)"} | SELECT       | :MaT{text="\pi_{name, age - 1}(R)"}              | SELECT name, age - 1 FROM R          
+| :MaT{text="A \cup B"}                    | UNION        | (SELECT * FROM R) UNION (SELECT * FROM S)        |
+| :MaT{text="A \cup B"}                    | INTERSECTION | (SELECT * FROM R) INTERSECT (SELECT * FROM S)    |
+| :MaT{text="A \cup B"}                    | DIFERENCE    | (SELECT * FROM R) EXCEPT (SELECT * FROM S)       |
+| :MaT{text="A x B"}                       | PRODUCT      | SELECT * FROM R CROSS JOIN S; SELECT * FROM R, S |
+</div>
+
+:Der{r="4" link="https://github.com/antlr/antlr4/blob/master/doc/targets.md"}
 
 ## [- Images]{.text-red .text-h2}
-
-::CustomImage{src="https://deadline.com/wp-content/uploads/2024/07/MCDSHRE_EC025.jpg?w=681&h=383&crop=1" label="Label of meme" width="400" marginTop="15"}
-
-::
 
 ::CustomImage
 ---
@@ -67,11 +79,12 @@ Normal table
 ::
 
 ## [- External link]{.text-red .text-h2}
-:elink{type="language-python" text="antlr4-tools" url="https://github.com/antlr/antlr4/blob/master/doc/getting-started.md" .mt-5}
 
+:elink{type="language-python" text="antlr4-tools" url="https://github.com/antlr/antlr4/blob/master/doc/getting-started.md" .mt-5}
 :elink{type="star" text="Nasa" url="https://nasa.gov" .ml-5 .mt-5 color="yellow"}
 
 ## [- Editor with output]{.text-red .text-h2}
+
 ::Editor{hasResult="true"}
 <pre>
 SELECT * FROM sometable</pre>
@@ -134,6 +147,7 @@ I'm on a strike! :Ref{r="4"}
 :Der{r="4" link="https://github.com/antlr/antlr4/blob/master/doc/targets.md"}
 
 ## [- Separator]{.text-red .text-h2}
+
 ::Sep
 ::
 
