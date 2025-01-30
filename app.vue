@@ -2,7 +2,7 @@
   <v-toolbar color="#121212">
     <template #title>
       <v-row justify="center">
-        <v-col class="v-col-lg-6 v-col-auto ml-15">
+        <v-col class="v-col-lg-4 v-col-auto ml-15">
           <h3 class="font-weight-bold text-uppercase"><a href="/">Surister's dev blog</a></h3>
         </v-col>
 
@@ -24,7 +24,10 @@
 body {
   background-color: #121212;
 }
-
+* {
+  font-family: Rubik, serif;
+  font-weight: 300;
+}
 </style>
 <script setup lang="ts">
 </script>
