@@ -1,39 +1,49 @@
 <script setup lang="ts">
+let cratedb_blogs = [
+  {
+    title: 'Doing Hybrid Search in CrateDB',
+    path: 'https://cratedb.com/blog/hybrid-search-explained',
+    date: '2024-07-22'
+  },
+  {
+    title: 'Dissecting a Hybrid Search query',
+    path: 'https://cratedb.com/blog/dissecting-a-hybrid-search-query-in-sql',
+    date: '2024-08-30'
+  }
+]
 
+let debug = true;
 </script>
 
 <template>
-  <div style="background-color: #EF5350; height: 20px"></div>
-  <v-container>
-    <h2>Last entries</h2>
-    <ContentList path="/blog/" v-slot="{ list }">
-      <v-card v-for="article in list"
-              :key="article._path"
-              variant="outlined"
-              link
-              :href="article._path"
-              elevation="10"
-              class="my-4 pa-5">
-        <v-row no-gutters>
-          <v-col cols="3" align-self="center">
-            <v-img
-                aspect-ratio="16/9"
-                cover
-                :src="article.image"/>
-          </v-col>
-          <v-col cols="9">
-            <v-card-title>{{ article.title }}</v-card-title>
-            <v-card-subtitle>
-              <v-chip v-for="tag in article.tags" class="mr-1" variant="outlined">{{ tag }}</v-chip><br>
-            </v-card-subtitle>
-            <div class="mt-3 ml-5"><span style="color: #EF5350">24-2-2002</span></div>
-            <v-card-text style="padding-top: .50rem !important;">
-              {{ article.description }}
-            </v-card-text>
-          </v-col>
-        </v-row>
-      </v-card>
-    </ContentList>
+  <div style="background-color: #EF5350; height: 10px"></div>
+  <v-container fluid class="pt-15">
+    <v-row no-gutters>
+      <v-col offset-md="1" offset-lg="4" offset-xl="1" offset-xxl="1">
+        <h2>Last entries</h2>
+        <ContentList path="/blog/" v-slot="{ list }">
+          <div v-for="article in list">
+            <template v-if="article.published || debug">
+              🗒️ <span class="text-red text-subtitle-1 ml-1">2025/01/01</span>
+              <elink :text="article.title" :url="article._path"></elink>
+            </template>
+          </div>
+        </ContentList>
+      </v-col>
+
+    </v-row>
+
+    <!--    CrateDB Section-->
+    <v-row no-gutters class="pt-5">
+      <v-col offset-md="1" offset-lg="4" offset-xl="1" offset-xxl="1">
+        <h2>CrateDB blog</h2>
+        <div v-for="article in cratedb_blogs">
+          🗒️ <span class="text-blue text-subtitle-1 ml-1">{{ article.date }}</span>
+          <elink :text="article.title" :url="article.path"></elink>
+        </div>
+      </v-col>
+    </v-row>
+
   </v-container>
 </template>
 
