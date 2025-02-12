@@ -27,11 +27,6 @@ export default defineNuxtConfig({
       theme: {
         defaultTheme: "dark",
         themes: {
-          darku: {
-            colors: {
-              background: "#09090b"
-            }
-          },
           dark: {
             colors: {
               background: "#1c1b22",
