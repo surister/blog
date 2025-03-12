@@ -21,9 +21,9 @@ jobs:
         with:
             command: |
               cd ${{ secrets.DEPLOYMENT_PROJECT_PATH }} 
-              git pull origin master
+              git reset --hard origin/master
   
-              docker compose down
+              docker compose -f ./deploy/docker-compose.yml down
               docker run -v $PWD:/build --workdir /build node npm install
               docker run -v $PWD:/build --workdir /build node npm run build
               docker compose -f ./deploy/docker-compose.yml up -d
