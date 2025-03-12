@@ -7,23 +7,23 @@ import Header from "~/components/slug/Header.vue";
     <article>
       <v-container fluid>
         <v-row>
-          <v-col class="v-col-lg-5 v-col-auto offset-lg-4">
+          <v-col class="v-col-xxl-3 v-col-xl-3 v-col-lg-3 v-col-md-3 v-col-xs-auto v-col-sm-12"></v-col>
+          <v-col class="v-col-lg-6 v-col-auto">
             <Header :doc="doc"></Header>
           </v-col>
         </v-row>
       </v-container>
 
       <v-container fluid>
-        <v-row no-gutters>
-          <v-col class="v-col-xxl-3 v-col-xl-3 v-col-lg-3 v-col-md-3 v-col-xs-auto v-col-sm-12">
+        <v-row no-gutters class="justify-md-center justify-start justify-lg-start">
+          <v-col class="v-col-xxl-3 v-col-xl-3 v-col-lg-3 v-col-md-3 v-col-xs-auto v-col-sm-12 ">
             <div style="top: 50px" class="position-sticky">
               <v-container>
                 <Toc></Toc>
               </v-container>
             </div>
           </v-col>
-          <v-col class="v-col-xl-auto v-col-lg-6 v-col-md-auto v-col-sm-12 v-col-xs-12"
-                 offset-md="1" offset-lg="1" offset-xl="1" offset-xxl="1">
+          <v-col class="v-col-xl-auto v-col-lg-7 v-col-md-auto v-col-sm-12 v-col-xs-12">
             <v-alert
                 v-if="!doc.published"
                 density="compact"
@@ -35,6 +35,7 @@ import Header from "~/components/slug/Header.vue";
               <ContentRenderer :value="doc"/>
             </main>
           </v-col>
+          <v-col class="v-col-xxl-3 v-col-xl-3 v-col-lg-3 v-col-md-3 v-col-xs-auto v-col-sm-12"></v-col>
         </v-row>
       </v-container>
     </article>
