@@ -12,7 +12,6 @@ let cratedb_blogs = [
   }
 ]
 
-let debug = true;
 </script>
 
 <template>
@@ -23,7 +22,7 @@ let debug = true;
         <h2>Last entries</h2>
         <ContentList path="/blog/" v-slot="{ list }">
           <div v-for="article in list">
-            <template v-if="article.published || debug">
+            <template v-if="article.published || article.show_preview">
               🗒️ <span class="text-red text-subtitle-1 ml-1">2025/01/01</span>
               <elink :text="article.title" :url="article._path"></elink>
             </template>
