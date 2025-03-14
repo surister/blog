@@ -22,7 +22,7 @@ watch(route, (to) => {
   <p :class="{highlighted: '#'+ r === current_hash, 'references': true}"
      style="margin-top: 0; font-size: 15px">
     <span :id="r" class="text-subtitle-1 font-weight-bold" style="color: #EF5350">[{{ r }}]</span>
-    {{ link }}
+    <a :href="link" target="_blank">{{ link }}</a>
   </p>
 </template>
 
