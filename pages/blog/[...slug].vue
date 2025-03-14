@@ -95,7 +95,7 @@ main ul {
 .h {
   font-size: 19px;
   background: rgb(52, 56, 65);
-  padding: .20rem .25rem;
+  padding: .05rem .20rem;
   border-radius: 5px;
 }
 
