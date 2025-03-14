@@ -7,7 +7,9 @@ const props = defineProps({
     type: String,
     default: "info"
   },
-  alert_icon: {},
+  icon: {
+    type: String
+  },
   alert_bd_color: {},
   e_link: {
     type: String
@@ -17,24 +19,23 @@ const props = defineProps({
 
 <template>
   <v-banner
-      class="my-4 text-subtitle-1"
+      class="my-4"
+      :bg-color="alert_type"
+      :icon="icon"
+      :lines="author ? 'four' : 'one'"
       elevation="5"
       rounded
-      density="compact"
-      :bg-color="alert_type"
-      :icon="alert_icon">
-    <template #prepend>
-      <v-icon size="45">mdi-format-quote-close</v-icon>
-    </template>
-    <template #text>
-      <p>{{ text }}</p>
-      <p class="font-weight-bold font-italic">{{ author }}</p>
-    </template>
+  >
+      <v-banner-text >
+        <span class="font-weight-bold text-subtitle-1">{{ text }}</span>
+        <p class="font-weight-bold font-italic" v-if="author">{{ author }}</p>
+      </v-banner-text>
 
-    <template v-slot:actions v-if="src">
-      <v-btn prepend-icon="mdi-open-in-new" :href="src">Source</v-btn>
-    </template>
-  </v-banner>
+      <template v-slot:actions v-if="src">
+        <v-btn prepend-icon="mdi-open-in-new">SOURCE</v-btn>
+      </template>
+    </v-banner>
+
 
 </template>
 
