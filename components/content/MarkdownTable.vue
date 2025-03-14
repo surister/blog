@@ -29,7 +29,7 @@ function get_rows(){
   </template>
   <template v-else-if="type === 'table'">
     <div style="height: 13px; background: #EF5350" v-if="hasTop"></div>
-    <v-table height="300px"
+    <v-table style="max-height: 300px"
              :class="[hasBottom ? 'rounded-b-lg' : '']"
              fixed-header>
       <thead>
