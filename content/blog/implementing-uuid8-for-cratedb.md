@@ -21,10 +21,10 @@ published: false
 CrateDB is a distributed SQL Database. This means that unlike your good old Postgres instance, which
 only has one node, CrateDB forms clusters; two or more nodes will join up, communicate and work
 together. Everytime you select data, the work will be split among the nodes, this and many other 
-https://cratedb.com/docs/guide/feature/index.html features make queries in CrateDB extremely fast
+ :alink{text="features" url="https://cratedb.com/docs/guide/feature/index.html"} make queries in CrateDB extremely fast
 on huge tables. 
 
-One advantage of having several nodes with their own copy of the data is HA (High Availability.) 
+CrateDB follows a shared nothing architecture, every node has its own copy of the data, one advantage of this is HA (High Availability.) 
 If a meteor hits the datacenter where you are hosting a node, other nodes in other datacenters can survive, your
 application (with slower queries) will still work and still be able to make the Monday's deadline.
 
@@ -44,7 +44,7 @@ One drawback of distributed databases (specifically those with share-nothing arc
 keeping all data in sync is a challenge, since insert/updates can happen at different rates in different nodes.
 
 One effect of this is the typical lack of monotonically increasing ids, commonly known as 
-[AUTO-INCREMENT]{.h} that is a table's column which every time a new row is inserted, the column's value
+[AUTO-INCREMENT]{.h}; that is a table's column which every time a new row is inserted the column's value
 gets incremented monotonically (usually by 1), it is extremely common in the SQL world.
 
 One example you might be familiar with is the [SERIAL]{.h} datatype in postgres,
@@ -78,8 +78,8 @@ SELECT * FROM sometable</pre>
 </pre>
 ::
 
-As you can see, id was incremented by one, every time we inserted a row.
-This is possible because the database keeps track of the count with a counter, (called sequences in Postgres).
+As you can see, id was incremented by one every time we inserted a row.
+This is possible because the database keeps track of the count with a counter (called sequences in Postgres).
 
 But in our distributed world every insert has to be executed in every node,
 in order for the nodes to increase the id correctly, they would need to communicate to keep their
@@ -88,25 +88,24 @@ and performance would be impacted, defeating the purpose of using a distributed 
 
 
 ## [Hunting for uniqueness in Primary Keys]{.text-h4}
-By definition, primary keys need to be unique and not null (since we need to identify every row uniquely)
-and we cannot use one of the simplest and most effective ones: auto-increment. What do we use then?
+By definition, primary keys need to be unique and not null since we need to identify every row uniquely,
+and we cannot use one of the simplest and most effective ones: [AUTO-INCREMENT]{.h}. What do we use then?
 
-Throughout the years, many different ways of creating unique IDs have been developed, mostly using a
+Throughout the years, many different ways of creating uncoordinated unique IDs have been developed, mostly using a
 combination of random data, timestamps, metadata (thread number, MAC address, proc id) and counters:
 
-Creation timestamp, random data, creation timestamp + machine id + increment
+Creation timestamp (simple created_at), random data, creation timestamp + machine id + increment
 (:alink{text="Twitter's snowflake" url="https://github.com/twitter-archive/snowflake"}), 
 creation timestamp + random (:alink{text="Ulid" url="https://github.com/ulid/spec"})...
 
 While many engineers and companies have developed their own way of creating unique IDs, the internet 
-task force is the 'official' body that takes care of promoting and publishing RFCS (standards).
-They have one for uniquely creating IDs, called 'UUID' (Universally Unique Identifier).
+task force, the 'official' body that takes care of promoting and publishing RFCS (standards) has
+their take on it: [UUID]{.h} (Universally Unique Identifier).
 
-# can we do ranges in https://github.com/crate/crate/issues/5845?
 
-## [Ids based on timestamp are amazing]{.text-h4}
+## [Sortable Ids are amazing]{.text-h4}
 Okey, primary keys have to be unique, but there is another amazing property that we lose by not being
-able to use auto-increment fields is [sortability]{.h}
+able to use auto-increment fields is [sortability]{.h} TODO EXPLAIN
 
 
 ## [Understanding UUIDs]{.text-h4}
@@ -179,7 +178,7 @@ the commonality between versions is the position of the version bit (48 to 51) a
 4. 4 [variant]{.h} [64, 65\] is the variant type.
 5. 5 [random_c]{.h} [66, 127\] is random data.
 
-Another simple way to visualize it, its just to paint the inclusive first bit number of every group.
+Another simple way to visualize it, is just to paint the inclusive first bit number of every group.
 
 ::CustomImage
 ---
@@ -187,9 +186,6 @@ Another simple way to visualize it, its just to paint the inclusive first bit nu
 "marginTop": "15"
 ---
 ::
-
-
-
 
 ## [What UUIDs is CrateDB using?]{.text-h4}
 CrateDB uses three different kinds :Ref{r="1"} of UUIDs in different places:
@@ -208,10 +204,32 @@ ElasticFlakes, UUID4 and DirtyUUID.
 As it names implies, this implementation is inherited from the Open Source days of elasticsearch :Ref{r="2"}
 they are a time based id optimized for Apache Lucene, the underlining library in which both CrateDB and Elasticsearch are based on.
 
-The [elasticflake]{.h}, is used to generate an [_id]{.h} :Ref{r="3"} for every row, and for the scalar function
+The [elasticflakes]{.h}, is used to generate a [_id]{.h} :Ref{r="3"} for every row, and for the scalar function
 [gen_random_text_uuid()]{.h} :Ref{r='4'}. Interesting enough, the documentation for the scalar
 says that it returns an 'ID' similar to flake IDs. Flake IDs :Ref{r='5'} are supposed to be time-based,
-but the name of the function has 'random' in it, an unfortunate name,
+but the name of the function has 'random' in it, an unfortunate name.
+
+An elasticflake has 120 bits, divided in 15 octets or bytes.
+
+It's composed of a random data + timestamp + mac address, divided in 6 groups:
+
+1. [random_a]{.h} [0, 15\] is random data, the LSB and MSF of the random long.
+2. [timestamp_a]{.h} [16, 47\] is timestamp, the minutes-years part of the timestamp in millis, (also bits 16-40).
+3. [metadata_a]{.h} [48, 95\] is randomized mac address.
+4. [timestamp_b]{.h} [96, 103\] is timestamp, the seconds part of the timestamp in millis
+5. [random_b]{.h} [104, 111\] is random data, the middle byte of the random long.
+6. [timestamp_c]{.h} [112, 119\] is timestamp, the LSB byte of the timestamp in millis, the milliseconds part.
+
+Resulting in:
+
+::CustomImage
+---
+"src": "/img/uuid/elasticflake.svg"
+"marginTop": "15"
+---
+::
+
+The flake is then converted to [base64]{.h}.
 
 Since they are time-based flakes, one would expect that you could sort and filter on them, but to my surprise, they are not. 
 
@@ -372,14 +390,26 @@ where inserted_at > 1741900214566</pre>
 </pre>
 ::
 
-We can clearly see that we are we cannot properly filter nor order by the elasticflake we are using.
+We can clearly see that we cannot properly filter nor order by the elasticflakes. Digging in the git logs
+I found a PR for https://github.com/crate/crate/issues/5845, so at least we know that at some point
+in the past it was possible.
 
+Probably the reason why it cannot be sorted, is that the flake is being transformed to base64, and
+base64
+
+# [Problems]{.text-h1}
 # This one is very interesting on how it works:
 # https://github.com/crate/crate/commit/c76a4a298de849be05b8c0a1b86b74a78b9a590c
-# 
 
-
-
+- why almost all characters in the flake look identical but the first ones, thile the last three bytes should be different
+if I manually create several flakes in another programs, the last parts of the flakes are different, as expected, why in cratedb are the same?
+it it because the synchronized? Test: log in cratedb the different parts of the flake, and insert serveral
+  - sequenceNumber is the same for the life of the program? i think so as its a class variable
+- why can we sort in base64?
+- why cant I sort on long tables?
+  - small sized rows it seems to work, only not in long tables <- test this more
+- elastic https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html
+- https://discuss.elastic.co/t/sort-by-id-field/169017/2
 
 
 :Der{r="1" link="https://github.com/crate/crate/blob/master/server/src/main/java/org/elasticsearch/common/UUIDs.java"}
@@ -387,3 +417,7 @@ We can clearly see that we are we cannot properly filter nor order by the elasti
 :Der{r="3" link="https://github.com/crate/crate/blob/79ff2217dde45d6a748b0f31b36c95a7b252878c/server/src/main/java/io/crate/analyze/Id.java#L48"}
 :Der{r="4" link="https://github.com/crate/crate/blob/master/server/src/main/java/io/crate/expression/scalar/GenRandomTextUUIDFunction.java"}
 :Der{r="5" link="https://github.com/boundary/flake"}
+
+CREATE TABLE test (ts TIMESTAMP);
+INSERT INTO test (ts) VALUES ('2017-01-01'), ('2017-01-02'), ('2017-01-03'), ('2017-01-04'), ('2017-01-05'), ('2017-01-06');
+SELECT ts, _id FROM test ORDER BY _id LIMIT 1;
