@@ -1,5 +1,5 @@
 ---
-title: 'Implementing uuid8 for CrateDB'
+title: 'Implementing the CratyFlake, a time-based sortable UUID for CrateDB.'
 image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-photo-of-a-cat-sitting-on-top-of-some-rocks.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
 description: 'Blueprint showcasing available components'
 tags: [ 'python', 'Antlr4', 'software' ]
@@ -9,23 +9,42 @@ published: false
 #comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
 ---
 
-1. explain briefly distributed database/cratedb
-2. explain why we need unique primary keys (also mention how nice it'd be to have sortable stuff)
+Title: Implementing the CrateFlake a time-based unique token for CrateDB
+0. Introduction: What are you going to read in this blogpost
+1. Explain what a distributed database is - Introduce CrateDB.
+2. Explain why 
 3. explain what UUID is
 4. limitations on cratedb _id field and generate_uuid4 (how can we sort/can we sort on _id? how is _id generated)
-5. propose UUID7  or UUID8 as solutions
+5. propose cratyflake 
 6. try UUID7/UUID8 IN CLIENT
 
+0. Introduction
+1. Distributed databases and a problem of them
+2. Uuuids as solutions of that problem
+3. My own proposal
+this is introduction
 
-## [The distributed nature of CrateDB.]{.text-h4}
+## [Introduction]{.text-h4}
+Distribute databases are very complex with additional layers of challenges compared to traditional databases.
+In this blog we will explore one of those challenges: uniquely identifying a row.
+We will also propose a custom UUID for CrateDB the 'CratyFlake'.
+
+By the end of the post I hope you will have a better understanding of distributed databases and the
+role of UUIDs.
+
+If you are already well-versed in Databases and just want to read about the Crateyflake, jump [here]
+
+## [About databases]{.text-h3 .text-red}
+
+### [The distributed nature of CrateDB.]{.text-h4}
 CrateDB is a distributed SQL Database. This means that unlike your good old Postgres instance, which
 only has one node, CrateDB forms clusters; two or more nodes will join up, communicate and work
 together. Everytime you select data, the work will be split among the nodes, this and many other 
  :alink{text="features" url="https://cratedb.com/docs/guide/feature/index.html"} make queries in CrateDB extremely fast
 on huge tables. 
 
-CrateDB follows a shared nothing architecture, every node has its own copy of the data, one advantage of this is HA (High Availability.) 
-If a meteor hits the datacenter where you are hosting a node, other nodes in other datacenters can survive, your
+CrateDB follows a shared nothing architecture where every node has its own copy of the data,
+one advantage of this is HA (High Availability.) If a meteor hits the datacenter where you are hosting a node, other nodes in other datacenters can survive, your
 application (with slower queries) will still work and still be able to make the Monday's deadline.
 
 ::Alert
@@ -45,7 +64,7 @@ keeping all data in sync is a challenge, since insert/updates can happen at diff
 
 One effect of this is the typical lack of monotonically increasing ids, commonly known as 
 [AUTO-INCREMENT]{.h}; that is a table's column which every time a new row is inserted the column's value
-gets incremented monotonically (usually by 1), it is extremely common in the SQL world.
+gets incremented monotonically (usually by 1).
 
 One example you might be familiar with is the [SERIAL]{.h} datatype in postgres,
 
@@ -87,43 +106,146 @@ counters in sync, in a read-heavy scenario would mean massive inter-node communi
 and performance would be impacted, defeating the purpose of using a distributed database.
 
 
-## [Hunting for uniqueness in Primary Keys]{.text-h4}
-By definition, primary keys need to be unique and not null since we need to identify every row uniquely,
-and we cannot use one of the simplest and most effective ones: [AUTO-INCREMENT]{.h}. What do we use then?
+### [The need for uniqueness]{.text-h4}
+In databases we often need to uniquely identify every row. Primary keys are used for that.
 
-Throughout the years, many different ways of creating uncoordinated unique IDs have been developed, mostly using a
-combination of random data, timestamps, metadata (thread number, MAC address, proc id) and counters:
+By definition, primary keys need to be unique and not null, and we cannot use one of the simplest 
+and most effective ones: [AUTO-INCREMENT]{.h}. What do we use then?
 
-Creation timestamp (simple created_at), random data, creation timestamp + machine id + increment
-(:alink{text="Twitter's snowflake" url="https://github.com/twitter-archive/snowflake"}), 
-creation timestamp + random (:alink{text="Ulid" url="https://github.com/ulid/spec"})...
+Throughout the years, many different ways of creating uncoordinated unique IDs have been developed,
+mostly using some combination of:
+
+- pseudo-random data
+- timestamps
+- metadata (thread number, MAC address, process id)
+- counters
+
+For example:
+
+- creation timestamp (simple created_at field in a table)
+- random data (UUID4)
+- creation timestamp + machine id + increment
+(:alink{text="Twitter's snowflake" url="https://github.com/twitter-archive/snowflake"})
+- creation timestamp + random (:alink{text="Ulid" url="https://github.com/ulid/spec"})
 
 While many engineers and companies have developed their own way of creating unique IDs, the internet 
-task force, the 'official' body that takes care of promoting and publishing RFCS (standards) has
+task force, the 'official' body that takes care of promoting and publishing RFCS (standards) have
 their take on it: [UUID]{.h} (Universally Unique Identifier).
 
 
-## [Sortable Ids are amazing]{.text-h4}
-Okey, primary keys have to be unique, but there is another amazing property that we lose by not being
-able to use auto-increment fields is [sortability]{.h} TODO EXPLAIN
+### [Sortable Ids are amazing]{.text-h4}
+Being unique is the bare minimum requirement, but there is another property that we lose by
+not being able to use an AUTO-INCREMENT id: [Sortability]{.h}.
+
+Having an id that is sortable, does not only allow you to use [ORDER BY id]{.h} statements, which 
+can be useful in presenting some queries, but enables aggregations like [min]{.h} and [max]{.h} that
+allow you to do very cool stuff.
+
+For example :alink{text="connector-x" url="https://github.com/sfu-db/connector-x"} is one of the
+fastest way to load data from databases to dataframes, it works by issuing 
+[SELECT MIN(field), MAX(field) FROM table]{.h}, and computing different 'buckets'. It then issues several
+[select * from table where field > (rows_per_partitions * bucketn) and field < (rows_per_partitions * bucketn + 1) ]{.h}
+statements in different threads concurrently.
+
+While this technique might not make too much sense in CrateDB to get data 'faster,'
+we can use the same technique to create a pseudo-paginator for a table, which is useful when
+batch-processing large tables.
+
+An example of this in Python:
+
+::Editor{lang='python'}
+<pre>
+class BatchedTable:
+    def __init__(self,
+                 table_name: str,
+                 id_column: str,
+                 flat: bool,
+                 chunk_size: int = 2048):
+        self.table_name = table_name
+        self.id_column = id_column
+
+        self.flat = flat
+        self.chunk_size = chunk_size
+        self.chunk_bucket = 1
+        self.connection = client.connect('http://localhost:4200')
+        self.cursor = self.connection.cursor()
+
+    def query_for(self):
+        return (
+          f'select * from {self.table_name}'
+          f' where'
+          f' {self.id_column} >'
+          f' {(self.chunk_bucket - 1) * self.chunk_size} and'
+          f' {self.id_column} <='
+          f' {((self.chunk_bucket) * self.chunk_size)} order by'
+          f' {self.id_column}'
+        )
+
+    def __iter__(self):
+        while True:
+            query = self.query_for()
+            self.cursor.execute(query)
+            self.chunk_bucket += 1
+            result = self.cursor.fetchall()
+
+            if len(result) < self.chunk_size:
+                return
+
+            if self.flat:
+                for l in result:
+                    yield l
+            else:
+                yield result
 
 
-## [Understanding UUIDs]{.text-h4}
+def table(table_name: str,
+          batch_size: int = 10_000,
+          id_column: str = 'row_number',
+          flat: bool = True):
+    return BatchedTable(table_name=table_name,
+                        id_column=id_column,
+                        flat=flat,
+                        chunk_size=batch_size)
+
+if __name__ == '__main__':
+    for rows in table('search3', batch_size=1000, flat=False):
+        print(rows)
+
+    # [(...),...] 1k rows
+    # [(...),...] 1k rows
+    # [(...),...] 1k rows
+    # [(...),...] 1k rows
+    ...</pre>
+::
+[table]{.h} will exhaust the whole table without hitting out of memory on large tables, this depends
+on a sortable id that we need to implement ourselves doing some pre-data processing to our table, for example
+using the window function [row_number()]{.h}. If our unique IDs were also sortable, we would have
+this feature for free.
+
+## [About unique IDs]{.text-h3 .text-red .mt-5}
+Now we have more context of the challenge of uniquely identifying rows in distributed databases. 
+Before jumping into what CrateDB does and how can we improve it, let's try to understand the
+most popular and used ones [UUIDs]{.h}.
+
+If you understand them at a fundamental level, you will understand every form of IDs there is,
+even if they have different size and components, it's all the same at the core.
+
+### [Understanding UUIDs]{.text-h4}
 There are eight versions of UUID, in May 2024 we finally got published the :alink{text="finished stable version" url="https://www.rfc-editor.org/rfc/rfc9562.html"}
 where version 7 and 8 were added, every version creates the UUID differently, and each version has different
 use cases.
 
-The first versions 1-4 have historically been used in distributed systems but 
-they were not enough for many systems, hence why we have so many variants. As the newest versions (7-8)
-are pretty much based on these variants.
+The first versions 1–4 have historically been used in distributed systems, as distributed system
+evolved, so did the requirements for the IDs, hence the new variants. 
 
-You have probably seen them many times already, they are those long IDs separated by dashes that look like `51000350-1197-4f2e-bcef-ca8bc5e11b51`{.h .text-subtitle-2} (uuid4).
+You have probably seen them many times already, they are those long IDs separated by dashes that
+look like `51000350-1197-4f2e-bcef-ca8bc5e11b51`{.h .text-subtitle-2} (UUID4).
 
-A UUID has 128 bits.
+An UUID has 128 bits.
 ::CustomImage
 ---
 "src": "/img/uuid/128.svg"
-"label": "Bits of an UUID"
+"label": "Bits of an UUID 4"
 "marginTop": "15"
 ---
 ::
@@ -138,18 +260,28 @@ The 128 bits are further split in 16 octets or bytes. Counting from 0 to 15.
 ---
 ::
 
-The UUID can be represented as binary data or integers.
+This is at the core, what an UUID is, and the different versions just dictate how we generate these octets.
 
-The integer representation of the image's UUID is `164584730332688677464161912706729264512`{.h .text-subtitle-2}
-(from base 2 to base 10). 
+We can represent it in different data 'types', depending on the system, these types will 
+tipically be just the data represented in different numerical bases:
 
-What you usually see is the base 16 of the integer (hex) with dashes.
+* Base 2 (binary): See image
+* Base 10 (u128): `164584730332688677464161912706729264512`{.h}
+* Base 16: `0x7bd1ddb5b15c4b68a507fd4ceb984580`{.h}
+* Base 16 with dashes: `7bd1ddb5-b15c-4b68-a507-fd4ceb984580`{.h}
+* Base64: `e9HdtbFcS2ilB/1M65hFgA==`{.h}
 
-Hex: `0x7bd1ddb5b15c4b68a507fd4ceb984580`{.h .text-subtitle-2}
+What you usually see and the default representation implementation for UUIDS is the base 16 of 
+the bytes (hex) with dashes.
 
-Hex and dashes: `7bd1ddb5-b15c-4b68-a507-fd4ceb984580`{.h .text-subtitle-2}
 
-To give you a clearer look at how everything comes together, let's see the hex value of every octet:
+To give you a clearer look at how everything comes together, let's see the base16 (hex) value of every octet,
+you can try this yourself in Python with:
+
+::Editor{lang='python'}
+<pre>>>> hex(0b1111011) # The first octet
+'0x7b'</pre>
+::
 
 ::CustomImage
 ---
@@ -160,10 +292,9 @@ To give you a clearer look at how everything comes together, let's see the hex v
 
 Now, the difference between UUID versions is what we decide what these groups of bits will be. 
 
-The bits are split in five groups of bits (except version 1 and 6 that have 6 groups),
-the commonality between versions is the position of the version bit (48 to 51) and variant (bit 64 to 65)
+The bits are split in groups of bits, there are common groups between versions: the position of the version bit (48 to 51) and variant (bit 64 to 65)
 
-[UUID4]{.h} goes as follows:
+[UUID4]{.h} has 5 groups of bits:
 
 ::CustomImage
 ---
@@ -187,9 +318,9 @@ Another simple way to visualize it, is just to paint the inclusive first bit num
 ---
 ::
 
-## [What UUIDs is CrateDB using?]{.text-h4}
-CrateDB uses three different kinds :Ref{r="1"} of UUIDs in different places:
-ElasticFlakes, UUID4 and DirtyUUID.
+### [What UUIDs is CrateDB using?]{.text-h4}
+CrateDB uses three different kinds :Ref{r="1"} of unique IDs in different places:
+[ElasticFlakes]{.h}, [UUID4 in base64]{.h} and [DirtyUUID]{.h}.
 
 ::Alert
 ---
@@ -201,26 +332,28 @@ ElasticFlakes, UUID4 and DirtyUUID.
 ::
 
 ### [ElasticFlakes]{.text-h5}
-As it names implies, this implementation is inherited from the Open Source days of elasticsearch :Ref{r="2"}
+As it names implies, this implementation is inherited from the Open Source days of [elasticsearch]{.h} :Ref{r="2"}
 they are a time based id optimized for Apache Lucene, the underlining library in which both CrateDB and Elasticsearch are based on.
 
 The [elasticflakes]{.h}, is used to generate a [_id]{.h} :Ref{r="3"} for every row, and for the scalar function
 [gen_random_text_uuid()]{.h} :Ref{r='4'}. Interesting enough, the documentation for the scalar
-says that it returns an 'ID' similar to flake IDs. Flake IDs :Ref{r='5'} are supposed to be time-based,
-but the name of the function has 'random' in it, an unfortunate name.
+says that it returns an 'ID' similar to flake IDs. 
+
+Flake IDs :Ref{r='5'} are supposed to be 128 bits and k-ordered,
+but the name of the function has 'random' in it, an unfortunate name since its confusing on what it
+actually is.
 
 An elasticflake has 120 bits, divided in 15 octets or bytes.
 
-It's composed of a random data + timestamp + mac address, divided in 6 groups:
+It's composed of a [random data]{.h} + [timestamp]{.h} + [mac address]{.h}, divided in 6 groups:
 
 1. [random_a]{.h} [0, 15\] is random data, the LSB and MSF of the random long.
-2. [timestamp_a]{.h} [16, 47\] is timestamp, the minutes-years part of the timestamp in millis, (also bits 16-40).
+2. [timestamp_a]{.h} [16, 47\] is timestamp, the minutes-years part of the timestamp in millis.
 3. [metadata_a]{.h} [48, 95\] is randomized mac address.
 4. [timestamp_b]{.h} [96, 103\] is timestamp, the seconds part of the timestamp in millis
 5. [random_b]{.h} [104, 111\] is random data, the middle byte of the random long.
 6. [timestamp_c]{.h} [112, 119\] is timestamp, the LSB byte of the timestamp in millis, the milliseconds part.
 
-Resulting in:
 
 ::CustomImage
 ---
@@ -229,11 +362,12 @@ Resulting in:
 ---
 ::
 
-The flake is then converted to [base64]{.h}.
+The flake is then converted to [base64]{.h} using an alphabet that is URL safe, the default
+alphabet uses '/' as an encoding character, meaning you could not use it as an url query parameter.
 
-Since they are time-based flakes, one would expect that you could sort and filter on them, but to my surprise, they are not. 
+Since they are time-based ids, one would expect that you could sort and filter on them, but they are not. 
 
-To test this I created the following table:
+To test this, you can create the following table:
 
 ::Editor{lang='sql'}
 <pre>
@@ -244,7 +378,7 @@ create table t (
 )</pre>
 ::
 
-The insert is:
+Then insert:
 
 ::Editor{lang='sql'}
 <pre>insert into t22 (real_pos)
@@ -334,80 +468,50 @@ limit 10</pre>
 </pre>
 ::
 
-Inserted at returns the correct results, this is repeatable in filtering, let's take for example the
-row with [real_pos] 3.
+[inserted_at]{.h} returns the correct results, this is also observable in filtering as expected.
 
-["7VFXkZUBNha00pvZ8RMm" -	3	-  1741900214566	- "hYtXkZUB5Zpn6aZb8fQn"]{.h}
+This might not a surprise if you are experienced in the topic, for two reasons:
 
-::Editor{hasResult="true" lang='sql'}
-<pre>
-select count(*) from t
-where _id > '7VFXkZUBNha00pvZ8RMm'</pre>
-::
+First, RFC Base64 does not preserve sort order for unencoded strings, because of the alphabet it uses;
+by pure randomness one could actually sort on a small set of elements though.
 
-::Sep
-::
+And second, because the implementation detail of how the random data is generated, it generates a 
+random integer that the node reuses for the group 1 and 5, like a seed, it then adds +1 every 
+time it uses it to generate a flake.
 
-::MarkdownTable{type="table"  hasBottom=true}
-<pre>
-|count(*)|
- |-| 
-|86732|
-</pre>
-::
+You can observe this by looking at the prefix of the `_id`, they are similar because they are sequential,
+in setups with more than one node, this random seed gets refresh more often, that's why you will only
+see this sequentiality in small groups. If you only use one node, it's very visible.
 
-::Editor{hasResult="true" lang='sql'}
-<pre>
-select count(*) from t
-where uuid > 'hYtXkZUB5Zpn6aZb8fQn'</pre>
-::
+To proof that the non-sortability of the elasticflake is not only because of the encoding:
 
-::Sep
-::
+* proof that base32hex and a custom base64 is lexicographically sortable on uuid7 but base64 is not.
+* proof that elasticflake is not lexicographically sortable in base32hex. 
 
-::MarkdownTable{type="table"  hasBottom=true}
-<pre>
-|count(*)|
- |-| 
-|28680|
-</pre>
-::
+todo: upload to repo
 
-::Editor{hasResult="true" lang='sql'}
-<pre>
-select count(*) from t
-where inserted_at > 1741900214566</pre>
-::
+### [UUID4]{.text-h5}
+A random UUID4 as per RFC 4122 (2005), in url safe Base64 encoding.
 
-::Sep
-::
-
-::MarkdownTable{type="table"  hasBottom=true}
-<pre>
-|count(*)|
- |-| 
-|99996|
-</pre>
-::
-
-We can clearly see that we cannot properly filter nor order by the elasticflakes. Digging in the git logs
-I found a PR for https://github.com/crate/crate/issues/5845, so at least we know that at some point
-in the past it was possible.
-
-Probably the reason why it cannot be sorted, is that the flake is being transformed to base64, and
-base64
-
-# [Problems]{.text-h1}
+# [Problems and questions]{.text-h1}
 # This one is very interesting on how it works:
 # https://github.com/crate/crate/commit/c76a4a298de849be05b8c0a1b86b74a78b9a590c
 
-- why almost all characters in the flake look identical but the first ones, thile the last three bytes should be different
+- why almost all characters in the flake look identical but the first ones, while the last three bytes should be different
 if I manually create several flakes in another programs, the last parts of the flakes are different, as expected, why in cratedb are the same?
-it it because the synchronized? Test: log in cratedb the different parts of the flake, and insert serveral
+is it because the synchronized? Test: log in cratedb the different parts of the flake, and insert serveral
   - sequenceNumber is the same for the life of the program? i think so as its a class variable
-- why can we sort in base64?
+    - yes, a random number gets computed, and then on every _id generation its incremented by 1
+    The are almost similar because precision, sometimes it might be able to generate several _id under
+    the milliseconds precission, if you generate more, you will get slightly different as timestamp
+    as advanced. 
+    - why put all millis in the right side, they dont help in compression and won't help in sorting
+
+-  can we sort in base64 in the new korderedelasticflake??
+  - no we cant, it still use normal base64
+
 - why cant I sort on long tables?
-  - small sized rows it seems to work, only not in long tables <- test this more
+  - small sized rows it seems to work (actually it doesn't, casualidad), only not in long table
 - elastic https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html
 - https://discuss.elastic.co/t/sort-by-id-field/169017/2
 
@@ -419,5 +523,5 @@ it it because the synchronized? Test: log in cratedb the different parts of the 
 :Der{r="5" link="https://github.com/boundary/flake"}
 
 CREATE TABLE test (ts TIMESTAMP);
-INSERT INTO test (ts) VALUES ('2017-01-01'), ('2017-01-02'), ('2017-01-03'), ('2017-01-04'), ('2017-01-05'), ('2017-01-06');
+INSERT INTO test (pos,ts) VALUES (1, '2017-01-01'), (2,'2017-01-02'), (3,'2017-01-03'), (4,'2017-01-04'), (5,'2017-01-05'), (6,'2017-01-06');
 SELECT ts, _id FROM test ORDER BY _id LIMIT 1;
