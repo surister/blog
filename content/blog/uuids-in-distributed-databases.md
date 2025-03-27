@@ -1,45 +1,26 @@
 ---
-title: 'Implementing the CratyFlake, a time-based sortable UUID for CrateDB.'
+title: 'UUIds in distributed databases'
 image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-photo-of-a-cat-sitting-on-top-of-some-rocks.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
 description: 'Blueprint showcasing available components'
-tags: [ 'python', 'Antlr4', 'software' ]
+tags: [ 'UUID', 'Distributed Databases', 'Databases', 'CrateDB' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Software Engineer' }, ]
 show_preview: true
 published: false
 #comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
 ---
 
-Title: Implementing the CrateFlake a time-based unique token for CrateDB
-0. Introduction: What are you going to read in this blogpost
-1. Explain what a distributed database is - Introduce CrateDB.
-2. Explain why 
-3. explain what UUID is
-4. limitations on cratedb _id field and generate_uuid4 (how can we sort/can we sort on _id? how is _id generated)
-5. propose cratyflake 
-6. try UUID7/UUID8 IN CLIENT
-
-0. Introduction
-1. Distributed databases and a problem of them
-2. Uuuids as solutions of that problem
-3. My own proposal
-this is introduction
 
 ## [Introduction]{.text-h4}
 Distribute databases are very complex with additional layers of challenges compared to traditional databases.
-In this blog we will explore one of those challenges: uniquely identifying a row.
-We will also propose a custom UUID for CrateDB the 'CratyFlake'.
-
-By the end of the post I hope you will have a better understanding of distributed databases and the
-role of UUIDs.
-
-If you are already well-versed in Databases and just want to read about the Crateyflake, jump [here]
+In this post we will explore: one of those challenges, uniquely identifying a row, UUIDs as solutions
+and what CrateDB uses.
 
 ## [About databases]{.text-h3 .text-red}
 
 ### [The distributed nature of CrateDB.]{.text-h4}
 CrateDB is a distributed SQL Database. This means that unlike your good old Postgres instance, which
 only has one node, CrateDB forms clusters; two or more nodes will join up, communicate and work
-together. Everytime you select data, the work will be split among the nodes, this and many other 
+together. Everytime you select data, the work will be split among the nodes. This and many other 
  :alink{text="features" url="https://cratedb.com/docs/guide/feature/index.html"} make queries in CrateDB extremely fast
 on huge tables. 
 
@@ -63,10 +44,10 @@ One drawback of distributed databases (specifically those with share-nothing arc
 keeping all data in sync is a challenge, since insert/updates can happen at different rates in different nodes.
 
 One effect of this is the typical lack of monotonically increasing ids, commonly known as 
-[AUTO-INCREMENT]{.h}; that is a table's column which every time a new row is inserted the column's value
+[AUTO-INCREMENT]{.h}; that is a table's column which every time a new row is inserted the id value
 gets incremented monotonically (usually by 1).
 
-One example you might be familiar with is the [SERIAL]{.h} datatype in postgres,
+One example you might be familiar with is the [SERIAL]{.h} datatype in postgres:
 
 ::Editor{lang='sql'}
 <pre>
@@ -76,8 +57,8 @@ CREATE TABLE mytable
     data  VARCHAR(128) not null
 );
 
-insert into mytable (data) values ('what is this');
-insert into mytable (data) values ('what is this x2');</pre>
+insert into mytable (data) values ('some data');
+insert into mytable (data) values ('some data x2');</pre>
 ::
 
 ::Editor{hasResult="true" lang='sql'}
@@ -98,16 +79,16 @@ SELECT * FROM sometable</pre>
 ::
 
 As you can see, id was incremented by one every time we inserted a row.
-This is possible because the database keeps track of the count with a counter (called sequences in Postgres).
+This is possible because the database keeps track of the count with a counter (called sequences in Postgres.)
 
 But in our distributed world every insert has to be executed in every node,
-in order for the nodes to increase the id correctly, they would need to communicate to keep their
-counters in sync, in a read-heavy scenario would mean massive inter-node communication overhead 
-and performance would be impacted, defeating the purpose of using a distributed database.
+in order for the nodes to increase the id correctly; they would need to communicate to keep their
+counters in sync, in a read-heavy scenario would mean massive inter-node communication overhead.
+Performance would be impacted, defeating the purpose of using a distributed database.
 
 
 ### [The need for uniqueness]{.text-h4}
-In databases we often need to uniquely identify every row. Primary keys are used for that.
+In databases, we often need to uniquely identify every row. Primary keys are used for that.
 
 By definition, primary keys need to be unique and not null, and we cannot use one of the simplest 
 and most effective ones: [AUTO-INCREMENT]{.h}. What do we use then?
@@ -134,7 +115,7 @@ their take on it: [UUID]{.h} (Universally Unique Identifier).
 
 
 ### [Sortable Ids are amazing]{.text-h4}
-Being unique is the bare minimum requirement, but there is another property that we lose by
+Being unique is the bare minimum requirement for a primary key, but there is another property that we lose by
 not being able to use an AUTO-INCREMENT id: [Sortability]{.h}.
 
 Having an id that is sortable, does not only allow you to use [ORDER BY id]{.h} statements, which 
@@ -148,7 +129,7 @@ fastest way to load data from databases to dataframes, it works by issuing
 statements in different threads concurrently.
 
 While this technique might not make too much sense in CrateDB to get data 'faster,'
-we can use the same technique to create a pseudo-paginator for a table, which is useful when
+we can use the same technique to create a pseudo-paginator for any table, which is useful when
 batch-processing large tables.
 
 An example of this in Python:
@@ -217,15 +198,14 @@ if __name__ == '__main__':
     # [(...),...] 1k rows
     ...</pre>
 ::
-[table]{.h} will exhaust the whole table without hitting out of memory on large tables, this depends
+[table]{.h} will exhaust the whole table without hitting an [out of memory]{.h} error on large tables, this depends
 on a sortable id that we need to implement ourselves doing some pre-data processing to our table, for example
 using the window function [row_number()]{.h}. If our unique IDs were also sortable, we would have
 this feature for free.
 
 ## [About unique IDs]{.text-h3 .text-red .mt-5}
 Now we have more context of the challenge of uniquely identifying rows in distributed databases. 
-Before jumping into what CrateDB does and how can we improve it, let's try to understand the
-most popular and used ones [UUIDs]{.h}.
+Before jumping into what CrateDB does let's try to understand the most popular and used ones [UUIDs]{.h}.
 
 If you understand them at a fundamental level, you will understand every form of IDs there is,
 even if they have different size and components, it's all the same at the core.
@@ -266,13 +246,12 @@ We can represent it in different data 'types', depending on the system, these ty
 tipically be just the data represented in different numerical bases:
 
 * Base 2 (binary): See image
-* Base 10 (u128): `164584730332688677464161912706729264512`{.h}
+* Base 10: `164584730332688677464161912706729264512`{.h}
 * Base 16: `0x7bd1ddb5b15c4b68a507fd4ceb984580`{.h}
 * Base 16 with dashes: `7bd1ddb5-b15c-4b68-a507-fd4ceb984580`{.h}
 * Base64: `e9HdtbFcS2ilB/1M65hFgA==`{.h}
 
-What you usually see and the default representation implementation for UUIDS is the base 16 of 
-the bytes (hex) with dashes.
+What you usually see and the default representation implementation for UUIDS is the base 16 with dashes.
 
 
 To give you a clearer look at how everything comes together, let's see the base16 (hex) value of every octet,
@@ -319,17 +298,9 @@ Another simple way to visualize it, is just to paint the inclusive first bit num
 ::
 
 ### [What UUIDs is CrateDB using?]{.text-h4}
-CrateDB uses three different kinds :Ref{r="1"} of unique IDs in different places:
+CrateDB 5.10.2 uses three different kinds :Ref{r="1"} of unique IDs in different places:
 [ElasticFlakes]{.h}, [UUID4 in base64]{.h} and [DirtyUUID]{.h}.
 
-::Alert
----
-"alert_type": "warning"
-"icon": "mdi-alert"
-"text": "Writing this for CrateDB 5.10.2"
-"alert_bd_color": "white"
----
-::
 
 ### [ElasticFlakes]{.text-h5}
 As it names implies, this implementation is inherited from the Open Source days of [elasticsearch]{.h} :Ref{r="2"}
@@ -475,9 +446,8 @@ This might not a surprise if you are experienced in the topic, for two reasons:
 First, RFC Base64 does not preserve sort order for unencoded strings, because of the alphabet it uses;
 by pure randomness one could actually sort on a small set of elements though.
 
-And second, because the implementation detail of how the random data is generated, it generates a 
-random integer that the node reuses for the group 1 and 5, like a seed, it then adds +1 every 
-time it uses it to generate a flake.
+And second, because the implementation detail of how the random data is generated. A random integer is
+generated like a seed and +1 is added every time a new id is created.
 
 You can observe this by looking at the prefix of the `_id`, they are similar because they are sequential,
 in setups with more than one node, this random seed gets refresh more often, that's why you will only
@@ -493,35 +463,11 @@ todo: upload to repo
 ### [UUID4]{.text-h5}
 A random UUID4 as per RFC 4122 (2005), in url safe Base64 encoding.
 
-# [Problems and questions]{.text-h1}
-# This one is very interesting on how it works:
-# https://github.com/crate/crate/commit/c76a4a298de849be05b8c0a1b86b74a78b9a590c
-
-- why almost all characters in the flake look identical but the first ones, while the last three bytes should be different
-if I manually create several flakes in another programs, the last parts of the flakes are different, as expected, why in cratedb are the same?
-is it because the synchronized? Test: log in cratedb the different parts of the flake, and insert serveral
-  - sequenceNumber is the same for the life of the program? i think so as its a class variable
-    - yes, a random number gets computed, and then on every _id generation its incremented by 1
-    The are almost similar because precision, sometimes it might be able to generate several _id under
-    the milliseconds precission, if you generate more, you will get slightly different as timestamp
-    as advanced. 
-    - why put all millis in the right side, they dont help in compression and won't help in sorting
-
--  can we sort in base64 in the new korderedelasticflake??
-  - no we cant, it still use normal base64
-
-- why cant I sort on long tables?
-  - small sized rows it seems to work (actually it doesn't, casualidad), only not in long table
-- elastic https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html
-- https://discuss.elastic.co/t/sort-by-id-field/169017/2
-
+### [DirtyUUID]{.text-h5}
+todo
 
 :Der{r="1" link="https://github.com/crate/crate/blob/master/server/src/main/java/org/elasticsearch/common/UUIDs.java"}
-:Der{r="2" link="Elasticsearch used to be open source, they dropped the open source license and as of August 2024 they are back again."}
+:Der{r="2" link="Elasticsearch used to be Open-Source, they dropped the open source license, and as of August 2024 they are Open-Source again."}
 :Der{r="3" link="https://github.com/crate/crate/blob/79ff2217dde45d6a748b0f31b36c95a7b252878c/server/src/main/java/io/crate/analyze/Id.java#L48"}
 :Der{r="4" link="https://github.com/crate/crate/blob/master/server/src/main/java/io/crate/expression/scalar/GenRandomTextUUIDFunction.java"}
 :Der{r="5" link="https://github.com/boundary/flake"}
-
-CREATE TABLE test (ts TIMESTAMP);
-INSERT INTO test (pos,ts) VALUES (1, '2017-01-01'), (2,'2017-01-02'), (3,'2017-01-03'), (4,'2017-01-04'), (5,'2017-01-05'), (6,'2017-01-06');
-SELECT ts, _id FROM test ORDER BY _id LIMIT 1;
