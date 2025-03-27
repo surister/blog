@@ -18,7 +18,7 @@ let cratedb_blogs = [
   <div style="background-color: #EF5350; height: 10px"></div>
   <v-container fluid class="pt-15">
     <v-row no-gutters>
-      <v-col offset-md="1" offset-lg="4" offset-xl="1" offset-xxl="1">
+      <v-col offset-md="1" offset-lg="3" offset-xl="1" offset-xxl="1">
         <h2>Last entries</h2>
         <ContentList path="/blog/" v-slot="{ list }">
           <div v-for="article in list">
@@ -34,7 +34,7 @@ let cratedb_blogs = [
 
     <!--    CrateDB Section-->
     <v-row no-gutters class="pt-5">
-      <v-col offset-md="1" offset-lg="4" offset-xl="1" offset-xxl="1">
+      <v-col offset-md="1" offset-lg="3" offset-xl="1" offset-xxl="1">
         <h2>CrateDB blog</h2>
         <div v-for="article in cratedb_blogs">
           🗒️ <span class="text-blue text-subtitle-1 ml-1">{{ article.date }}</span>
