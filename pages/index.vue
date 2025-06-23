@@ -23,8 +23,13 @@ let cratedb_blogs = [
         <ContentList path="/blog/" v-slot="{ list }">
           <div v-for="article in list">
             <template v-if="article.published || article.show_preview">
-              🗒️ <span class="text-red text-subtitle-1 ml-1">2025/01/01</span>
-              <elink :text="article.title" :url="article._path"></elink>
+              🗒️ <span class="text-red text-subtitle-1 ml-1">{{ article.published_date || new Date().toISOString().slice(0, 10) }}</span>
+              <v-badge content="preview" v-if="!article.published && article.show_preview">
+                <elink :text="article.title" :url="article._path"></elink>
+              </v-badge>
+              <template v-else>
+                 <elink :text="article.title" :url="article._path"></elink>
+              </template>
             </template>
           </div>
         </ContentList>
