@@ -1,5 +1,5 @@
 ---
-title: 'Ingesting parquet to CrateDB, optimizing from 316.90s to 40s with Rust'
+title: 'Ingesting parquet to CrateDB: optimizing from 316.90s to 40s with Rust'
 image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-photo-of-a-cat-sitting-on-top-of-some-rocks.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
 description: 'Investigating how to ingest parquet to CrateDB as efficiently as possible optimizing the client.'
 authors: [ { 'name': 'Ivan', 'job_title': 'Database Environment Engineer' } ]
