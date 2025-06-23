@@ -2,7 +2,18 @@
 import hljs from 'highlight.js/lib/core';
 import bash from 'highlight.js/lib/languages/bash';
 
-hljs.registerLanguage('bash', bash);
+const props = defineProps(
+    {
+      'hasSyntaxHighlighting': {
+        'type': Boolean,
+        default: false
+      }
+    }
+)
+
+if (props.hasSyntaxHighlighting){
+  hljs.registerLanguage('bash', bash);
+}
 
 const slots = useSlots();
 const value = slots.default()[0].children.default()[0].children;
@@ -11,7 +22,7 @@ const value = slots.default()[0].children.default()[0].children;
 <template>
   <span class="bg-gray rounded-b-lg">
          <code><pre class="pa-4 rounded-b-lg" style="overflow: scroll"><span
-             v-html="hljs.highlight(value, {language: 'bash'}).value"></span></pre>
+             v-html="hasSyntaxHighlighting ? hljs.highlight(value, {language: 'bash'}).value : value"></span></pre>
          </code>
   </span>
 </template>

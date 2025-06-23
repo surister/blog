@@ -4,6 +4,9 @@ image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-pho
 description: 'Blueprint showcasing available components'
 tags: [ 'python', 'Antlr4', 'software' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Monologue Expert' }, { 'name': 'Anon' } ]
+show_preview: true
+published: false
+published_date: '2025-06-23'
 comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
 ---
 
@@ -160,6 +163,27 @@ I'm on a strike! :Ref{r="4"}
 "author": "@ritchie46"
 "text": "...I would advice against using multiprocessing for this. Polars already paralellizes the work for you. Trying to parallelize more would hurt Polars' performance."
 "src": "https://github.com/pola-rs/polars/issues/14219#issuecomment-1925326705"
+"alert_bd_color": "white"
+---
+::
+
+::Alert
+---
+"alert_type": "warning"
+"icon": "mdi-format-quote-close"
+"author": "@ritchie46"
+"text": "...I would advice against using multiprocessing for this."
+"src": "https://github.com/pola-rs/polars/issues/14219#issuecomment-1925326705"
+"alert_bd_color": "white"
+---
+::
+
+
+::Alert
+---
+"alert_type": "success"
+"icon": "mdi-lightbulb"
+"text": "Don't let the end of the world mess with your sprint."
 "alert_bd_color": "white"
 ---
 ::

@@ -10,9 +10,9 @@ const props = defineProps(['doc'])
            align-content="center">
       <v-col cols="auto" align-self="center">
               <span class="text-subtitle-1 font-weight-bold text-grey-lighten-1">
-                29/02/2024
+                {{ doc.published_date || 'date_unpublished' }}
               </span>
-        <span class="pl-1">·</span>
+        <span class="pl-1" v-if="doc.comment_links">·</span>
         <elink type="comment" :text="link.name" class="mb-1"
                v-for="link in doc.comment_links"/>
       </v-col>
