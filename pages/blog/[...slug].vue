@@ -65,7 +65,7 @@ a {
 }
 
 main p {
-  font-size: 19px;
+  font-size: 1.188rem;
   margin-top: 20px;
   line-height: 30px;
 }
@@ -86,17 +86,18 @@ main h4 {
 }
 
 main ul {
-  font-size: 19px;
+  font-size: 1.188rem;
   margin-left: 50px;
   margin-top: 25px;
   margin-bottom: 25px;
 }
 
 .h {
-  font-size: 19px;
+  font-size: 1rem;
   background: rgb(52, 56, 65);
   padding: .05rem .20rem;
   border-radius: 5px;
+  word-wrap: break-word;
 }
 
 #toc-title {
@@ -113,9 +114,15 @@ main ul {
   text-justify: distribute;
 }
 
-
 th,
 td {
   padding: 5px;
+}
+
+ol {
+  font-size: 1.1rem;
+  list-style: decimal;
+  margin-left: 20px;
+  margin-top: 5px
 }
 </style>
