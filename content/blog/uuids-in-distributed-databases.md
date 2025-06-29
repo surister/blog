@@ -458,7 +458,7 @@ Just two integers cobbled up together, not following the UUID rfc format.
 
 
 :Der{r="1" link="https://github.com/crate/crate/blob/master/server/src/main/java/org/elasticsearch/common/UUIDs.java"}
-:Der{r="2" link="Elasticsearch used to be Open-Source, they dropped the open source license, and as of August 2024 they are Open-Source again."}
+:Der{r="2" text="Elasticsearch used to be Open-Source, they dropped the open source license, and as of August 2024 they are Open-Source again."}
 :Der{r="3" link="https://github.com/crate/crate/blob/79ff2217dde45d6a748b0f31b36c95a7b252878c/server/src/main/java/io/crate/analyze/Id.java#L48"}
 :Der{r="4" link="https://github.com/crate/crate/blob/master/server/src/main/java/io/crate/expression/scalar/GenRandomTextUUIDFunction.java"}
 :Der{r="5" link="https://github.com/boundary/flake"}
