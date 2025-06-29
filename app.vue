@@ -1,9 +1,9 @@
 <template>
   <v-toolbar color="#121212">
     <template #title>
-      <v-row justify="center">
-        <v-col class="v-col-lg-6 v-col-auto ml-15">
-          <h3 class="font-weight-bold text-uppercase"><a href="/">Surister's dev blog</a></h3>
+      <v-row class="justify-md-center justify-sm-start">
+        <v-col class="v-col-sm-5 v-col-6 v-col-md-5 v-col-lg-6">
+          <h3 class="font-weight-bold text-uppercase ml-lg-5 ml-sm-16 ml-md-16 ml-xs-0"><a href="/">Surister's dev blog</a></h3>
         </v-col>
 
       </v-row>
@@ -24,6 +24,7 @@
 body {
   background-color: #121212;
 }
+
 * {
   font-family: Rubik, serif;
   font-weight: 300;

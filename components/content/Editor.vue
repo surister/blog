@@ -48,16 +48,21 @@ function copyToClipboard(text) {
   <CodeEditor :text="value"
               :show-line-number="false"
               :class="['mt-5', 'rounded-t-lg', hasResult ? '' : 'rounded-b-lg']"
+              border-radius="10"
               highlight-row-background-color="red"
               background-color="#212121"
               padding-bottom="10"
-              padding-top="10"
+              padding-top="16"
+              code-font-size="16"
               read-only
               :prepend-inline="true"
               :highlight="(text) => hljs.highlight(text, {language: lang}).value">
     <template #appendText>
-      <v-btn variant="outlined" :color="copied ? 'success' : ''" style="border-radius: 5px"
-             :icon="copied ? 'mdi-check' : 'mdi-content-copy'" size="x-small"
+      <v-btn variant="outlined"
+             :color="copied ? 'success' : ''"
+             style="border-radius: 5px"
+             :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
+             size="x-small"
              @click="copyToClipboard(value)">
       </v-btn>
     </template>

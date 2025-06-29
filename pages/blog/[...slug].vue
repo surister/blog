@@ -6,36 +6,36 @@ import Header from "~/components/slug/Header.vue";
   <ContentDoc v-slot="{ doc }">
     <article>
       <v-container fluid>
-        <v-row>
-          <v-col class="v-col-xxl-3 v-col-xl-3 v-col-lg-3 v-col-md-3 v-col-xs-auto v-col-sm-12"></v-col>
-          <v-col class="v-col-lg-6 v-col-auto">
-            <Header :doc="doc"></Header>
-          </v-col>
-        </v-row>
-      </v-container>
+        <v-row no-gutters class="justify-center justify-lg-start justify-sm-center justify-xs-center">
 
-      <v-container fluid>
-        <v-row no-gutters class="justify-md-center justify-start justify-lg-start">
-          <v-col class="v-col-xxl-3 v-col-xl-3 v-col-lg-3 v-col-md-3 v-col-xs-auto v-col-sm-12 ">
+          <!--  TABLE OF CONTENTS  -->
+          <v-col class="v-col-lg-3 v-col-md-3 v-col-xs-12">
+            <div style="height: 350px" class="hidden-sm hidden-xs"></div>
             <div style="top: 50px" class="position-sticky">
               <v-container>
                 <Toc></Toc>
               </v-container>
             </div>
           </v-col>
-          <v-col class="v-col-xl-auto v-col-lg-7 v-col-md-auto v-col-sm-12 v-col-xs-12">
-            <v-alert
-                v-if="!doc.published"
-                density="compact"
-                max-width="860"
-                text="This article is incomplete, it will most likely contain wrong data, typos, lack of references and/or unfinished paragraphs."
-                title="Warning: This is a work in progress and is not yet published."
-                type="warning"/>
-            <main style="max-width: 860px">
-              <ContentRenderer :value="doc"/>
-            </main>
+
+          <!--  CONTENT  -->
+          <v-col style="background-color: rgba(0,128,0,0)"
+                 class="v-col-xl-auto v-col-lg-7 v-col-md-7 v-col-sm-12 v-col-xs-12">
+            <div style="max-width: 860px">
+
+              <!--  BLOG HEADER  -->
+              <Header :doc="doc" class="my-6"></Header>
+              <v-alert
+                  v-if="!doc.published"
+                  density="compact"
+                  text="This article is incomplete, it will most likely contain wrong data, typos, lack of references and/or unfinished paragraphs."
+                  title="Warning: This is a work in progress and is not yet published."
+                  type="warning"/>
+              <main ref="main">
+                <ContentRenderer :value="doc"/>
+              </main>
+            </div>
           </v-col>
-          <v-col class="v-col-xxl-3 v-col-xl-3 v-col-lg-3 v-col-md-3 v-col-xs-auto v-col-sm-12"></v-col>
         </v-row>
       </v-container>
     </article>

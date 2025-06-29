@@ -7,6 +7,9 @@ const props = defineProps({
   },
   link: {
     type: String
+  },
+  text: {
+    type: String
   }
 })
 
@@ -19,10 +22,18 @@ watch(route, (to) => {
 </script>
 
 <template>
-  <p :class="{highlighted: '#'+ r === current_hash, 'references': true}"
-     style="margin-top: 0; font-size: 15px">
+  <p :class="{highlighted: '#'+ r === current_hash, 'references': true}" class="text-subtitle-1">
     <span :id="r" class="text-subtitle-1 font-weight-bold" style="color: #EF5350">[{{ r }}]</span>
-    <a :href="link" target="_blank">{{ link }}</a>
+    <a v-if="link"
+        :href="link"
+       target="_blank"
+       style="word-break: break-all"
+       class="text-medium-emphasis text-decoration-underline">
+      {{ link }}
+    </a>
+    <span v-else>
+      {{ text }}
+    </span>
   </p>
 </template>
 
@@ -30,4 +41,5 @@ watch(route, (to) => {
 .highlighted {
   background-color: rgba(239, 83, 80, 0.07);
 }
+
 </style>

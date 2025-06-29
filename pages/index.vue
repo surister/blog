@@ -17,8 +17,10 @@ let cratedb_blogs = [
 <template>
   <div style="background-color: #EF5350; height: 10px"></div>
   <v-container fluid class="pt-15">
-    <v-row no-gutters>
-      <v-col offset-md="1" offset-lg="3" offset-xl="1" offset-xxl="1">
+
+    <!--   Last Entries   -->
+    <v-row no-gutters class="justify-center">
+      <v-col cols="6">
         <h2>Last entries</h2>
         <ContentList path="/blog/" v-slot="{ list }">
           <div v-for="article in list">
@@ -34,12 +36,11 @@ let cratedb_blogs = [
           </div>
         </ContentList>
       </v-col>
-
     </v-row>
 
-    <!--    CrateDB Section-->
-    <v-row no-gutters class="pt-5">
-      <v-col offset-md="1" offset-lg="3" offset-xl="1" offset-xxl="1">
+    <!--   CrateDB Section   -->
+    <v-row no-gutters class="pt-5 justify-center">
+      <v-col cols="6">
         <h2>CrateDB blog</h2>
         <div v-for="article in cratedb_blogs">
           🗒️ <span class="text-blue text-subtitle-1 ml-1">{{ article.date }}</span>
