@@ -21,7 +21,7 @@ import Header from "~/components/slug/Header.vue";
           <!--  CONTENT  -->
           <v-col style="background-color: rgba(0,128,0,0)"
                  class="v-col-xl-auto v-col-lg-7 v-col-md-7 v-col-sm-12 v-col-xs-12">
-            <div style="max-width: 860px">
+            <div style="max-width: 700px">
 
               <!--  BLOG HEADER  -->
               <Header :doc="doc" class="my-6"></Header>
@@ -65,7 +65,7 @@ a {
 }
 
 main p {
-  font-size: 1.188rem;
+  font-size: 1.3rem;
   margin-top: 20px;
   line-height: 30px;
 }
@@ -88,7 +88,7 @@ main h4 {
 main ul {
   font-size: 1.188rem;
   margin-left: 50px;
-  margin-top: 25px;
+  margin-top: 5px;
   margin-bottom: 25px;
 }
 

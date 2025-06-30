@@ -25,7 +25,7 @@ watch(route, (to) => {
   <p :class="{highlighted: '#'+ r === current_hash, 'references': true}" class="text-subtitle-1">
     <span :id="r" class="text-subtitle-1 font-weight-bold" style="color: #EF5350">[{{ r }}]</span>
     <a v-if="link"
-        :href="link"
+       :href="link"
        target="_blank"
        style="word-break: break-all"
        class="text-medium-emphasis text-decoration-underline">

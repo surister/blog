@@ -51,7 +51,6 @@ For every 'solution' we try, we are going to log memory (GiB), cpu (%), upload s
 data integrity using a custom Python script :Ref{r="4"}
 
 :Icon{size="x-small" color="red" icon="mdi-alert"} Disclaimer:
-
 * Benchmarking is hard :Ref{r="5"}.
 * We’re going to run every approach a few times only.
 
@@ -118,7 +117,10 @@ lazy_frame = polars.scan_parquet(FILE_PATH)
 
 batch_size = 100_000  # Number of rows per batch
 
-for batch in lazy_frame.collect(streaming=True).iter_slices(n_rows=batch_size):
+for batch in (lazy_frame
+        .collect(streaming=True)
+        .iter_slices(n_rows=batch_size)
+):
     batch.write_database(
         connection=CRATE_URI,
         table_name='ny_taxi',
@@ -172,7 +174,12 @@ table = pq.read_table("/data/taxi_01_24.parquet")
 BATCH_SIZE = 100_000
 
 for batch in table.to_batches(BATCH_SIZE):
-    batch.to_pandas().to_sql('ny_taxi', con=CRATE_URI, if_exists='append', index=False)</pre>
+    batch.to_pandas().to_sql(
+        'ny_taxi',
+        con=CRATE_URI,
+        if_exists='append',
+        index=False
+    )</pre>
 ::        
 
 Results
@@ -231,8 +238,12 @@ row_groups = file.num_row_groups
 def send_to_crate(row_group: int) -> None:
     f = file.read_row_group(row_group)
     for batch in f.to_batches(100_000):
-        batch.to_pandas().to_sql('ny_taxi', con=CRATE_URI, if_exists='append', index=False)
-
+        batch.to_pandas().to_sql(
+            'ny_taxi',
+            con=CRATE_URI,
+            if_exists='append',
+            index=False
+        )
 
 with ThreadPoolExecutor(max_workers=6) as e:
     for row_group in range(row_groups):
@@ -268,17 +279,19 @@ We’re going to ignore row groups for a second.
 import pyarrow.parquet as pq
 
 CRATE_URI = 'crate://192.168.88.251:4200'
-file = pq.ParquetFile("/home/surister/PycharmProjects/lab/mytlab/data/taxi_01_24.parquet")
-
+file = pq.ParquetFile("/data/taxi_01_24.parquet")
 
 def send_to_crate(batch):
-    batch.to_pandas().to_sql('ny_taxi', con=CRATE_URI, if_exists='append', index=False)
-
+    batch.to_pandas().to_sql(
+        'ny_taxi',
+        con=CRATE_URI,
+        if_exists='append',
+        index=False
+    )
 
 with ThreadPoolExecutor(max_workers=12) as e:
     for batch in file.iter_batches(100_000):
-        e.submit(send_to_crate, batch)
-</pre>
+        e.submit(send_to_crate, batch)</pre>
 ::        
 
 Results
@@ -313,12 +326,16 @@ file = pq.ParquetFile("/data/taxi_01_24.parquet")
 
 
 def send_to_crate(batch):
-    batch.to_pandas().to_sql('ny_taxi', con=CRATE_URI, if_exists='append', index=False)
+    batch.to_pandas().to_sql(
+        'ny_taxi',
+        con=CRATE_URI,
+        if_exists='append',
+        index=False
+    )
 
 
 def read_parquet(row_group: int):
     f = file.read_row_group(row_group)
-    print(f'{f} row groups')
     with ThreadPoolExecutor(max_workers=12) as e:
         for batch in f.to_batches(50_000):
             e.submit(send_to_crate, batch)
