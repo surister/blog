@@ -1,12 +1,27 @@
 <script setup lang="ts">
 import Header from "~/components/slug/Header.vue";
+
+const scrollTop = () => {
+  window.scrollTo({top: 0,})
+}
+let showScrollUp = ref(false)
+const handle = (_) => {
+  showScrollUp.value = window.scrollY >= 500;
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handle)
+})
+
 </script>
 
 <template>
   <ContentDoc v-slot="{ doc }">
     <article>
       <v-container fluid>
-        <v-row no-gutters class="justify-center justify-lg-start justify-sm-center justify-xs-center">
+        <v-row
+            no-gutters
+            class="justify-center justify-lg-start justify-sm-center justify-xs-center">
 
           <!--  TABLE OF CONTENTS  -->
           <v-col class="v-col-lg-3 v-col-md-3 v-col-xs-12">
@@ -21,21 +36,26 @@ import Header from "~/components/slug/Header.vue";
           <!--  CONTENT  -->
           <v-col style="background-color: rgba(0,128,0,0)"
                  class="v-col-xl-auto v-col-lg-7 v-col-md-7 v-col-sm-12 v-col-xs-12">
-            <div style="max-width: 700px">
+
+            <div class="max-w-720px">
 
               <!--  BLOG HEADER  -->
               <Header :doc="doc" class="my-6"></Header>
-              <v-alert
-                  v-if="!doc.published"
-                  density="compact"
-                  text="This article is incomplete, it will most likely contain wrong data, typos, lack of references and/or unfinished paragraphs."
-                  title="Warning: This is a work in progress and is not yet published."
-                  type="warning"/>
+
+              <v-alert v-if="!doc.published"
+                       density="compact"
+                       text="This article is incomplete, it will most likely contain wrong data, typos, lack of references and/or unfinished paragraphs."
+                       title="Warning: This is a work in progress and is not yet published."
+                       type="warning"/>
+
               <main ref="main">
                 <ContentRenderer :value="doc"/>
               </main>
+
             </div>
+
           </v-col>
+
         </v-row>
       </v-container>
     </article>
@@ -53,11 +73,31 @@ import Header from "~/components/slug/Header.vue";
         <!--        </span>-->
       </div>
     </v-container>
+    <v-btn class="hidden-xs scroll-to-top"
+           @click="scrollTop"
+           icon="mdi-arrow-up"
+           v-if="showScrollUp"
+      >
+
+    </v-btn>
   </ContentDoc>
+
 
 </template>
 
 <style>
+.max-w-720px {
+  max-width: 720px;
+}
+
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 99;
+}
+
 a {
   /* Removes link color and underline */
   color: inherit;
@@ -80,6 +120,7 @@ main h3 {
   margin-top: 30px;
   margin-bottom: 30px;
 }
+
 main h4 {
   margin-top: 30px;
   margin-bottom: 30px;
@@ -124,5 +165,9 @@ ol {
   list-style: decimal;
   margin-left: 20px;
   margin-top: 5px
+}
+
+html {
+  scroll-behavior: smooth;
 }
 </style>

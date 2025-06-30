@@ -21,7 +21,7 @@ let cratedb_blogs = [
     <v-row no-gutters class="justify-center">
       <v-col class="v-col-xs-12 v-col-sm-12 v-col-md-7 v-col-lg-6 v-col-xl-6">
         <h2>Last entries</h2>
-        <ContentList path="/blog/" v-slot="{ list }">
+        <ContentList v-slot="{ list }">
           <div v-for="article in list">
             <template v-if="article.published || article.show_preview">
               <div class="my-1">
@@ -30,7 +30,7 @@ let cratedb_blogs = [
               </span>
                 <a :href="article._path"
                    target="_blank"
-                   class="font-weight-bold text-decoration-none text-white">
+                   class="font-weight-bold text-decoration-none text-white text-h6">
                   {{ article.title }}
                 </a>
                 <v-chip variant="outlined"
@@ -47,7 +47,7 @@ let cratedb_blogs = [
 
     <!--   CrateDB Section   -->
     <v-row no-gutters class="pt-5 justify-center">
-      <v-col class="v-col-xs-12 v-col-sm-12 v-col-md-7 v-col-lg-6 v-col-xl-6">
+      <v-col class="v-col-xl-6 v-col-lg-6 v-col-md-7 v-col-sm-12 v-col-xs-12">
         <h2>CrateDB blog</h2>
         <div v-for="article in cratedb_blogs">
           <div class="my-1">
@@ -56,7 +56,7 @@ let cratedb_blogs = [
               </span>
             <a :href="article._path"
                target="_blank"
-               class="font-weight-bold text-decoration-none text-white">
+               class="font-weight-bold text-decoration-none text-white text-h6">
               {{ article.title }}
             </a>
 

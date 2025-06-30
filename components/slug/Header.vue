@@ -4,7 +4,7 @@ const props = defineProps(['doc'])
 
 <template>
   <header class="text-sm-center text-center text-md-start">
-    <h1 class="text-h3 ms-n1 text-red">{{ doc.title }}</h1>
+    <h1 class="text-h4 ms-n1 text-red">{{ doc.title }}</h1>
     <v-row class="bottom-0 mt-5">
       <v-col cols="auto" align-self="center">
               <span class="text-subtitle-1 font-weight-bold text-grey-lighten-1">
