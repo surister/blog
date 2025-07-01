@@ -49,7 +49,11 @@ let config = {
   },
   chartOptions: {
     responsive: true,
-
+    scales: {
+      x: {
+        display: false
+      }
+    },
     plugins: {
       title: {}
     }
