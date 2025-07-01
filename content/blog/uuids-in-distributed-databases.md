@@ -3,7 +3,7 @@ title: 'Unique identifiers in distributed databases'
 image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-photo-of-a-cat-sitting-on-top-of-some-rocks.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
 description: 'Blueprint showcasing available components'
 tags: [ 'UUID', 'Distributed Databases', 'Databases', 'CrateDB' ]
-authors: [ { 'name': 'Ivan', 'job_title': 'Software Engineer' }, ]
+authors: [ { 'name': 'Ivan', 'job_title': 'Database Environment Engineer' }, ]
 show_preview: true
 published: false
 #comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
@@ -16,7 +16,6 @@ the most popular unique id: UUID is composed and what CrateDB uses.
 
 
 ## [About databases]{.text-h3 .text-red}
-
 One challenge of distributed databases (specifically those with shared-nothing architecture) 
 is data consistency, keeping all data in sync while staying performant is hard,
 since insert/updates can happen at different rates in different nodes. 
@@ -452,15 +451,15 @@ A random UUID4 as per RFC 4122 (2005), in url safe Base64 encoding.
 ### [DirtyUUID]{.text-h5}
 Just two integers cobbled up together, not following the UUID rfc format.
 
+## References
 
 ::divider{.my-6}
 ::
 
-
-:Der{r="1" link="https://github.com/crate/crate/blob/master/server/src/main/java/org/elasticsearch/common/UUIDs.java"}
-:Der{r="2" text="Elasticsearch used to be Open-Source, they dropped the open source license, and as of August 2024 they are Open-Source again."}
-:Der{r="3" link="https://github.com/crate/crate/blob/79ff2217dde45d6a748b0f31b36c95a7b252878c/server/src/main/java/io/crate/analyze/Id.java#L48"}
-:Der{r="4" link="https://github.com/crate/crate/blob/master/server/src/main/java/io/crate/expression/scalar/GenRandomTextUUIDFunction.java"}
-:Der{r="5" link="https://github.com/boundary/flake"}
-:Der{r="6" link="https://github.com/surister/mylab/blob/master/crate_uuid/sort.py"}
-:Der{r="7" link="https://github.com/surister/mylab/blob/master/crate_uuid/elasticflaketest.py"}
+:Der{r="1" meta="GitHub, 2025-07-01" text="CrateDB UUIDs class" link="https://github.com/crate/crate/blob/master/server/src/main/java/org/elasticsearch/common/UUIDs.java"}
+:Der{r="2" meta="Elastic blog." link="https://www.elastic.co/blog/elasticsearch-is-open-source-again" text="Elasticsearch Is Open Source. Again!"}
+:Der{r="3" meta="GitHub, 2025-07-01" text="CrateDB Id class" link="https://github.com/crate/crate/blob/79ff2217dde45d6a748b0f31b36c95a7b252878c/server/src/main/java/io/crate/analyze/Id.java#L48"}
+:Der{r="4" meta="GitHub, 2025-07-01" text="CrateDB GenRandomTextUUIDFunction class" link="https://github.com/crate/crate/blob/master/server/src/main/java/io/crate/expression/scalar/GenRandomTextUUIDFunction.java"}
+:Der{r="5" meta="GitHub, 2025-07-01" text="Flake: A decentralized, k-ordered id generation service in Erlang" link="https://github.com/boundary/flake"}
+:Der{r="6" meta="GitHub, 2025-07-01" text="surister sort script" link="https://github.com/surister/mylab/blob/master/crate_uuid/sort.py"}
+:Der{r="7" meta="GitHub, 2025-07-01" text="surister elasticflaketest script" link="https://github.com/surister/mylab/blob/master/crate_uuid/elasticflaketest.py"}

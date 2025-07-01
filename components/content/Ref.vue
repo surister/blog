@@ -11,8 +11,8 @@ const props = defineProps({
 </script>
 
 <template>
-  <a :href="`#${r}`">
-    <sup class="text-subtitle-1 font-weight-bold" style="color: #EF5350">{{ r }}</sup>
+  <a :href="`#${r}`" :id="`${r}-ref`">
+    <sup class="text-subtitle-1 font-weight-bold" style="color: #EF5350">[{{ r }}]</sup>
   </a>
 </template>
 

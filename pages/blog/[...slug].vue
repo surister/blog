@@ -110,7 +110,7 @@ a {
   text-decoration: inherit;
 }
 
-main p {
+main div p {
   font-size: 1.3rem;
   margin-top: 20px;
   line-height: 30px;
