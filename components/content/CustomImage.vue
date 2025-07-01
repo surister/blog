@@ -26,9 +26,11 @@ const props = defineProps({
            :width="width"
            :src="src"
            :style="{'marginTop': marginTop + 'px'}"
-           cover>
-    </v-img>
-    <v-label class="text-subtitle-2 font-italic pt-2">{{ label }}</v-label>
+           cover/>
+    <v-label class="text-subtitle-2 font-italic pt-2"
+             style="white-space: pre-wrap">
+      {{ label }}
+    </v-label>
   </div>
 </template>
 
