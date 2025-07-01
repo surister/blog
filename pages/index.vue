@@ -14,13 +14,13 @@ let cratedb_blogs = [
 </script>
 
 <template>
-  <div style="background-color: #EF5350; height: 10px"></div>
-  <v-container fluid class="pt-15">
+  <v-container  class="pt-15" style="max-width: 720px">
 
     <!--   Last Entries   -->
-    <v-row no-gutters class="justify-center">
-      <v-col class="v-col-xs-12 v-col-sm-12 v-col-md-7 v-col-lg-6 v-col-xl-6">
+    <v-row no-gutters>
+      <v-col>
         <h2>Last entries</h2>
+
         <ContentList v-slot="{ list }">
           <div v-for="article in list">
             <template v-if="article.published || article.show_preview">
@@ -29,8 +29,7 @@ let cratedb_blogs = [
                 {{ article.published_date || new Date().toISOString().slice(0, 10) }}
               </span>
                 <a :href="article._path"
-                   target="_blank"
-                   class="font-weight-bold text-decoration-none text-white text-h6">
+                   class="font-weight-bold text-decoration-none text-white">
                   {{ article.title }}
                 </a>
                 <v-chip variant="outlined"
@@ -42,12 +41,14 @@ let cratedb_blogs = [
             </template>
           </div>
         </ContentList>
+
       </v-col>
     </v-row>
 
     <!--   CrateDB Section   -->
-    <v-row no-gutters class="pt-5 justify-center">
-      <v-col class="v-col-xl-6 v-col-lg-6 v-col-md-7 v-col-sm-12 v-col-xs-12">
+    <v-row no-gutters class="pt-5" >
+
+      <v-col>
         <h2>CrateDB blog</h2>
         <div v-for="article in cratedb_blogs">
           <div class="my-1">
@@ -55,16 +56,15 @@ let cratedb_blogs = [
                 {{ article.published_date || new Date().toISOString().slice(0, 10) }}
               </span>
             <a :href="article._path"
-               target="_blank"
-               class="font-weight-bold text-decoration-none text-white text-h6">
+               class="font-weight-bold text-decoration-none text-white">
               {{ article.title }}
             </a>
 
           </div>
         </div>
       </v-col>
-    </v-row>
 
+    </v-row>
   </v-container>
 </template>
 

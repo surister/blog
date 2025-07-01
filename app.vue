@@ -1,21 +1,31 @@
 <template>
-  <v-toolbar color="#121212">
-    <template #title>
-      <v-row class="justify-md-center justify-sm-start">
-        <v-col class="v-col-sm-5 v-col-6 v-col-md-5 v-col-lg-6">
-          <h3 class="font-weight-bold text-uppercase ml-lg-5 ml-sm-16 ml-md-16 ml-xs-0"><a href="/">Surister's dev blog</a></h3>
-        </v-col>
+  <v-toolbar color="#121212" border>
 
-      </v-row>
+    <template #title>
+      <v-container fluid style="max-width: 720px;" class="pl-lg-14 pl-md-14">
+        <v-row>
+          <v-col class>
+            <div class="font-weight-bold text-uppercase text-h7">
+              <a href="/">Surister's dev blog</a>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
     </template>
+
     <template #append>
-      <span class="ma-2">
-        <v-btn icon="mdi-github" class="mr-2" href="https://github.com/surister" target="_blank"
-               style="border-radius: 0"></v-btn>
-        <v-btn icon="mdi-head-question-outline" class="mr-2" href="/about" target="_blank"
-               style="border-radius: 0"></v-btn>
+      <span class="ma-1">
+        <v-btn icon="mdi-github"
+               class="mr-1"
+               href="https://github.com/surister"
+               target="_blank"/>
+        <v-btn icon="mdi-head-question-outline"
+               class="mr-1"
+               href="/about"
+               target="_blank"/>
       </span>
     </template>
+
   </v-toolbar>
   <NuxtPage/>
 </template>
@@ -29,6 +39,13 @@ body {
   font-family: Rubik, serif;
   font-weight: 300;
 }
+
+.v-toolbar__content > .v-toolbar-title {
+  margin-inline-start: 0px !important;
+}
+
 </style>
-<script setup lang="ts">
+
+<script setup>
+
 </script>

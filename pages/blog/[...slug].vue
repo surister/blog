@@ -5,8 +5,11 @@ const scrollTop = () => {
   window.scrollTo({top: 0,})
 }
 let showScrollUp = ref(false)
+let isTocFixed = ref(false)
+
 const handle = (_) => {
   showScrollUp.value = window.scrollY >= 500;
+  isTocFixed.value = window.scrollY >= 200;
 }
 
 onMounted(() => {
@@ -19,34 +22,39 @@ onMounted(() => {
   <ContentDoc v-slot="{ doc }">
     <article>
       <v-container fluid>
-        <v-row
-            no-gutters
-            class="justify-center justify-lg-start justify-sm-center justify-xs-center">
+        <v-row justify="center"
+               no-gutters>
 
           <!--  TABLE OF CONTENTS  -->
-          <v-col class="v-col-lg-3 v-col-md-3 v-col-xs-12">
-            <div style="height: 350px" class="hidden-sm hidden-xs"></div>
-            <div style="top: 50px" class="position-sticky">
-              <v-container>
-                <Toc></Toc>
-              </v-container>
-            </div>
-          </v-col>
+          <div style="
+               position: fixed;
+               animation: ease;
+               transition: all .5s;
+               left: 50px;
+               z-index: 1000;"
+               :style="{top: isTocFixed ? '100px' : '300px'}"
+               ref="toc"
+               class="hidden-md hidden-sm hidden-xs">
+            <Toc></Toc>
+          </div>
 
           <!--  CONTENT  -->
-          <v-col style="background-color: rgba(0,128,0,0)"
-                 class="v-col-xl-auto v-col-lg-7 v-col-md-7 v-col-sm-12 v-col-xs-12">
+          <v-col cols="auto">
 
             <div class="max-w-720px">
 
               <!--  BLOG HEADER  -->
-              <Header :doc="doc" class="my-6"></Header>
+              <Header :doc="doc" class="my-6"/>
 
               <v-alert v-if="!doc.published"
                        density="compact"
                        text="This article is incomplete, it will most likely contain wrong data, typos, lack of references and/or unfinished paragraphs."
                        title="Warning: This is a work in progress and is not yet published."
                        type="warning"/>
+
+              <div class="mt-8 hidden-lg hidden-xl">
+                <Toc class="text-h1"></Toc>
+              </div>
 
               <main ref="main">
                 <ContentRenderer :value="doc"/>
@@ -74,14 +82,12 @@ onMounted(() => {
       </div>
     </v-container>
     <v-btn class="hidden-xs scroll-to-top"
+           style="transition: all 10s"
            @click="scrollTop"
            icon="mdi-arrow-up"
-           v-if="showScrollUp"
-      >
-
+           v-if="showScrollUp">
     </v-btn>
   </ContentDoc>
-
 
 </template>
 
@@ -90,12 +96,12 @@ onMounted(() => {
   max-width: 720px;
 }
 
-
 .scroll-to-top {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 99;
+  transition: all 10s;
 }
 
 a {
@@ -128,9 +134,10 @@ main h4 {
 
 main ul {
   font-size: 1.188rem;
-  margin-left: 50px;
+  margin-left: 18px;
   margin-top: 5px;
   margin-bottom: 25px;
+  list-style-type: circle;
 }
 
 .h {
@@ -139,6 +146,10 @@ main ul {
   padding: .05rem .20rem;
   border-radius: 5px;
   word-wrap: break-word;
+}
+
+#toc-container {
+  margin-left: 20px;
 }
 
 #toc-title {
@@ -170,4 +181,6 @@ ol {
 html {
   scroll-behavior: smooth;
 }
+
+
 </style>
