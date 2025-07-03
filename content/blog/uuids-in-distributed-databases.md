@@ -11,20 +11,21 @@ published: false
 
 
 ## [Introduction]{.text-h4}
-In this post, we will explore the properties of unique identifiers in Distribute databases, how
-the most popular unique id: UUID is composed and what CrateDB uses.
+In this post, we will explore some properties of unique identifiers in Distribute databases, use cases,
+how the most popular unique id: [UUID]{.font-weight-medium} is composed and what CrateDB; a distributed
+shared-nothing database uses.
 
 
 ## [About databases]{.text-h3 .text-red}
 One challenge of distributed databases (specifically those with shared-nothing architecture) 
-is data consistency, keeping all data in sync while staying performant is hard,
+is data consistency, keeping all data consistent while staying performant is hard,
 since insert/updates can happen at different rates in different nodes. 
 
-One effect of this is the typical lack of monotonically increasing ids, commonly known as 
-[AUTO-INCREMENT]{.h}; that is a table's column which every time a new row is inserted the column's value
-gets incremented monotonically (usually by 1).
+One effect of this is the lack of monotonically increasing ids, commonly known as 
+[AUTO-INCREMENT]{.font-weight-medium}; that is a table's column which every time a new row is
+inserted, the column's value gets incremented monotonically (usually by 1).
 
-One example you might be familiar with is the [SERIAL]{.h} datatype in postgres:
+One example you might be familiar with is the [SERIAL]{.fm} datatype in postgres:
 
 ::Editor{lang='sql'}
 <pre>
@@ -56,35 +57,48 @@ SELECT * FROM sometable</pre>
 ::
 
 As you can see, [id]{.h} was incremented by one every time we inserted a row.
-This is possible because the database keeps track of the count with a counter (called sequences in Postgres.)
+This is possible because the database keeps track of the count with a counter
+(called sequences in Postgres). This is effectively a unique id, [within]{.fm} the table,
+and is commonly used as a primary key.
 
-But in our distributed world every insert has to be executed in every node,
+But in our distributed world every insert has to be executed in every node or instance of the database,
 in order for the nodes to increase the id correctly; they would need to communicate to keep their
-counters in sync, in a read-heavy scenario this would mean massive inter-node communication.
-Performance would be impacted, defeating the purpose of using a distributed database.
-
+counters in sync, in a read-heavy scenario this would mean massive inter-node communication, locking
+and decrease of write performance, defeating one of the nice characteristics of distributed databases.
 
 ### [The need for uniqueness]{.text-h4}
-In databases, we often need to uniquely identify every row. Primary keys are used for that.
+In databases, we often need to uniquely identify rows. [Primary keys]{.fm} are used for that.
+By definition, primary keys need to be unique and not null, and most distributed databases choose
+not to implement auto-increment sequences. What should be used then?
 
-By definition, primary keys need to be unique and not null, and we cannot use one of the simplest 
-and most effective ones: [AUTO-INCREMENT]{.h}. What do we use then?
+Well, there are two different flavors to create ids, [coordinated]{.fm}; the one we said it is not usually
+implemented in distribute databases, because coordination is expensive, and [uncoordinated]{.fm}.
+Uncoordinated means that any database instance or node should be able to generate valid ids 
+without talking to others, [without collisions]{.fm}, and that's one of the challenges: Not creating
+the same id again, otherwise it wouldn't be unique.
 
-Throughout the years, many different ways of creating uncoordinated unique IDs have been developed,
-mostly using some combination of:
+We could create a massive blob of pseudo-random data that would assure us it would never be generated again
+in the lifespan of the universe; avoiding collisions, but that'd be not efficient. 
+Imagine generating a 1GB unique id for every row in your database, it's just not feasible. Like in 
+encryption, there is a careful balance between how much uniqueness we want and how much we pay for it.
 
-- pseudo-random data
+That's why there is not a single way of creating an uncoordinated identifier, and depending on its
+components and how its created, it will have different uniqueness guarantees, and other properties.
+
+Some common components are:
+
+- just pseudo-random data
 - timestamps
 - metadata (thread number, MAC address, process id)
 - counters
 
-For example:
+And some examples of uncoordinated unique ids:
 
-- creation timestamp (simple created_at field in a table)
+- creation timestamp (simple [created_at]{.h} field in a table)
 - random data (UUID4)
 - creation timestamp + machine id + increment
-(:alink{text="Twitter's snowflake" url="https://github.com/twitter-archive/snowflake"})
-- creation timestamp + random (:alink{text="Ulid" url="https://github.com/ulid/spec"})
+(:alink{.fm text="Twitter's snowflake" url="https://github.com/twitter-archive/snowflake"})
+- creation timestamp + random (:alink{.fm text="Ulid" url="https://github.com/ulid/spec"})
 
 While many engineers and companies have developed their own way of creating unique IDs, the internet 
 task force, the 'official' body that takes care of promoting and publishing RFCS (standards) have
@@ -92,23 +106,51 @@ their take on it: [UUID]{.h} (Universally Unique Identifier).
 
 
 ### [Sortable Ids are amazing]{.text-h4}
-Being unique is the bare minimum requirement for a primary key, but there is another property that we lose by
-not being able to use an AUTO-INCREMENT, meaningful [Sortability]{.h}.
+Being unique is the bare minimum requirement for a primary key, but there is another property
+that we lose by not being able to use a sequence, the capacity to [sort]{.fm}.
 
-Being unique is the bare minimum requirement for a primary key,
-but [AUTO-INCREMENT]{.h} columns offer another valuable property that we lose in distributed systems:
-sortability.
+Having a column that is sortable makes aggregations more efficient and enables 
+features like pagination, incremental queries or last-write detection. 
 
-Having a column that is sortable makes aggregations more efficient and enable sorting, which we can
-leverage to do pagination, incremental queries or last-write detection.
+For example :alink{.fm text="connector-x" url="https://github.com/sfu-db/connector-x"} uses a
+sorted column to do client side query partitioning, making loading data from a database to
+a dataframe very fast. More specifically, it works by issuing [SELECT MIN(field), MAX(field) FROM table]{.h},
+and computing different 'buckets.' It then issues several queries in different threads concurrently.
 
-For example :alink{text="connector-x" url="https://github.com/sfu-db/connector-x"} uses a sorted column
-to do client side query partitioning, making loading data from a database to a dataframe very fast. 
+This is an example of a partition planner that I created in rust similar to connector-x's:
 
-More specifically, it works by issuing [SELECT MIN(field), MAX(field) FROM table]{.h}, and computing different 'buckets.'
-It then issues several [select * from table where field > (rows_per_partitions * bucket) and field < (rows_per_partitions * bucket + 1) ]{.h}
-statements in different threads concurrently.
+::Editor
+<pre>
+PartitionPlan(
+    min_value=1,
+    max_value=1200000,
+    count=1199969,
+    metadata_query='...omitted...',
+    query_data=[
+    'select * from (select l_orderkey from lineitem)'
+    'where l_orderkey >= 1 and l_orderkey < 600001',
+    'select * from (select l_orderkey from lineitem)'
+    'where l_orderkey >= 600001 and l_orderkey < 1200000'],
+    partition_config=PartitionConfig(
+        queries=['select l_orderkey 'from lineitem'],
+        partition_on='l_orderkey',
+        partition_num=2,
+        partition_range=None,
+        needed_metadata_from_source='CountAndMinMax',
+        query_partition_mode='OnePartitionedQuery')
+    )
+)</pre>
+::
 
+The original query is [select l_orderkey from lineitem]{.h} and we split the query in two:
+
+[select l_orderkey from lineitem where l_orderkey >= 1 and l_orderkey < 600001]{.h}
+
+and
+
+[select l_orderkey from lineitem where l_orderkey >= 600001 and l_orderkey < 1200000]{.h}
+
+But this only works if [l_orderkey]{.h} is of a datatype that can be sorted and therefore filtered.
 We can use the same technique to create a client side pseudo-paginator for any table,
 which can be useful when batch-processing large tables.
 

@@ -93,6 +93,7 @@ onMounted(() => {
 </template>
 
 <style>
+/* Custom styling classes. */
 .max-w-720px {
   max-width: 720px;
 }
@@ -105,31 +106,38 @@ onMounted(() => {
   transition: all 10s;
 }
 
-a {
-  /* Removes link color and underline */
-  color: inherit;
-  text-decoration: inherit;
+/* h: highlighting */
+.h {
+  font-size: 1.188rem !important;
+  background: rgb(33, 33, 33);
+  padding: .2em .4em;
+  border-radius: 4px;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+/* fm: font-medium */
+.fm {
+  font-weight: 500 !important;
+}
+
+.ct table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid red;
+  text-align: center;
+  text-justify: distribute;
+}
+
+/* Custom tag styling */
+html {
+  scroll-behavior: smooth;
 }
 
 main div p {
   font-size: 1.3rem;
   line-height: 30px;
-}
-
-p + p, div + p, ul + p, ol + p {
-  margin-top: 1em;
-}
-
-h1 + p, h2 +p, h3 + p {
-  padding-top: .8em
-}
-
-p + h1, p +h2, p + h3 {
-  padding-top: 2em
-}
-
-p + ol, p + ul {
-  margin-top: .8em;
 }
 
 main li {
@@ -144,33 +152,6 @@ main ul {
   list-style-type: circle;
 }
 
-.h {
-  font-size: 1.188rem !important;
-  background: rgb(33, 33, 33);
-  padding: .2em .4em;
-  border-radius: 4px;
-  font-weight: 400;
-  word-wrap: break-word;
-}
-
-#toc-container {
-  margin-left: 20px;
-}
-
-#toc-title {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.ct table {
-  table-layout: fixed;
-  width: 100%;
-  border-collapse: collapse;
-  border: 2px solid red;
-  text-align: center;
-  text-justify: distribute;
-}
-
 th,
 td {
   padding: 5px;
@@ -183,9 +164,41 @@ ol {
   margin-top: 5px
 }
 
-html {
-  scroll-behavior: smooth;
+a {
+  /* Removes link color and underline */
+  color: inherit;
+  text-decoration: inherit;
 }
 
 
+/* Custom spacing between elements. */
+p + p, div + p, ul + p, ol + p {
+  margin-top: 1em;
+}
+
+h1 + p, h2 + p, h3 + p {
+  padding-top: .8em
+}
+
+p + h1, p + h2, p + h3 {
+  padding-top: 2em
+}
+
+p + ol, p + ul {
+  margin-top: .8em;
+}
+
+h2 + h3 {
+  margin-top: .8em
+}
+
+/* Table of contents styling */
+#toc-container {
+  margin-left: 20px;
+}
+
+#toc-title {
+  font-size: 20px;
+  font-weight: bold;
+}
 </style>
