@@ -47,6 +47,7 @@ onMounted(() => {
               <Header :doc="doc" class="my-6"/>
 
               <v-alert v-if="!doc.published"
+                       class="my-5"
                        density="compact"
                        text="This article is incomplete, it will most likely contain wrong data, typos, lack of references and/or unfinished paragraphs."
                        title="Warning: This is a work in progress and is not yet published."
@@ -112,24 +113,27 @@ a {
 
 main div p {
   font-size: 1.3rem;
-  margin-top: 20px;
   line-height: 30px;
 }
 
-
-main h2 {
-  margin-top: 30px;
-  margin-bottom: 30px;
+p + p, div + p, ul + p, ol + p {
+  margin-top: 1em;
 }
 
-main h3 {
-  margin-top: 30px;
-  margin-bottom: 30px;
+h1 + p, h2 +p, h3 + p {
+  padding-top: .8em
 }
 
-main h4 {
-  margin-top: 30px;
-  margin-bottom: 30px;
+p + h1, p +h2, p + h3 {
+  padding-top: 2em
+}
+
+p + ol, p + ul {
+  margin-top: .8em;
+}
+
+main li {
+  font-size: 1.188rem;
 }
 
 main ul {
@@ -141,10 +145,11 @@ main ul {
 }
 
 .h {
-  font-size: 1rem;
-  background: rgb(52, 56, 65);
-  padding: .05rem .20rem;
-  border-radius: 5px;
+  font-size: 1.188rem !important;
+  background: rgb(33, 33, 33);
+  padding: .2em .4em;
+  border-radius: 4px;
+  font-weight: 400;
   word-wrap: break-word;
 }
 
