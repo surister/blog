@@ -10,11 +10,32 @@ published_date: '2025-06-23'
 comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
 ---
 
-## [- Text]{.text-red .text-h2}
+## [Text styling]{.text-h2 .text-red}
 
-[Antlr4]{.h} highlighted
+### [Color]{.text-h3}
+[Some heading is good]{.text-blue .text-h6}
 
-[Big text]{.text-h1}
+[Some text is bad]{.text-green}
+
+### [Emphasis]{.text-h3}
+Use Highlight {.h} for code references like classes, enums and methods:
+[TypeVar]{.h} [TypeVarFactory(one=1)]{.h}
+
+but use bold when emphasizing:
+
+I hate when we have to use [typevars]{.font-weight-bold} or factories.
+
+### [Headings]{.text-h2}
+
+[h1]{.text-h1}
+
+[h2]{.text-h2}
+
+[h3]{.text-h3}
+
+[h4]{.text-h4}
+
+[h5]{.text-h5}
 
 ## [- Tables]{.text-red .text-h2}
 
@@ -68,7 +89,6 @@ Normal table
 | :MaT{text="A x B"}                       | PRODUCT      | SELECT * FROM R CROSS JOIN S; SELECT * FROM R, S |
 </div>
 
-:Der{r="4" link="https://github.com/antlr/antlr4/blob/master/doc/targets.md"}
 
 ## [- Images]{.text-red .text-h2}
 
@@ -79,6 +99,7 @@ Normal table
 "width": "400"
 "marginTop": "15"
 ---
+::
 ::
 
 ## [- External link]{.text-red .text-h2}
@@ -144,6 +165,7 @@ My second reference :Ref{r="2"}<br>
 My third reference :Ref{r="3"}
 I'm on a strike! :Ref{r="4"}
 
+### [References]{.text-h3}
 :Der{r="1" link="https://github.com/antlr/antlr4/blob/master/doc/targets.md"}
 :Der{r="2" link="https://github.com/antlr/antlr4/blob/master/doc/targets.md"}
 :Der{r="3" link="https://github.com/antlr/antlr4/blob/master/doc/targets.md"}
@@ -235,3 +257,7 @@ I'm on a strike! :Ref{r="4"}
 * One
 * Two
 * Third
+
+1. One
+2. Two
+3. Three
