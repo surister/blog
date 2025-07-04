@@ -4,7 +4,7 @@ image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-pho
 description: 'Blueprint showcasing available components'
 tags: [ 'python', 'Antlr4', 'software' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Monologue Expert' }, { 'name': 'Anon' } ]
-show_preview: true
+show_preview: false
 published: false
 published_date: '2025-06-23'
 comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
