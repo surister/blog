@@ -62,8 +62,35 @@ let config = {
 </script>
 
 <template>
-  <div>
-    <Line :data="config.chartData" :options="config.chartOptions" :plugins="config.plugins"/>
+  <v-dialog max-width="70%">
+    <template v-slot:activator="{ props: activatorProps }">
+      <v-btn v-bind="activatorProps"
+             class="my-2"
+             color="surface-variant"
+             text="Expand"
+             size="small"
+             variant="outlined"/>
+    </template>
+
+    <template v-slot:default="{ isActive }">
+      <v-card color="red">
+        <Line :data="config.chartData"
+          :options="config.chartOptions"
+          :plugins="config.plugins"/>
+
+        <v-card-actions>
+          <v-btn @click="isActive.value = false"
+                 class="font-weight-bold">
+            <template #default><span class="fm">close</span></template>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </template>
+  </v-dialog>
+  <div >
+    <Line :data="config.chartData"
+          :options="config.chartOptions"
+          :plugins="config.plugins"/>
   </div>
 </template>
 
