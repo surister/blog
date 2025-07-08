@@ -19,7 +19,7 @@ const props = defineProps({
 <template>
 <a :style="{'color': color}"
    :href="url"
-   class="a-tag"
+   class="a-tag text-decoration-underline"
   target="_blank">
   {{ text }}
 </a>
@@ -27,6 +27,6 @@ const props = defineProps({
 
 <style>
 .a-tag:hover {
-  color: beige;
+  color: beige !important;
 }
 </style>
