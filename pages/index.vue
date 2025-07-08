@@ -53,9 +53,9 @@ let cratedb_blogs = [
         <div v-for="article in cratedb_blogs">
           <div class="my-1">
                 <span class="text-blue text-subtitle-1 ml-1">
-                {{ article.published_date || new Date().toISOString().slice(0, 10) }}
+                {{ article.date || new Date().toISOString().slice(0, 10) }}
               </span>
-            <a :href="article._path"
+            <a :href="article.path"
                class="font-weight-bold text-decoration-none text-white">
               {{ article.title }}
             </a>
