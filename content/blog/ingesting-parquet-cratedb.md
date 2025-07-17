@@ -13,53 +13,50 @@ right now use it in some shape or form, it has become what JSON is to web dev.
 Almost all popular data manipulation and data analysis tools support it, just to name a few:
 Spark, Pandas, Polars, DuckDB, Delta lake :Ref{r="1"}...
 
-The format is very powerful:
+The format is very efficient in terms of storage, for example, this ~3M rows dataset :alink{text="Yellow taxi trip - January 2024" url="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page" .mt-1}
+takes:
 
-:elink{text="Yellow taxi trip - January 2024" url="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page" .mt-1}
-
-* [48MB]{.h} in Parquet
-* [342MB]{.h} in CSV
-* [1.2GB]{.h} in JSON
-* [510MB]{.h} in PostgreSQL 16.1 (Debian 16.1-1.pgdg120+1)
+* [48MB]{.fm} in Parquet
+* [342MB]{.fm} in CSV
+* [1.2GB]{.fm} in JSON
+* [510MB]{.fm} in PostgreSQL 16.1 (Debian 16.1-1.pgdg120+1)
 
 One of the first things that I was interested when I joined CrateDB was ingesting
 parquet files, the database does not implement it natively; in fact, few SQL databases natively support
-ingesting the format, some claim they do, but the feature is either in beta or actually way more limited than
-they make you believe.
+ingesting the format, some claim they do, but the ingestion is either in beta or actually way 
+more limited than they make you believe.
 
-The goal of this post is to load Parquet as fast as possible without any data loss, we’re going to
-read parquet files transform it into SQL-like directives, and send them to the database.
+The goal of this post is to load Parquet as fast as possible without any data loss.
 While this is going to be for CrateDB, it will probably translate well to other SQL databases.
 
-There are three possible bottlenecks when ingesting data like this:
-
-The client, the server and the link between them.
+There are three possible bottlenecks when ingesting data to a database the client, the server and
+the physical link between them, the network.
 
 For these tests we’re going to use
 
-* [CrateDB 5.9.3 (built f542b18/NA, Linux 5.15.0-125-generic amd64, OpenJDK 64-Bit Server VM 22.0.2+9)]{.h}
-* Server [Ubuntu 22.04.2 LTS x86_64 - 5.15.0-125-generic - Intel i7-7700K (8) @ 4.500GHz - 16GB RAM]{.h}
-* Client [Arch Linux x86_64 - 6.11.6-arch1-1 - 13th Gen Intel i7-13700KF (24) @ 5.300GHz - 32GB RAM]{.h}
-* Link between client-server is a 10m ethernet CAT5e cable through a 1GiB/s switch.
+* [CrateDB]{.fm .text-red}: [CrateDB 5.9.3 (built f542b18/NA, Linux 5.15.0-125-generic amd64, OpenJDK 64-Bit Server VM 22.0.2+9)]
+* [Server]{.fm .text-red} [Ubuntu 22.04.2 LTS x86_64 - 5.15.0-125-generic - Intel i7-7700K (8) @ 4.500GHz - 16GB RAM]
+* [Client]{.fm .text-red} [Arch Linux x86_64 - 6.11.6-arch1-1 - 13th Gen Intel i7-13700KF (24) @ 5.300GHz - 32GB RAM]
+* [Link]{.fm .text-red} between client-server is a 10m ethernet CAT5e cable through a 1GiB/s switch.
 
-On the server side, there are many things that we can do to improve ingestion performance :Ref{r="2"} :Ref{r="3"}, increase
-nodes, remove replication, a faster disk, a better cpu... but CrateDB already handles big volumes fairly well,
-so I will focus on the bottleneck that's mostly related to my job, [client side]{ .text-red}.
-
+On the server side, there are many things that we can do to improve ingestion performance
+:Ref{r="2"} :Ref{r="3"}, increase the number of nodes, remove replication, remove indexing,
+having a faster disk, a better cpu... but for the sake of my limited time we are going to focus,
+on the bottleneck that's mostly related to my job, [client side]{.text-red}.
 
 For every 'solution' we try, we are going to log memory (GiB), cpu (%), upload speed (Mbps) and
 data integrity using a custom Python script :Ref{r="4"}
 
 :Icon{size="x-small" color="red" icon="mdi-alert"} Disclaimer:
 * Benchmarking is hard :Ref{r="5"}.
-* We’re going to run every approach a few times only.
+* I'm going to run everything a few times and post one result, not the averages.
 
-I'm going to try to solve this problem as I write this post, so new ideas will appear.
+ALso, I'm going to try to solve this problem as I write this post, so new ideas will appear.
 I might not find the most efficient solution right now.
 
 ## [Polars]{.text-h3}
 
-Loading parquet to CrateDB is simple:
+The first thing that comes to my mind is to use Polars, which is very straight forward:
 
 ::Editor{lang="python" header_text="load_parquet1.py" show_header=true}
 <pre>import polars
@@ -78,10 +75,10 @@ df.write_database(
 
 Results
 
-* Time: [316.90s (5.26 minutes)]{.h}
-* Avg upload speed: [1.93Mb/s]{.h} - [max(2.8)]{.h}
-* Avg memory usage: [6.33Gb]{.h} - [max(6.67)]{.h}
-* Avg cpu usage: [1.37%]{.h} - [max(7.8)]{.h}
+* Time: [316.90s (5.26 minutes)]{.fm}
+* Avg upload speed: [1.93Mb/s]{.fm} - [max(2.8)]{.fm}
+* Avg memory usage: [6.33Gb]{.fm} - [max(6.67)]{.fm}
+* Avg cpu usage: [1.37%]{.fm} - [max(7.8)]{.fm}
 * Avg throughput: 2964624 rows / 316.90 = [9355.18rows/s]{.h}
 
 ::line{.pt-5}
@@ -92,18 +89,18 @@ Results
 
 High memory usage indicates that the whole file is loaded into memory.
 Cpu usage is low as well, not that I expect it to be higher, the only 'heavy' computation
-that is done is transposing columnar data into rows. Everything was executed in one process.
+that is done is transposing columnar data into rows and serialization. Everything was executed in one process.
 
 Looking at the upload speed, I don't think its properly batched (or they’re small), it's fairly low and not consistent
 as it has some troughs.
 
-In conclusion, it takes too long ~6 minutes and too much memory, we need to explore more options.
+In conclusion, it takes too long (~6 minutes) and too much memory, we need to explore more options.
 
 Trying [low_memory=True]{.h} yielded the same results.
 
 ## [Polars - Lazyframe + Batched]{.text-h3}
 
-We could use a :elink{text="LazyFrame" url="https://docs.pola.rs/api/python/stable/reference/lazyframe/index.html" color="red"}
+We could use a :alink{text="LazyFrame" url="https://docs.pola.rs/api/python/stable/reference/lazyframe/index.html" color="red"}
 to use batches, so instead of loading everything to memory, we will only load smaller chunks of rows.
 
 Let's try batches of [50k]{.h} and [100k]{.h}
@@ -130,10 +127,10 @@ for batch in (lazy_frame
 
 Results
 
-* Time: [315.88s (5.26 minutes)]{.h}
-* Avg upload speed: [1.94MiB/s]{.h} - [max(2.78)]{.h}
-* Avg memory usage: [0.96GiB]{.h} - [max(0.97)]{.h}
-* Avg cpu usage: [1.66%]{.h} - [max(4.9)]{.h}
+* Time: [315.88s (5.26 minutes)]{.fm}
+* Avg upload speed: [1.94MiB/s]{.fm} - [max(2.78)]{.fm}
+* Avg memory usage: [0.96GiB]{.fm} - [max(0.97)]{.fm}
+* Avg cpu usage: [1.66%]{.fm} - [max(4.9)]{.fm}
 * Avg throughput: 2964624 rows / 315.88 = [9385.18rows/s]{.h}
 
 ::line{.pt-5}
@@ -153,15 +150,15 @@ The time taken is still the same as the non-batched solution.
 
 Batch size of [50_000:]{.h}
 
-* Time: [326.89s (5.44)]{.h}
-* Avg upload speed: [1.88MiB/s]{.h} - [max(2.84)]{.h}
-* Avg memory usage: [0.84GiB]{.h} - [max(0.84)]{.h}
-* Avg cpu usage: [2.68%]{.h} - [max(10.1)]{.h}
+* Time: [326.89s (5.44)]{.fm}
+* Avg upload speed: [1.88MiB/s]{.fm} - [max(2.84)]{.fm}
+* Avg memory usage: [0.84GiB]{.fm} - [max(0.84)]{.fm}
+* Avg cpu usage: [2.68%]{.fm} - [max(10.1)]{.fm}
 * Avg throughput: 2964624 rows / 326.89 = [9069.3rows/s]{.h}
 
 ## [PyArrow]{.text-h3}
 
-Polars uses the Rust implementation of :elink{text="Arrow" url="https://arrow.apache.org/" slim=True .pa-1}
+Polars uses the Rust implementation of :alink{text="Arrow" url="https://arrow.apache.org/" slim=True .pa-1}
 under the hood. With [PyArrow]{.h} we can quickly try it without any additional setup. I don't expect it to be
 much faster since I do not belive that Polars overhead is significant, let's try:
 
@@ -184,10 +181,10 @@ for batch in table.to_batches(BATCH_SIZE):
 
 Results
 
-* Time: [315.85s (5.26 minutes)]{.h}
-* Avg upload speed: [1.94MiB/s]{.h} - [max(2.68)]{.h}
-* Avg memory usage: [1.04GiB]{.h} - [max(1.12)]{.h}
-* Avg cpu usage: [3.19%]{.h} - [max(14.3)]{.h}
+* Time: [315.85s (5.26 minutes)]{.fm}
+* Avg upload speed: [1.94MiB/s]{.fm} - [max(2.68)]{.fm}
+* Avg memory usage: [1.04GiB]{.fm} - [max(1.12)]{.fm}
+* Avg cpu usage: [3.19%]{.fm} - [max(14.3)]{.fm}
 * Avg throughput: 2964624 rows / 315.85 = [9386.04rows/s]{.h}
 
 ::line{.pt-5}
@@ -196,14 +193,14 @@ Results
 ---
 ::
 
-Practically identical with Polars, at least the metrics, the graph shows a different CPU pattern, ram and upload
-speed is very similar.
+Practically identical with Polars, at least in the metrics, the graph shows a different CPU pattern,
+ram and upload speed is very similar.
 
 ## [Parallelizing row groups]{.text-h3}
 
-My first idea to improve performance further is to parallelize, but how can we parallelize reading different batches? 
+A common idea to improve performance further is to parallelize, but how can we parallelize reading different batches? 
 
-If we look at the :elink{type="book-open-page-variant" text="parquet specification" url="https://parquet.apache.org/docs/file-format/"} we see that data
+If we look at the :alink{type="book-open-page-variant" text="parquet specification" url="https://parquet.apache.org/docs/file-format/"} we see that data
 is logically split in [Row groups]{.h} so I think we can safely read different groups of data.  
 
 ::CustomImage{.pt-5}
@@ -219,7 +216,7 @@ row group size and the file size, so if we have the file split in two groups, we
 At least in our first naive implementation.
 
 I suspect that this is not the most efficient way of doing it, it is probably better to let
-whatever Arrow implementation we use handle the reads for us. If we still want to read on row groups
+whatever parquet reader implementation we use handle the reads for us. If we still want to read on row groups
 we could further split the reads on different ranges of rows within the row group, but let's try it.
 
 For every row group, we are going to start a thread in a [ThreadPoolExecutor]{.h} and have it independently
@@ -252,10 +249,10 @@ with ThreadPoolExecutor(max_workers=6) as e:
 
 Results
 
-* Time: [164.69s (2.74 minutes)]{.h}
-* Avg upload speed: [3.78MiB/s]{.h} - [max(6.04)]{.h}
-* Avg memory usage: [1.45GiB]{.h} - [max(1.5)]{.h}
-* Avg cpu usage: [1.91%]{.h} - [max(5.7)]{.h}
+* Time: [164.69s (2.74 minutes)]{.fm}
+* Avg upload speed: [3.78MiB/s]{.fm} - [max(6.04)]{.fm}
+* Avg memory usage: [1.45GiB]{.fm} - [max(1.5)]{.fm}
+* Avg cpu usage: [1.91%]{.fm} - [max(5.7)]{.fm}
 * Avg throughput: 2964624 rows / 164.69 = [18000.82rows/s]{.h}
 
 ::line{.pt-5}
@@ -267,11 +264,13 @@ Results
 Results are way better than expected; almost half the time while maintaining a similar memory footprint,
 running 3 or 12 workers doesn't change much. We also almost double the throughput, from [9k]{.h} to [18k]{.h} rows/s
 
+It makes sense since most of the work is I/O and the GIL is typically released on these operations,
+so the more threads we have waiting while sending bytes, the better.
 
 While running this, I thought why not pass every batch to a different thread, it will theoretically
 use more memory, since batches will live longer in the pool as they’re waiting to get executed.
 
-We’re going to ignore row groups for a second.
+We're going to ignore row groups for a second.
 
 ::Editor{lang="python" header_text="load_parquet5.py" show_header=true}
 <pre>from concurrent.futures import ThreadPoolExecutor
@@ -296,10 +295,10 @@ with ThreadPoolExecutor(max_workers=12) as e:
 
 Results
 
-* Time: [123.63s (2.06 minutes)]{.h}
-* Avg upload speed: [5.19MiB/s]{.h} - [max(9.99)]{.h}
-* Avg memory usage: [3.35GiB]{.h} - [max(3.6)]{.h}
-* Avg cpu usage: [4.8%]{.h} - [max(18.0)]{.h}
+* Time: [123.63s (2.06 minutes)]{.fm}
+* Avg upload speed: [5.19MiB/s]{.fm} - [max(9.99)]{.fm}
+* Avg memory usage: [3.35GiB]{.fm} - [max(3.6)]{.fm}
+* Avg cpu usage: [4.8%]{.fm} - [max(18.0)]{.fm}
 * Avg throughput: 2964624 rows / 123.63 = [23979.33rows/s]{.h}
 
 ::line{.pt-5}
@@ -308,12 +307,13 @@ Results
 ---
 ::
 
-Performance is better, memory composition goes up, if we use [24]{.h} workers we use more memory and get the
-same time, using [3]{.h} will use less memory and will take longer, [163s]{.h} meaning we can tweak memory/time depending
-on the number of workers, for this dataset [12]{.h} seems to be good. 
+Performance is better, memory composition goes up, if we use [24]{.h} workers we use more
+memory and get the same time, using [3]{.h} will use less memory and will take longer,
+[163s]{.h} meaning we can tweak memory/time depending on the number of workers, for this 
+dataset [12]{.h} seems to be good.
 
-Next thing I can think of is combining both approaches, launching different processes, one for every row group,
-then batch it to the database with a threadpool.
+The next thing I can think of is combining both approaches, launching different processes,
+one for every row group, then batch it to the database with a threadpool.
 
 ::Editor{lang="python" header_text="load_parquet6.py" show_header=true}
 <pre>from concurrent.futures import ThreadPoolExecutor
@@ -348,10 +348,10 @@ if __name__ == '__main__':
 
 Results
 
-* Time: [90.60s (1.51 minutes)]{.h}
-* Avg upload speed: [7.12MiB/s]{.h} - [max(12.1)]{.h}
-* Avg memory usage: [4.73GiB]{.h} - [max(4.96)]{.h}
-* Avg cpu usage: [4.89%]{.h} - [max(15.7)]{.h}
+* Time: [90.60s (1.51 minutes)]{.fm}
+* Avg upload speed: [7.12MiB/s]{.fm} - [max(12.1)]{.fm}
+* Avg memory usage: [4.73GiB]{.fm} - [max(4.96)]{.fm}
+* Avg cpu usage: [4.89%]{.fm} - [max(15.7)]{.fm}
 * Avg throughput: 2964624 rows / 90.60 = [32721.08rows/s]{.h}
 
 ::line{.pt-5}
@@ -362,8 +362,9 @@ Results
 
 This is great, we have gone from [337]{.h} seconds to [90]{.h}; ~3.78x faster!
 
-But now what? I want better performance, 90 seconds still feels too much, and memory consumption is actually
-very high. We effectively traded memory for execution time (typical space over time tradeoff we see in algorithms)
+But now what? I want better performance, 90 seconds still feels too much, and memory consumption
+is actually very high. We effectively traded memory for execution time 
+(typical space over time tradeoff we see in algorithms).
 
 I had two options, either think harder and see where I could gain more performance in Python and
 dive deper in to these APIs. Ultimately, I think that doing proper concurrency is going to be key,
@@ -381,13 +382,63 @@ So how about?
 
 It's gotta be easier, right?
 
+[Hold up cowboy!]{.text-orange} I showed up this article to a colleague, and he told me there
+is a way of doing it that I hadn't used, I internally mini-panicked thinking that I missed a pretty
+obvious one, luckily for the time invested into this article, it's less performant than Rust.
+
+::Editor{lang="python" header_text="load_parquet7.py" show_header=true}
+<pre>import pandas
+import sqlalchemy as sa
+from sqlalchemy_cratedb.support import insert_bulk
+
+CRATE_URI = 'crate://192.168.88.251:4200'
+FILE_PATH = '/data/taxi_01_24.parquet'
+TABLE_NAME = 'taxi_pueblo'
+
+# Create a pandas DataFrame, and connect to CrateDB.
+df = pandas.read_parquet(FILE_PATH)
+engine = sa.create_engine(CRATE_URI)
+
+# Insert content of DataFrame using batches of records.
+df.to_sql(
+    name=TABLE_NAME,
+    con=engine,
+    if_exists="replace",
+    index=False,
+    chunksize=50_000,
+    method=insert_bulk,
+)</pre>
+::        
+
+Results
+
+* Time: [61.57s (1.03 minutes)]{.fm}
+* Avg upload speed: [4.59MiB/s]{.fm} - [max(9.93)]{.fm}
+* Avg memory usage: [2.87GiB]{.fm} - [max(2.91)]{.fm}
+* Avg cpu usage: [3.13%]{.fm} - [max(11.9)]{.fm}
+* Avg throughput: 2964624 rows / 61.57 = [48147.53rows/s]{.h}
+
+::line{.pt-5}
+---
+"chartProps": {"labels": [1752776962.1555526, 1752776963.156067, 1752776964.1569138, 1752776965.1581721, 1752776966.1589825, 1752776967.1593924, 1752776968.1597917, 1752776969.160365, 1752776970.1611888, 1752776971.162314, 1752776972.1634598, 1752776973.1646144, 1752776974.1659188, 1752776975.1670828, 1752776976.1682131, 1752776977.169367, 1752776978.170555, 1752776979.1717858, 1752776980.1727777, 1752776981.1735158, 1752776982.1747806, 1752776983.1760125, 1752776984.177256, 1752776985.178445, 1752776986.1796215, 1752776987.1808906, 1752776988.18205, 1752776989.1831875, 1752776990.1842074, 1752776991.1852887, 1752776992.186539, 1752776993.1876955, 1752776994.1888907, 1752776995.1900332, 1752776996.1908898, 1752776997.1916542, 1752776998.1929219, 1752776999.1940777, 1752777000.1952376, 1752777001.1963537, 1752777002.1975482, 1752777003.198361, 1752777004.1988065, 1752777005.199306, 1752777006.199712, 1752777007.2003524, 1752777008.2013435, 1752777009.2023613, 1752777010.2035282, 1752777011.20472, 1752777012.2059298, 1752777013.207179, 1752777014.2083337, 1752777015.2096145, 1752777016.2109163, 1752777017.21172, 1752777018.2121398, 1752777019.2126198, 1752777020.2134748, 1752777021.2143285], "datasets": [{"data": [1.4, 2.56, 2.9, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.91, 2.57], "borderColor": "rgb(255, 99, 132)", "label": "Memory (Gb)", "color": "white"}, {"data": [0.0, 0.02, 0.0, 4.64, 4.66, 4.68, 4.64, 4.65, 6.99, 6.95, 4.64, 4.65, 4.64, 4.66, 4.65, 4.65, 0.0, 4.65, 4.65, 4.66, 9.3, 4.65, 4.65, 4.64, 4.64, 4.64, 4.65, 4.66, 4.65, 4.66, 4.65, 4.65, 4.65, 4.72, 4.78, 4.7, 4.64, 4.66, 4.65, 4.66, 4.67, 4.65, 4.68, 5.86, 3.44, 4.65, 9.3, 4.67, 4.63, 4.64, 0.0, 4.64, 4.66, 4.65, 4.65, 4.65, 4.65, 4.66, 4.79, 9.93], "borderColor": "rgb(54, 162, 235)", "label": "Upload speed (Mb/s)"}, {"data": [0.0, 4.3, 1.4, 0.9, 1.2, 1.0, 1.3, 1.0, 1.0, 1.3, 5.7, 3.4, 6.6, 3.8, 3.7, 1.9, 2.1, 11.9, 2.1, 2.9, 1.8, 1.6, 1.4, 1.4, 1.5, 0.9, 2.8, 1.9, 2.4, 3.4, 1.3, 0.9, 5.1, 10.2, 7.9, 3.1, 3.8, 2.3, 1.9, 1.9, 2.0, 2.0, 2.0, 4.2, 3.1, 3.3, 3.5, 4.4, 3.6, 3.9, 2.0, 3.0, 1.8, 1.6, 3.6, 3.1, 4.8, 3.3, 6.9, 5.9], "borderColor": "rgb(255, 205, 86)", "label": "CPU (%)"}]}
+---
+::
+
+It sort of makes sense that performs well, the [insert_bulk]{.h} function overrides the actual
+function that is used to send data, and changes it to leverage the [http bulk args]{.fm} option that
+CrateDB has. Unfortunately, we cannot apply this to Polars as easily as Pandas, without monkey patching.
+
+
 ## [Rust, happened.]{ .text-h3}
 
-:Icon{icon="mdi-alert" color="red"} We are going to re-use some code that I have in [CrateDBx]{.h}, it's a project I started to try
-ingest data to CrateDB in the most efficient way possible. Also to learn Rust, I'm still very new 
-to the language. The code is very dirty and not heavily optimized, so bare with me.
+:Icon{icon="mdi-alert" color="red"} We are going to re-use some code that I have in [CrateDBx]{.h},
+it's a project I started to try to ingest data to CrateDB in the most efficient way possible from
+different sources.
 
-Tokio
+
+
+### [Tokio]{.text-h4}
+Using tokio (async) to load the parquet in batches as we did in #2
 
 Results
 
@@ -403,48 +454,80 @@ Results
 ---
 ::
 
-Rayon      
+Slightly faster than Pandas, the main difference is that it's able to send much bigger batches,
+hence the big peaks in upload speed.
+
+### [Rayon]{.text-h4}      
+
+Rayon is a data-parallelism library, think real multi-threading unlike Python, what we are going to
+do is open a stream of batches, and create a thread for every batch, every thread will
+read the batch, deserialize it to native rust types and serialize back to a string to be sent
+over HTTP using the bulk args parameter.
+
+::Editor{lang="python" header_text="main.rs" show_header=true}
+<pre>
+fn main(){
+    let batch_size = 20000;
+    let file = File::open(
+        "/home/surister/RustroverProjects/cdctest/data.parquet"
+    ).unwrap();
+    let builder = ParquetRecordBatchReaderBuilder::try_new(file)
+        .unwrap().with_batch_size(batch_size);
+    
+    let mut reader = builder
+        .build()
+        .unwrap();
+    let batches = reader.collect();
+    
+    batches.into_par_iter().for_each(|batch| {
+        let r = batch.unwrap();
+        
+        let columns = r
+            .schema()
+            .fields()
+            .iter()
+            .map(|field| field.name().clone())
+        .collect();
+    
+        let records = record_batch_to_cvalues(r);
+        let rows = cvalues_column_to_rows(records);
+        
+        cratedb.send_batch_http_sync(
+                "doc",
+                "taxi_rayon",
+                &columns,
+                rows
+            );
+    });
+}</pre>
+::        
 
 Results
 
-* Time: [66.59s (1.11 minutes)]{.h}
-* Avg upload speed: [4.88MiB/s]{.h} - [max(13.33)]{.h}
-* Avg memory usage: [1.54GiB]{.h} - [max(1.58)]{.h}
-* Avg cpu usage: [3.82%]{.h} - [max(19.1)]{.h}
-* Avg throughput: 2964624 rows / 66.59 = [44518.29rows/s]{.h}
+* Time: [34.54s (0.57)]{.h}
+* Avg upload speed: [8.54MiB/s]{.fm} - [max(45.68)]{.fm}
+* Avg memory usage: [1.95GiB]{.fm} - [max(1.97)]{.fm}
+* Avg cpu usage: [3.45%]{.fm} - [max(21.4)]{.fm}
+* Avg throughput: 2964624 rows / 34.54 = [85825.17rows/s]{.h}
+
+Fantastic results.
 
 ::line{.pt-5}
 ---
-"chartProps": {"labels": [1735843215.3895416, 1735843216.3906443, 1735843217.3917577, 1735843218.3931682, 1735843219.3941598, 1735843220.3950193, 1735843221.3963046, 1735843222.397649, 1735843223.3986065, 1735843224.3992019, 1735843225.4000742, 1735843226.401369, 1735843227.4026651, 1735843228.4039903, 1735843229.405272, 1735843230.4061935, 1735843231.406987, 1735843232.4082596, 1735843233.409633, 1735843234.4106424, 1735843235.4110796, 1735843236.411513, 1735843237.4122782, 1735843238.4132724, 1735843239.4142525, 1735843240.4155762, 1735843241.417064, 1735843242.4183688, 1735843243.4197283, 1735843244.42108, 1735843245.422025, 1735843246.422903, 1735843247.424374, 1735843248.4258053, 1735843249.4272575, 1735843250.4285588, 1735843251.429977, 1735843252.4312234, 1735843253.432361, 1735843254.4333348, 1735843255.4341471, 1735843256.4355252, 1735843257.4369097, 1735843258.4383214, 1735843259.4397585, 1735843260.4410682, 1735843261.4424617, 1735843262.4438057, 1735843263.4452221, 1735843264.446454, 1735843265.447685, 1735843266.4489882, 1735843267.4502468, 1735843268.4508212, 1735843269.451659, 1735843270.452968, 1735843271.4545734, 1735843272.4555652, 1735843273.456019, 1735843274.4568768, 1735843275.4582136, 1735843276.4594557, 1735843277.4608116, 1735843278.4620945, 1735843279.4634945], "datasets": [{"data": [1.48, 1.48, 1.48, 1.48, 1.48, 1.48, 1.48, 1.48, 1.48, 1.52, 1.52, 1.52, 1.52, 1.52, 1.52, 1.52, 1.53, 1.53, 1.54, 1.54, 1.54, 1.54, 1.54, 1.55, 1.55, 1.55, 1.55, 1.55, 1.55, 1.55, 1.56, 1.56, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.58, 1.53, 1.53, 1.51, 1.51, 1.51, 1.51, 1.51, 1.51], "borderColor": "rgb(255, 99, 132)", "label": "Memory (Gb)", "color": "white"}, {"data": [0.0, 13.33, 13.3, 12.41, 4.3, 0.02, 0.0, 0.01, 0.0, 1.55, 11.18, 13.0, 12.92, 6.17, 1.54, 1.53, 3.5, 5.92, 10.99, 10.15, 8.91, 10.07, 11.39, 3.25, 10.45, 8.59, 5.42, 10.9, 4.58, 3.08, 1.54, 1.54, 4.69, 5.32, 2.51, 0.01, 0.0, 1.55, 0.72, 7.33, 0.12, 12.28, 12.73, 11.52, 0.01, 0.02, 0.0, 0.01, 0.68, 9.5, 12.98, 12.58, 1.55, 0.01, 0.01, 0.01, 2.24, 0.76, 8.35, 3.88, 3.6, 0.95, 0.01, 0.01, 0.01], "borderColor": "rgb(54, 162, 235)", "label": "Upload speed (Mb/s)"}, {"data": [0.0, 2.0, 3.6, 2.2, 4.2, 4.2, 2.4, 2.9, 3.0, 19.1, 3.8, 2.5, 1.8, 1.9, 2.3, 3.0, 2.8, 7.4, 4.9, 7.2, 8.9, 3.5, 4.1, 6.4, 3.5, 4.4, 4.1, 2.0, 2.8, 1.8, 2.8, 3.2, 4.3, 2.0, 4.7, 4.2, 2.4, 3.6, 3.6, 2.4, 11.4, 3.0, 2.1, 1.3, 2.2, 3.4, 2.0, 1.3, 11.7, 3.9, 4.7, 1.0, 2.0, 1.5, 4.8, 3.1, 4.1, 4.5, 3.8, 3.2, 1.6, 1.7, 3.1, 4.1, 2.8], "borderColor": "rgb(255, 205, 86)", "label": "CPU (%)"}]}
+"chartProps": {"labels": [1752779333.488945, 1752779334.4898658, 1752779335.4908073, 1752779336.492172, 1752779337.493356, 1752779338.494562, 1752779339.4957812, 1752779340.49697, 1752779341.49818, 1752779342.4994326, 1752779343.5006638, 1752779344.5019815, 1752779345.5032403, 1752779346.5044992, 1752779347.5054479, 1752779348.5064378, 1752779349.5073867, 1752779350.508326, 1752779351.5094793, 1752779352.5107017, 1752779353.511795, 1752779354.5132084, 1752779355.5143354, 1752779356.5151696, 1752779357.5158308, 1752779358.5169835, 1752779359.5182328, 1752779360.519191, 1752779361.5203943, 1752779362.5214884, 1752779363.522653, 1752779364.5238206, 1752779365.5250015], "datasets": [{"data": [1.97, 1.97, 1.97, 1.97, 1.96, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.95, 1.96, 1.96, 1.96, 1.95, 1.95, 1.95, 1.93, 1.93, 1.93, 1.93, 1.93, 1.93, 1.93], "borderColor": "rgb(255, 99, 132)", "label": "Memory (Gb)", "color": "white"}, {"data": [0.0, 45.68, 0.0, 5.7, 3.8, 15.2, 13.3, 0.0, 11.4, 9.49, 3.8, 17.08, 11.4, 0.0, 13.29, 7.61, 7.6, 14.79, 0.42, 11.39, 3.8, 13.29, 1.89, 13.4, 4.12, 16.75, 1.94, 8.03, 6.47, 10.62, 9.5, 0.0, 0.01], "borderColor": "rgb(54, 162, 235)", "label": "Upload speed (Mb/s)"}, {"data": [0.0, 21.4, 3.8, 1.2, 3.3, 2.8, 9.4, 2.4, 1.8, 1.1, 2.6, 2.0, 1.0, 2.5, 3.3, 5.8, 6.5, 3.9, 3.3, 2.3, 2.1, 2.2, 2.0, 2.5, 3.0, 2.1, 1.8, 1.7, 2.1, 2.0, 0.6, 2.7, 3.0], "borderColor": "rgb(255, 205, 86)", "label": "CPU (%)"}]}
 ---
 ::
 
-Rayon 2
-
-Results
-
-* Time: [44.55s (0.74 min)]{.h}
-* Avg upload speed: [7.4MiB/s]{.h} - [max(13.21)]{.h}
-* Avg memory usage: [1.57GiB]{.h} - [max(1.61)]{.h}
-* Avg cpu usage: [5.04%]{.h} - [max(27.6)]{.h}
-* Avg throughput: 2964624 rows / 44.55 = [66548.11rows/s]{.h}
-
-::line{.pt-5}
----
-"chartProps": {"labels": [1735844038.3692622, 1735844039.3701174, 1735844040.37141, 1735844041.3727648, 1735844042.3740926, 1735844043.3754194, 1735844044.3763561, 1735844045.3771224, 1735844046.3781095, 1735844047.3786058, 1735844048.3793752, 1735844049.3805444, 1735844050.3817801, 1735844051.382766, 1735844052.3839004, 1735844053.3854034, 1735844054.3860035, 1735844055.3866382, 1735844056.3872983, 1735844057.3878987, 1735844058.3885076, 1735844059.389365, 1735844060.390678, 1735844061.3919487, 1735844062.392937, 1735844063.3937383, 1735844064.395111, 1735844065.396399, 1735844066.397793, 1735844067.3987796, 1735844068.3996847, 1735844069.400669, 1735844070.4011748, 1735844071.4016678, 1735844072.4024353, 1735844073.4037826, 1735844074.4051437, 1735844075.406645, 1735844076.4076426, 1735844077.4084895, 1735844078.4098995, 1735844079.410893, 1735844080.411798], "datasets": [{"data": [0.29, 1.61, 1.61, 1.61, 1.6, 1.6, 1.6, 1.6, 1.59, 1.59, 1.58, 1.58, 1.59, 1.58, 1.59, 1.59, 1.59, 1.59, 1.59, 1.59, 1.59, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.59], "borderColor": "rgb(255, 99, 132)", "label": "Memory (Gb)", "color": "white"}, {"data": [0.0, 0.0, 1.81, 13.21, 12.77, 13.0, 12.38, 5.08, 10.78, 4.27, 7.17, 11.14, 9.62, 5.77, 5.2, 12.72, 12.0, 10.96, 6.27, 7.76, 3.37, 9.63, 6.89, 11.34, 7.06, 6.56, 12.24, 12.06, 5.4, 8.95, 8.75, 8.61, 12.18, 9.01, 5.56, 5.91, 9.15, 7.27, 0.15, 2.23, 4.07, 0.0, 0.03], "borderColor": "rgb(54, 162, 235)", "label": "Upload speed (Mb/s)"}, {"data": [0.0, 27.6, 2.4, 3.9, 3.7, 4.8, 5.8, 7.3, 4.4, 4.5, 4.8, 4.5, 5.1, 5.8, 5.3, 4.7, 7.3, 5.3, 6.3, 4.1, 6.8, 4.7, 7.8, 3.9, 4.8, 4.9, 4.6, 2.0, 4.9, 4.7, 3.2, 4.8, 3.5, 2.9, 2.3, 4.6, 2.0, 2.0, 5.8, 4.0, 1.8, 3.9, 3.6], "borderColor": "rgb(255, 205, 86)", "label": "CPU (%)"}]}
----
-::
-
-Rayon 3
+#### [Getting fancy]{.text-h4}
 
 24 cores - 20k batch size
 
 Results
 
-* Time: [30.55s ()]{.h}
-* Avg upload speed: [11.31MiB/s]{.h} - [max(67.63)]{.h}
-* Avg memory usage: [1.93GiB]{.h} - [max(1.98)]{.h}
-* Avg cpu usage: [1.67%]{.h} - [max(3.2)]{.h}
+* Time: [30.55s (0.57 min)]{.fm}
+* Avg upload speed: [11.31MiB/s]{.fm} - [max(67.63)]{.fm}
+* Avg memory usage: [1.93GiB]{.fm} - [max(1.98)]{.fm}
+* Avg cpu usage: [1.67%]{.fm} - [max(3.2)]{.fm}
 * Avg throughput: 2964624 rows / 30.55 = [97050.18rows/s]{.h}
 
 ::line{.pt-5}
