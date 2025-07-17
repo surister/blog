@@ -11,7 +11,7 @@ Parquet has become the main format for modern data engineering; I would even arg
 right now use it in some shape or form, it has become what JSON is to web dev.
 
 Almost all popular data manipulation and data analysis tools support it, just to name a few:
-Spark, Pandas, Polars, DuckDB, Delta lake :Ref{r="1"}...
+Spark, Pandas, Polars, DuckDB, Delta lake...
 
 The format is very efficient in terms of storage, for example, this ~3M rows dataset :alink{text="Yellow taxi trip - January 2024" url="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page" .mt-1}
 takes:
@@ -40,15 +40,15 @@ For these tests we’re going to use
 * [Link]{.fm .text-red} between client-server is a 10m ethernet CAT5e cable through a 1GiB/s switch.
 
 On the server side, there are many things that we can do to improve ingestion performance
-:Ref{r="2"} :Ref{r="3"}, increase the number of nodes, remove replication, remove indexing,
+:Ref{r="1"} :Ref{r="2"}, increase the number of nodes, remove replication, remove indexing,
 having a faster disk, a better cpu... but for the sake of my limited time we are going to focus,
 on the bottleneck that's mostly related to my job, [client side]{.text-red}.
 
 For every 'solution' we try, we are going to log memory (GiB), cpu (%), upload speed (Mbps) and
-data integrity using a custom Python script :Ref{r="4"}
+data integrity using a custom Python script :Ref{r="3"}
 
 :Icon{size="x-small" color="red" icon="mdi-alert"} Disclaimer:
-* Benchmarking is hard :Ref{r="5"}.
+* Benchmarking is hard :Ref{r="4"}.
 * I'm going to run everything a few times and post one result, not the averages.
 
 ALso, I'm going to try to solve this problem as I write this post, so new ideas will appear.
@@ -504,7 +504,7 @@ fn main(){
 
 Results
 
-* Time: [34.54s (0.57)]{.h}
+* Time: [34.54s (0.57 min)]{.h}
 * Avg upload speed: [8.54MiB/s]{.fm} - [max(45.68)]{.fm}
 * Avg memory usage: [1.95GiB]{.fm} - [max(1.97)]{.fm}
 * Avg cpu usage: [3.45%]{.fm} - [max(21.4)]{.fm}
@@ -524,7 +524,7 @@ Fantastic results.
 
 Results
 
-* Time: [30.55s (0.57 min)]{.fm}
+* Time: [30.55s (0.509 min)]{.fm}
 * Avg upload speed: [11.31MiB/s]{.fm} - [max(67.63)]{.fm}
 * Avg memory usage: [1.93GiB]{.fm} - [max(1.98)]{.fm}
 * Avg cpu usage: [1.67%]{.fm} - [max(3.2)]{.fm}
@@ -535,3 +535,12 @@ Results
 "chartProps": {"labels": [1751018430.5599427, 1751018431.560738, 1751018432.561663, 1751018433.5629394, 1751018434.5641966, 1751018435.5653565, 1751018436.5665238, 1751018437.5676858, 1751018438.5689478, 1751018439.5702062, 1751018440.571476, 1751018441.5724356, 1751018442.5733945, 1751018443.5745697, 1751018444.5758402, 1751018445.5771344, 1751018446.578361, 1751018447.5795717, 1751018448.5807076, 1751018449.5814946, 1751018450.5826952, 1751018451.5838015, 1751018452.584709, 1751018453.5852792, 1751018454.5862248, 1751018455.5874672, 1751018456.5887654, 1751018457.5903108, 1751018458.5915005], "datasets": [{"data": [1.86, 1.86, 1.85, 1.85, 1.85, 1.85, 1.86, 1.87, 1.87, 1.88, 1.89, 1.93, 1.93, 1.96, 1.97, 1.97, 1.97, 1.97, 1.98, 1.98, 1.98, 1.98, 1.98, 1.98, 1.98, 1.98, 1.98, 1.98, 1.94], "borderColor": "rgb(255, 99, 132)", "label": "Memory (Gb)", "color": "white"}, {"data": [67.63, 30.18, 2.24, 8.04, 18.97, 11.4, 0.0, 15.19, 11.39, 3.8, 11.4, 15.18, 12.02, 3.18, 11.4, 9.49, 11.38, 1.89, 7.6, 15.21, 1.9, 13.28, 1.9, 9.49, 7.93, 11.73, 3.8, 4.12, 6.15], "borderColor": "rgb(54, 162, 235)", "label": "Upload speed (Mb/s)"}, {"data": [0.0, 2.0, 1.5, 3.2, 1.5, 0.7, 2.1, 1.8, 1.0, 2.0, 2.1, 1.8, 0.9, 1.8, 1.6, 1.8, 0.8, 1.3, 2.3, 0.6, 2.0, 0.5, 1.8, 2.0, 2.6, 1.2, 1.3, 2.2, 2.3], "borderColor": "rgb(255, 205, 86)", "label": "CPU (%)"}]}
 ---
 ::
+
+## [References]{.text-h3 .text-red}
+
+::divider{.my-6}
+::
+:Der{r="1" link="https://cratedb.com/docs/guide/performance/index.html" text="Performance Guides" meta="CrateDB documentation, 2025"}
+:Der{r="2" link="https://cratedb.com/blog/how-we-scaled-ingestion-to-one-million-rows-per-second" text="How we scaled ingestion to one million rows per second" meta="CrateDB blog, 2023-08-02"}
+:Der{r="3" link="https://github.com/surister/mylab/blob/master/code/stats.py" text="mylab/blob/master/code/stats.py" meta="GitHub, surister/mylab"}
+:Der{r="4" link="https://hannes.muehleisen.org/publications/DBTEST2018-performance-testing.pdf" text="Mark Raasveldt, Pedro Holanda, Tim Gubner & Hannes Mühleisen, Fair Benchmarking Considered Difficult: Common Pitfalls In Database Performance Testing" meta="Website, hannes.muehleisen.org/publications/DBTEST2018 2025"}
