@@ -322,7 +322,7 @@ Another simple way to visualize it, is just to paint the inclusive first bit num
 ---
 ::
 
-## [What UUIDs is CrateDB using?]{.text-h3}
+## [What UUIDs is CrateDB using?]{.text-h3 .text-red}
 CrateDB; a shared-nothing distribute database in 5.10.2 uses three different kinds :Ref{r="1"} of unique IDs:
 * [ElasticFlakes]{.h}
 * [UUID4 in base64]{.h}
@@ -493,7 +493,7 @@ A random UUID4 as per RFC 4122 (2005), in url safe Base64 encoding.
 ### [DirtyUUID]{.text-h5}
 Just two integers cobbled up together, not following the UUID rfc format.
 
-## References
+## [References]{.text-h3 .text-red}
 
 ::divider{.my-6}
 ::
