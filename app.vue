@@ -36,7 +36,7 @@ body {
 }
 
 * {
-  font-family: Rubik, serif;
+  font-family: Rubik, Roboto;
   font-weight: 300;
 }
 
