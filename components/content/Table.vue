@@ -20,6 +20,7 @@ const props = defineProps({
 <template>
   <div style="height: 13px; background: #EF5350" v-if="hasTop"></div>
   <v-table style="max-height: 300px"
+           density="compact"
            :class="[hasBottom ? 'rounded-b-lg' : '']"
            fixed-header>
     <thead>
