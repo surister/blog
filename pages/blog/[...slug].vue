@@ -188,7 +188,19 @@ p + ol, p + ul {
   margin-top: .8em;
 }
 
+p + div {
+  margin-top: .8em
+}
+
 h2 + h3 {
+  margin-top: .8em
+}
+
+div + h2 {
+  margin-top: 2em
+}
+
+div + h3 {
   margin-top: .8em
 }
 
