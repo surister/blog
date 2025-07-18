@@ -4,7 +4,7 @@ image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-pho
 description: 'Investigating how to ingest parquet to CrateDB as efficiently as possible optimizing the client.'
 authors: [ { 'name': 'Ivan', 'job_title': 'Database Environment Engineer' } ]
 published: true
-published_date: '2025-06-23'
+published_date: '2025-07-18'
 tags: [ 'python', 'rust', 'software', 'optimization', 'CrateDB' ]
 ---
 Parquet has become the main format for modern data engineering; I would even argue that most companies
@@ -31,7 +31,7 @@ The goal of this post is to load Parquet as fast as possible without any data lo
 While this is going to be for CrateDB, it will probably translate well to other SQL databases.
 
 There are three possible bottlenecks when ingesting data to a database the client, the server and
-the physical link between them, the network.
+the physical link between them: the network.
 
 For these tests we’re going to use
 
