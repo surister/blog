@@ -35,7 +35,7 @@ the physical link between them: the network.
 
 For these tests we’re going to use
 
-* [CrateDB]{.fm}: [CrateDB 5.9.3 (built f542b18/NA, Linux 5.15.0-125-generic amd64, OpenJDK 64-Bit Server VM 22.0.2+9)]
+* [CrateDB]{.fm} [CrateDB 5.9.3 (built f542b18/NA, Linux 5.15.0-125-generic amd64, OpenJDK 64-Bit Server VM 22.0.2+9)]
 * [Server]{.fm} [Ubuntu 22.04.2 LTS x86_64 - 5.15.0-125-generic - Intel i7-7700K (8) @ 4.500GHz - 16GB RAM]
 * [Client]{.fm} [Arch Linux x86_64 - 6.11.6-arch1-1 - 13th Gen Intel i7-13700KF (24) @ 5.300GHz - 32GB RAM]
 * [Link]{.fm} between client-server is a 10m ethernet CAT5e cable through a 1GiB/s switch.
