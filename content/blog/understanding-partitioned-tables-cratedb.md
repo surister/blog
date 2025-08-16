@@ -378,7 +378,7 @@ Sharding a table is part of the fundamental structure of the data model in Crate
 is [replication]{.fm}.
 
 By default tables have one replica, this multiplies the number of shards,
-as the total number of shards is: [primary shards + replica shards]{.h}. In this article, the replication was
+the total number of shards is: [primary shards + replica shards]{.h}. In this article, the replication was
 turned off and the images showing shards do not show replica shards, only primary shards.
 
 This was done to simplify the different explanations and query results.
