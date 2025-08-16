@@ -48,7 +48,6 @@ function copyToClipboard(text) {
   <CodeEditor :text="value"
               :show-line-number="false"
               :class="['mt-5', 'rounded-t-lg', hasResult ? '' : 'rounded-b-lg']"
-              border-radius="10"
               highlight-row-background-color="red"
               background-color="#212121"
               padding-bottom="10"
