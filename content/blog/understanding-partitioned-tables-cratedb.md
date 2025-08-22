@@ -7,7 +7,7 @@ authors: [ { 'name': 'Ivan', 'job_title': 'Database Environment Engineer' } ]
 show_preview: false
 published: true
 published_date: '2025-08-16'
-comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
+comment_links: [ { 'name': 'reddit', 'href': 'https://www.reddit.com/r/databasedevelopment/comments/1mxff2a/post_understanding_partitioned_tables_and/' } ]
 ---
 
 Earlier this summer (2025) I was in J on the Beach having a conversation with a very charming Staff Engineer from
