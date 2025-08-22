@@ -20,7 +20,8 @@ but they meant slightly different things in each system.
 The phrase I said that I think sparked the most confusion was: "In CrateDB a partition is the
 specialization of a shard(s), by the user specifying a 'rule' to route records/rows into a shard(s)".
 
-In this article, we will try to understand sharding and partitioning in CrateDB.
+In this article, I will try to shed some light on what sharding and partitioning is in CrateDB,
+a feature that's used to maximize read operations performance. 
 
 ## [The storage model]{ .text-red .text-h4 }
 To understand why a partition is a [specialized]{.fm} shard, we first need to understand the storage
