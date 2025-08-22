@@ -186,7 +186,7 @@ SELECT
   id as shard_id,
   num_docs
 FROM
-  SYS.shards
+  sys.shards
 WHERE
   table_name = 't'
 ORDER BY
@@ -221,11 +221,11 @@ After another insert:
 ### [Inserting a record (segments)]{.text-red .text-h5}
 
 The record(s) is first committed to both the [translog]{.fm} and an [in-memory buffer]{.fm}, once
-its written to the translog we can ensure that the data will not be lost if a node failure happens
+it's written to the translog we can ensure that the data will not be lost if a node failure happens
 as we can recover and write the new segments from it.
 
 When a refresh happens, the segment is created, still in memory, and it will now be available in
-search results, after that at some point the in-memory segments will be committed to memory
+search results, after that at some point the in-memory segments will be committed to disk.
 
 ::CustomImage
 ---
@@ -377,7 +377,7 @@ on the data, use case and requirements, you can read more about this :alink{text
 Sharding a table is part of the fundamental structure of the data model in CrateDB, another fundamental aspect
 is [replication]{.fm}.
 
-By default tables have one replica, this multiplies the number of shards,
+By default, tables have one replica, this multiplies the number of shards,
 the total number of shards is: [primary shards + replica shards]{.h}. In this article, the replication was
 turned off and the images showing shards do not show replica shards, only primary shards.
 
