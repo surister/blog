@@ -14,6 +14,7 @@ const props = defineProps(['doc'])
         </span>
         <span class="pl-1" v-if="doc.comment_links">·</span>
         <elink type="comment"
+               :url="link.href"
                :text="link.name"
                class="mb-1"
                v-for="link in doc.comment_links"/>
