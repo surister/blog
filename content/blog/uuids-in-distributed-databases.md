@@ -10,13 +10,13 @@ published: false
 ---
 
 
-## [Introduction]{.text-h4}
+## [Introduction]
 In this post, we will explore some properties of unique identifiers in Distribute databases, use cases,
 how the most popular unique id: [UUID]{.font-weight-medium} is composed and what CrateDB; a distributed
 shared-nothing database uses.
 
 
-## [About databases]{.text-h3 .text-red}
+## [About databases]
 One challenge of distributed databases (specifically those with shared-nothing architecture) 
 is data consistency, keeping all data consistent while staying performant is hard,
 since insert/updates can happen at different rates in different nodes. 
@@ -64,7 +64,7 @@ in order for the nodes to increase the id correctly; they would need to communic
 counters in sync, in a read-heavy scenario this would mean massive inter-node communication, locking
 and decrease of write performance, defeating one of the nice characteristics of distributed databases.
 
-### [The need for uniqueness]{.text-h4 .text-red}
+### [The need for uniqueness]
 In databases, we often need to uniquely identify rows. [Primary keys]{.fm} are used for that.
 By definition, primary keys need to be unique and not null, and most distributed databases choose
 not to implement auto-increment sequences. What should be used then?
@@ -103,7 +103,7 @@ task force, the 'official' body that takes care of promoting and publishing RFCS
 their take on it: [UUID]{.h} (Universally Unique Identifier).
 
 
-### [Sortable Ids are amazing]{.text-h4}
+### [Sortable Ids are amazing]
 Being unique is the bare minimum requirement for a primary key, but there is another property
 that we lose by not being able to use a sequence, the capacity to [sort]{.fm}.
 
@@ -222,14 +222,14 @@ if __name__ == '__main__':
 All of this depend on a [sortable]{.h} id, achieving maximum efficiency when the ids are monotonically
 increased by 1.
 
-## [About unique IDs]{.text-h3 .text-red .mt-5}
+## [About unique IDs]
 Now we have more context of uniquely identifying rows in distributed databases. 
 Let's try to understand the most popular and used ones [UUIDs]{.h}.
 
 If you understand them at a fundamental level, you will pretty much understand every form of unique 
 IDs there is, it's all very similar at the core.
 
-### [Understanding UUIDs]{.text-h4}
+### [Understanding UUIDs]
 There are eight versions of UUIDs, in May 2024 we finally got published the :alink{text="last stable version" href="https://www.rfc-editor.org/rfc/rfc9562.html"}
 where version 7 and 8 were added, every version creates the UUID differently, and each version has different
 use cases.
@@ -241,7 +241,7 @@ You’ve probably seen them many times already; they’re those long IDs separat
 look like `51000350-1197-4f2e-bcef-ca8bc5e11b51`{.h .text-subtitle-2} (UUID4).
 
 
-### [Anatomy of an UUID]{.text-h4}
+### [Anatomy of an UUID]
 
 The UUID has 128 bits.
 
@@ -278,7 +278,7 @@ Now, the difference between UUID versions is what we decide what these groups of
 
 The bits are split in groups of bits, there are common groups between versions: the position of the version bit (48 to 51) and variant (bit 64 to 65)
 
-### [UUID4]{.text-h4}
+### [UUID4]
 
 [UUID4]{.h} has 5 groups of bits:
 
@@ -294,14 +294,14 @@ Another simple way to visualize it, is just to paint the inclusive first bit num
 
 ![](/img/uuid/groups.svg)
 
-## [What UUIDs is CrateDB using?]{.text-h3 .text-red}
+## [What UUIDs is CrateDB using?]
 CrateDB; a shared-nothing distribute database in 5.10.2 uses three different kinds :Ref{r="1"} of unique IDs:
 * [ElasticFlakes]{.h}
 * [UUID4 in base64]{.h}
 * [DirtyUUID]{.h}.
 
 
-### [ElasticFlakes]{.text-h5}
+### [ElasticFlakes]
 This implementation is inherited from the Open Source days of [elasticsearch]{.h} :Ref{r="2"}
 they are a time based id optimized for [Apache Lucene]{.h}, the underlining library in which 
 both CrateDB and Elasticsearch are based on.
@@ -449,13 +449,13 @@ If you want to check some of these things, see:
 * base32hex and a custom base64 are lexicographically sortable on uuid7 but base64 is not. :Ref{r="6"}
 * elasticflake is still not lexicographically sortable in base32hex. :Ref{r="7"} 
 
-### [UUID4]{.text-h5}
+### [UUID4]
 A random UUID4 as per RFC 4122 (2005), in url safe Base64 encoding.
 
-### [DirtyUUID]{.text-h5}
+### [DirtyUUID]
 Just two integers cobbled up together, not following the UUID rfc format.
 
-## [References]{.text-h3 .text-red}
+## [References]
 
 ::divider{.my-6}
 ::

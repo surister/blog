@@ -23,7 +23,7 @@ specialization of a shard(s), by the user specifying a 'rule' to route records/r
 In this article, I will try to shed some light on what sharding and partitioning is in CrateDB,
 a feature that's used to maximize read operations performance. 
 
-## [The storage model]{ .text-red .text-h4 }
+## [The storage model]
 To understand why a partition is a [specialized]{.fm} shard, we first need to understand the storage
 model of CrateDB.
 
@@ -80,14 +80,14 @@ An index has a path because it's a file, as we said before, composed of immutabl
 allows for easy backup and synchronization between different nodes as the database just
 needs to send and receive files.
 
-## [Operations of the storage models]{ .text-red .text-h4}
+## [Operations of the storage models]
 
 The fundamental part of CrateDB storage model is the [segment]{.fm}, and as operations
 (read/write/update/delete) happen on node, segments are created and merged. They are merged
 because search performance decreases as segments pile up, also each segment consumes file handles,
 memory and CPU time.
 
-### [Merging segments]{ .text-red .text-h5 }
+### [Merging segments]
 
 Segments are merged periodically by default. In Lucene, there are other merge strategies than time-based,
 and CrateDB might change the policy in the future.
@@ -108,8 +108,7 @@ merge the segments since in some situations, mostly after heavy writes, it can b
 Michael McCandless as a great :alink{text='post' href='https://blog.mikemccandless.com/2011/02/visualizing-lucenes-segment-merges.html'}
 where you can visualize how merges happen with different merge policies.
 
-### [Deleting a record]{ .text-red .text-h5 }
-
+### [Deleting a record]
 When a record is deleted, it's not really deleted, the information stays on disk (in the segment),
 and the record is marked as deleted/invalid, when an [IndexReader]{.h} reads from the indexes,
 it will skip these records.
@@ -120,7 +119,7 @@ When a merge occurs, the new segment will not contain the records that were mark
 
 ![Merge of segments after deletion of a record](/img/partitions/node_record_deleted_merge.svg)
 
-### [Updating a record]{ .text-red .text-h5}
+### [Updating a record]
 
 When a record is updated, it's marked as deleted in its original segment, and the newly updated record
 is written to a new segment. After a refresh, the [IndexReader]{.h} will be aware of the new segment
@@ -131,7 +130,7 @@ same as if we had updated the original segment.
 
 ![Merge of segments after the update of a record](/img/partitions/record_updated.svg)
 
-### [Inserting a record (routing)]{ .text-red .text-h5}
+### [Inserting a record (routing)]
 
 When inserting records, they have to be approximately [evenly]{.fm} routed to the shards, otherwise
 shard imbalance could degrade performance.
@@ -187,7 +186,7 @@ After another insert:
 </pre>
 ::
 
-### [Inserting a record (segments)]{.text-red .text-h5}
+### [Inserting a record (segments)]
 
 The record(s) is first committed to both the [translog]{.fm} and an [in-memory buffer]{.fm}, once
 it's written to the translog we can ensure that the data will not be lost if a node failure happens
@@ -242,7 +241,7 @@ segment is still not committed to disk. If we call optimize to forcibly merge th
 Segments are now merged, if you are wondering why there are two instead of one, remember that the
 segments belong to a shard, the merged segments were from the shard nº2.
 
-## [Partitioned tables]{.text-red .text-h5}
+## [Partitioned tables]
 
 ::Alert
 ---
@@ -322,7 +321,7 @@ create many partitions, hurting performance and storage. The right partition col
 on the data, use case and requirements, you can read more about this in
 [sharding and partitioning guide](https://cratedb.com/docs/guide/admin/sharding-partitioning.html).
 
-## [Notes: Replication is turned off]{.text-red .text-h4}
+## [Notes: Replication is turned off]
 
 Sharding a table is part of the fundamental structure of the data model in CrateDB, another fundamental aspect
 is [replication]{.fm}.
@@ -333,7 +332,7 @@ turned off and the images showing shards do not show replica shards, only primar
 
 This was done to simplify the different explanations and query results.
 
-## [Summary]{.text-red .text-h4}
+## [Summary]
 
 I hope that by the end of the article you have a deeper understanding of CrateDB's storage model and
 partitioning: How every table in CrateDB is split into shards and how partitioning is just creating

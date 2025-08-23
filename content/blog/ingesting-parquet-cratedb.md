@@ -55,8 +55,7 @@ data integrity using a custom Python script :Ref{r="3"}
 ALso, I'm going to try to solve this problem as I write this post, so new ideas will appear.
 I might not find the most efficient solution right now.
 
-## [Polars]{.text-h3}
-
+## [Polars]
 The first thing that comes to my mind is to use Polars, which is very straight forward:
 
 ```python [load_parquet1.py]
@@ -100,7 +99,7 @@ In conclusion, it takes too long (~6 minutes) and too much memory, we need to ex
 
 Trying [low_memory=True]{.h} yielded the same results.
 
-## [Polars - Lazyframe + Batched]{.text-h3}
+## [Polars - Lazyframe + Batched]
 
 We could use a :alink{text="LazyFrame" href="https://docs.pola.rs/api/python/stable/reference/lazyframe/index.html" .text-red}
 to use batches, so instead of loading everything to memory, we will only load smaller chunks of rows.
@@ -158,7 +157,7 @@ Batch size of [50_000:]{.h}
 * Avg cpu usage: [2.68%]{.fm} - [max(10.1)]{.fm}
 * Avg throughput: 2964624 rows / 326.89 = [9069.3rows/s]{.h}
 
-## [PyArrow]{.text-h3}
+## [PyArrow]
 
 Polars uses the Rust implementation of :alink{text="Arrow" href="https://arrow.apache.org/" slim=True .pa-1}
 under the hood. With [PyArrow]{.h} we can quickly try it without any additional setup. I don't expect it to be
@@ -198,7 +197,7 @@ Results
 Practically identical with Polars, at least in the metrics, the graph shows a different CPU pattern,
 ram and upload speed is very similar.
 
-## [Parallelizing row groups]{.text-h3}
+## [Parallelizing row groups]
 
 A common idea to improve performance further is to parallelize, but how can we parallelize reading different batches? 
 
@@ -420,7 +419,7 @@ function that is used to send data, and changes it to leverage the :alink{text="
 CrateDB has. Unfortunately, we cannot apply this to Polars as easily as Pandas, without monkey patching.
 
 
-## [Rust, happened.]{.text-red .text-h3}
+## [Rust, happened.]
 
 :Icon{icon="mdi-information" color="green"} We are going to re-use some code that I wrote in [CrateDBx]{.h},
 it's a project I started to try to ingest data to CrateDB in the most efficient way possible from
@@ -428,7 +427,7 @@ different sources.
 
 
 
-### [Tokio]{.text-h4}
+### [Tokio]
 Using tokio (async) to load the parquet in batches as we did in #2
 
 Results
@@ -448,7 +447,7 @@ Results
 Slightly faster than Pandas, the main difference is that it's able to send much bigger batches,
 hence the big peaks in upload speed.
 
-### [Rayon]{.text-h4}      
+### [Rayon]     
 
 Rayon is a data-parallelism library, think real multi-threading unlike Python, what we are going to
 do is open a stream of batches, and create a thread for every batch, then every thread will
@@ -508,7 +507,7 @@ Fantastic results.
 ---
 ::
 
-### [Getting fancy]{.text-h4}
+### [Getting fancy]
 
 For this last one, we will try to leverage the entire 24 cores. In arrow we can skip pages when
 reading a specific range of rows, so we are going to calculate a range of rows and assign them
@@ -610,7 +609,7 @@ time yields similar results, not too much difference with the last one, maybe ~3
 we can do with 3M rows, and with more data we would start seeing the difference between rayon
 methods.
 
-## [Conclusion]{.text-h3 .text-red}
+## [Conclusion]
 
 We went from 316.90s to 34s, not too bad, still more testing could be done, with different datatypes
 and row numbers. On the rust side, there are things that can be optimized, when we deserialize
@@ -663,7 +662,7 @@ Results
 ::
 
 
-## [References]{.text-h3 .text-red}
+## [References]
 
 ::divider{.my-6}
 ::
