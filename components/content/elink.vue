@@ -26,9 +26,7 @@ const icon = computed(() => `mdi-${props.type}`)
          :href="url"
          link>
       <span class="font-weight-bold"
-            style="font-size:15px">
-        {{ text }}
-      </span>
+            style="font-size:15px">{{ text }}</span>
   </v-btn>
 </template>
 
