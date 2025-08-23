@@ -27,7 +27,7 @@ a feature that's used to maximize read operations performance.
 To understand why a partition is a [specialized]{.fm} shard, we first need to understand the storage
 model of CrateDB.
 
-:alink{text='Apache Lucene' href='https://lucene.apache.org/'} is the cornerstone of the data model.
+[Apache Lucene](https://lucene.apache.org/) is the cornerstone of the data model.
 A table is split is several chunks called [shards]{ .fm }, a shard is the same as a Lucene Index.
 Every index is composed of [segments]{.fm}, segments are immutable and
 write-only, akin to pages, and they are composed of [documents/rows]{.fm}. Segments can be
@@ -38,7 +38,7 @@ A table clustered (or split) in 2 shards would look like:
 ::CustomImage
 ---
 "src": "/img/partitions/node.svg"
-"label": "Table divided in two shards"
+"label": "Table split in two shards"
 "marginTop": "15"
 ---
 ::
@@ -50,16 +50,14 @@ formula:
 
 Alternatively, you can manually set in the DDL query how many shards a table will be split into:
 
-::editor{lang='sql'}
-<pre>
+```sql
 CREATE TABLE t (content TEXT)
-CLUSTERED INTO 3 shards WITH (number_of_replicas = 0)</pre>
-::
+CLUSTERED INTO 3 shards WITH (number_of_replicas = 0)
+```
 
 We can inspect how many shards a table has by querying [sys.shards]{.h}
 
-::editor{hasResult="true" lang='sql'}
-<pre>
+```sql true
 SELECT
   id,
   num_docs,
@@ -68,8 +66,8 @@ FROM
   sys.shards
 WHERE
   table_name = 't'
-ORDER BY id</pre>
-::
+ORDER BY id
+```
 
 ::Sep
 ::
@@ -112,10 +110,9 @@ When two segments are merged, all the 'valid' records of each segment are combin
 
 You can also manually merge the segments of a table explicitly by calling:
 
-::editor{lang='sql'}
-<pre>
-OPTIMIZE TABLE table_name WITH (max_num_segments=1)</pre>
-::
+```sql
+OPTIMIZE TABLE table_name WITH (max_num_segments=1)
+```
 
 This often results in less disk usage and faster search operations, it's typically best to let CrateDB
 merge the segments since in some situations, mostly after heavy writes, it can be an expensive operation.
@@ -171,7 +168,7 @@ shard imbalance could degrade performance.
 
 This is the used formula:
 
-[shard number = hash(routing column) % total primary shards]{.h}.
+[shard number = hash(routing column) % total primary shards]{.h}
 
 If a primary key exists, that will be used as the routing column. The user can also specify an
 explicit routing column with [CRATE TABLE t (a integer, b text) CLUSTERED BY (a)]{.h}, if no
@@ -181,8 +178,7 @@ We can see the effect of routing after inserting a value and checking the shards
 
 After one insert:
 
-::editor{hasResult="true" lang='sql'}
-<pre>
+```sql true
 SELECT
   id as shard_id,
   num_docs
@@ -191,8 +187,8 @@ FROM
 WHERE
   table_name = 't'
 ORDER BY
-  id</pre>
-::
+  id
+```
 
 ::Sep
 ::
@@ -209,7 +205,9 @@ ORDER BY
 
 After another insert:
 
-::MarkdownTable{type="table"  hasBottom=true}
+
+
+::MarkdownTable{type="table" hasBottom=true hasTop=true}
 <pre>
 |shard_id|num_docs|
  |-|-| 
@@ -239,8 +237,7 @@ search results, after that at some point the in-memory segments will be committe
 We can see this by checking the segments system table, after inserting a new record and manually
 calling refresh:
 
-::editor{hasResult="true" lang='sql'}
-<pre>
+```sql true
 SELECT
   committed,
   deleted_docs,
@@ -250,13 +247,13 @@ SELECT
 FROM
   sys.segments
 WHERE
-  table_name = 't'</pre>
-::
+  table_name = 't'
+```
 
 ::Sep
 ::
 
-::MarkdownTable{type="table"  hasBottom=true}
+::MarkdownTable{type="table" hasBottom=true}
 <pre>
 |committed|deleted_docs|num_docs|search|shard_id|
  |-|-|-|-|-| 
@@ -304,16 +301,15 @@ hence the _"a partition is the specialization of a shard(s)..."_.
 
 To understand the concept better, let's look at this table:
 
-::editor{lang='sql'}
-<pre>
+```sql
 CREATE TABLE t (
   "ts" TIMESTAMP,
   "ts_month" TIMESTAMP GENERATED ALWAYS AS date_trunc('month', "ts")
 ) 
 CLUSTERED INTO 3 SHARDS
 PARTITIONED BY ("ts_month")
-WITH (number_of_replicas = 0)</pre>
-::
+WITH (number_of_replicas = 0)
+```
 
 [ts_month]{.h} will contain the month of [ts]{.h}, and the table is partitioned by it, so for
 every unique value of the partition column (every month) a new partition will be created, furthermore
@@ -371,7 +367,8 @@ Choosing the [partition_column]{.fm} is critical, a badly chosen column can resu
 number of shards and most likely hit the default limit of 1000 shards per table, imagine if we chose
 [seconds]{.fm} as the partition column, if we added many timestamp records, very quickly we would
 create many partitions, hurting performance and storage. The right partition column will depend
-on the data, use case and requirements, you can read more about this :alink{text='here' href='https://cratedb.com/docs/guide/admin/sharding-partitioning.html'}.
+on the data, use case and requirements, you can read more about this in
+[sharding and partitioning guide](https://cratedb.com/docs/guide/admin/sharding-partitioning.html).
 
 ## [Notes: Replication is turned off]{.text-red .text-h4}
 

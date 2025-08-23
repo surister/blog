@@ -59,8 +59,8 @@ I might not find the most efficient solution right now.
 
 The first thing that comes to my mind is to use Polars, which is very straight forward:
 
-::Editor{lang="python" header_text="load_parquet1.py" show_header=true}
-<pre>import polars
+```python [load_parquet1.py]
+import polars
 
 CRATE_URI = 'crate://192.168.88.251:4200'
 FILE_PATH = '/data/taxi_01_24.parquet'
@@ -71,8 +71,9 @@ df.write_database(
     connection=CRATE_URI,
     table_name='ny_taxi',
     if_table_exists='append'
-)</pre>
-::        
+)
+```
+
 
 Results
 
@@ -106,8 +107,8 @@ to use batches, so instead of loading everything to memory, we will only load sm
 
 Let's try batches of [50k]{.h} and [100k]{.h}
 
-::Editor{lang="python" header_text="load_parquet2.py" show_header=true}
-<pre>import polars
+```python [load_parquet2.py]
+import polars
 
 CRATE_URI = 'crate://192.168.88.251:4200'
 FILE_PATH = '/data/taxi_01_24.parquet'
@@ -123,8 +124,8 @@ for batch in (lazy_frame
         connection=CRATE_URI,
         table_name='ny_taxi',
         if_table_exists='append'
-    )</pre>
-::        
+    )
+```
 
 Results
 
@@ -163,8 +164,8 @@ Polars uses the Rust implementation of :alink{text="Arrow" href="https://arrow.a
 under the hood. With [PyArrow]{.h} we can quickly try it without any additional setup. I don't expect it to be
 much faster since I do not belive that Polars overhead is significant, let's try:
 
-::Editor{lang="python" header_text="load_parquet3.py" show_header=true}
-<pre>import pyarrow.parquet as pq
+```python [load_parquet3.py]
+import pyarrow.parquet as pq
 
 CRATE_URI = 'crate://192.168.88.251:4200'
 table = pq.read_table("/data/taxi_01_24.parquet")
@@ -177,8 +178,8 @@ for batch in table.to_batches(BATCH_SIZE):
         con=CRATE_URI,
         if_exists='append',
         index=False
-    )</pre>
-::        
+    )
+```
 
 Results
 
@@ -223,8 +224,8 @@ we could further split the reads on different ranges of rows within the row grou
 For every row group, we are going to start a thread in a [ThreadPoolExecutor]{.h} and have it independently
 send data to the Database, leveraging PyArrow's [pyarrow.ParquetFile.read_row_group]{.h} method.
 
-::Editor{lang="python" header_text="load_parquet4.py" show_header=true}
-<pre>from concurrent.futures import ThreadPoolExecutor
+```python [load_parquet4.py]
+from concurrent.futures import ThreadPoolExecutor
 
 import pyarrow.parquet as pq
 
@@ -245,8 +246,8 @@ def send_to_crate(row_group: int) -> None:
 
 with ThreadPoolExecutor(max_workers=6) as e:
     for row_group in range(row_groups):
-        e.submit(send_to_crate, row_group)</pre>
-::        
+        e.submit(send_to_crate, row_group)
+```
 
 Results
 
@@ -273,8 +274,8 @@ use more memory, since batches will live longer in the pool as they’re waiting
 
 We're going to ignore row groups for a second.
 
-::Editor{lang="python" header_text="load_parquet5.py" show_header=true}
-<pre>from concurrent.futures import ThreadPoolExecutor
+```python [load_parquet5.py]
+from concurrent.futures import ThreadPoolExecutor
 
 import pyarrow.parquet as pq
 
@@ -291,8 +292,8 @@ def send_to_crate(batch):
 
 with ThreadPoolExecutor(max_workers=12) as e:
     for batch in file.iter_batches(100_000):
-        e.submit(send_to_crate, batch)</pre>
-::        
+        e.submit(send_to_crate, batch)
+```
 
 Results
 
@@ -316,8 +317,8 @@ dataset [12]{.h} seems to be good.
 The next thing I can think of is combining both approaches, launching different processes,
 one for every row group, then batch it to the database with a threadpool.
 
-::Editor{lang="python" header_text="load_parquet6.py" show_header=true}
-<pre>from concurrent.futures import ThreadPoolExecutor
+```python [load_parquet6.py]
+from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool
 
 import pyarrow.parquet as pq
@@ -344,8 +345,8 @@ def read_parquet(row_group: int):
 
 if __name__ == '__main__':
     with Pool(processes=file.num_row_groups) as pool:
-        pool.map(read_parquet, range(file.num_row_groups))</pre>
-::        
+        pool.map(read_parquet, range(file.num_row_groups))
+```
 
 Results
 
@@ -387,8 +388,8 @@ It's gotta be easier, right?
 is a way of doing it that I hadn't used, I internally mini-panicked thinking that I missed a pretty
 obvious one, luckily for the time invested into this article, it's less performant than Rust.
 
-::Editor{lang="python" header_text="load_parquet7.py" show_header=true}
-<pre>import pandas
+```python [load_parquet7.py]
+import pandas
 import sqlalchemy as sa
 from sqlalchemy_cratedb.support import insert_bulk
 
@@ -408,8 +409,8 @@ df.to_sql(
     index=False,
     chunksize=50_000,
     method=insert_bulk,
-)</pre>
-::        
+)
+```
 
 Results
 
@@ -465,8 +466,7 @@ do is open a stream of batches, and create a thread for every batch, then every 
 read the batch, deserialize it to native rust types and serialize back to a string to be sent
 over HTTP using the bulk args parameter.
 
-::Editor{lang="rust" header_text="main.rs" show_header=true}
-<pre>
+```rust
 fn main(){
     let batch_size = 20000;
     let file = File::open(
@@ -483,7 +483,7 @@ fn main(){
     batches.into_par_iter().for_each(|batch| {
         let r = batch.unwrap();
         
-        let columns = r
+        let columns: Vec<_> = r
             .schema()
             .fields()
             .iter()
@@ -500,8 +500,8 @@ fn main(){
                 rows
             );
     });
-}</pre>
-::        
+}
+```
 
 Results
 
@@ -537,8 +537,7 @@ Every thread will open a [ParquetRecordBatchReaderBuilder]{.h} with ranges like:
 
 and send batches of 20k to the database.
 
-::Editor{lang="rust" header_text="main.rs" show_header=true}
-<pre>
+```rust
 fn main(){
     let file = File::open("/data_id.parquet").unwrap();
 
@@ -596,11 +595,12 @@ fn main(){
             cratedb.send_batch_http_sync(
                 "doc",
                 "taxi_superfast",
-                &columns, rows
+                &columns,
+                 rows
             );
         }
-    });</pre>
-::        
+    });
+```
 
 Results
 
@@ -655,8 +655,8 @@ Here is a table with every result compiled:
 </pre>
 ::
 
-If you are curious about how far CrateDB can go, here you have the results of rayon with
-a couple of smaller tweaks, these tweaks are on server side, we disabled replicas and set refresh
+If you are curious about how far CrateDB can go, these are the results of rayon with
+a couple of smaller tweaks, these tweaks are on the server side, we disabled replicas and set refresh
 time to 0.
 
 Results

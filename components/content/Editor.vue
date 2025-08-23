@@ -2,8 +2,9 @@
 import {CodeEditor} from "magic-code-editor";
 import 'magic-code-editor/style.css'
 
-const slots = useSlots();
-const value = slots.default()[0].children.default()[0].children;
+// const slots = useSlots();
+// const value = slots.default()[0].children.default()[0].children;
+
 import hljs from 'highlight.js/lib/core';
 import python from 'highlight.js/lib/languages/python'
 import rust from 'highlight.js/lib/languages/rust'
@@ -17,17 +18,25 @@ hljs.registerLanguage('sql', sql)
 
 const props = defineProps(
     {
-      'hasResult': {
-        'type': Boolean,
+      text: {},
+      code: {
+        type: String,
+        default: ""
+      },
+      hasResult: {
+        type: Boolean,
         default: false
       },
-      'lang': {
+      language: {
         type: String,
         default: 'shell'
       },
-      'header_text': {
-        type: String
-      }
+      filename: {
+        type: String,
+        default: ""
+      },
+      meta: {},
+      highlights: {}
     }
 )
 
@@ -45,9 +54,12 @@ function copyToClipboard(text) {
 </script>
 
 <template>
-  <CodeEditor :text="value"
+<!--  We remove the last character of code, because for some reason a \n is added, don't know why -->
+  <CodeEditor :text="code.substring(0, code.length - 1)"
               :show-line-number="false"
-              :class="['mt-5', 'rounded-t-lg', hasResult ? '' : 'rounded-b-lg']"
+              :class="['mt-5', 'rounded-t-lg', meta === 'true' ? '' : 'rounded-b-lg']"
+              :show-header="filename !== ''"
+              :header-text="filename"
               highlight-row-background-color="red"
               background-color="#212121"
               padding-bottom="10"
@@ -55,14 +67,14 @@ function copyToClipboard(text) {
               code-font-size="16"
               read-only
               :prepend-inline="true"
-              :highlight="(text) => hljs.highlight(text, {language: lang}).value">
+              :highlight="(text) => hljs.highlight(text, {language: language}).value">
     <template #appendText>
       <v-btn variant="outlined"
              :color="copied ? 'success' : ''"
              style="border-radius: 5px"
              :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
              size="x-small"
-             @click="copyToClipboard(value)">
+             @click="copyToClipboard(code)">
       </v-btn>
     </template>
   </CodeEditor>

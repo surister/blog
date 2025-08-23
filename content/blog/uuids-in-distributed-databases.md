@@ -27,8 +27,7 @@ inserted, the column's value gets incremented monotonically (usually by 1).
 
 One example you might be familiar with is the [SERIAL]{.fm} datatype in postgres:
 
-::Editor{lang='sql'}
-<pre>
+```sql
 CREATE TABLE mytable
 (
     id    serial primary key,
@@ -36,13 +35,12 @@ CREATE TABLE mytable
 );
 
 insert into mytable (data) values ('some data');
-insert into mytable (data) values ('some data x2');</pre>
-::
+insert into mytable (data) values ('some data x2');
+```
 
-::Editor{hasResult="true" lang='sql'}
-<pre>
-SELECT * FROM sometable</pre>
-::
+```sql true
+SELECT * FROM sometable
+```
 
 ::Sep
 ::
@@ -66,7 +64,7 @@ in order for the nodes to increase the id correctly; they would need to communic
 counters in sync, in a read-heavy scenario this would mean massive inter-node communication, locking
 and decrease of write performance, defeating one of the nice characteristics of distributed databases.
 
-### [The need for uniqueness]{.text-h4}
+### [The need for uniqueness]{.text-h4 .text-red}
 In databases, we often need to uniquely identify rows. [Primary keys]{.fm} are used for that.
 By definition, primary keys need to be unique and not null, and most distributed databases choose
 not to implement auto-increment sequences. What should be used then?
@@ -119,8 +117,7 @@ and computing different 'buckets.' It then issues several queries in different t
 
 This is an example of a partition planner that I created in rust similar to connector-x's:
 
-::Editor
-<pre>
+```rust
 PartitionPlan(
     min_value=1,
     max_value=1200000,
@@ -139,8 +136,8 @@ PartitionPlan(
         needed_metadata_from_source='CountAndMinMax',
         query_partition_mode='OnePartitionedQuery')
     )
-)</pre>
-::
+)
+```
 
 The original query is [select l_orderkey from lineitem]{.h} and we split the query in two:
 
@@ -156,8 +153,7 @@ which can be useful when batch-processing large tables.
 
 An example of this in Python:
 
-::Editor{lang='python'}
-<pre>
+```python
 class BatchedTable:
     def __init__(self,
                  table_name: str,
@@ -218,8 +214,9 @@ if __name__ == '__main__':
     # [(...),...] 1k rows
     # [(...),...] 1k rows
     # [(...),...] 1k rows
-    ...</pre>
-::
+    ...
+```
+
 [table]{.h} will exhaust the whole table without hitting an [out of memory]{.h} error on large tables.
 
 All of this depend on a [sortable]{.h} id, achieving maximum efficiency when the ids are monotonically
@@ -280,10 +277,10 @@ What's commonly used and the default representation implementation for UUIDs is 
 To give you a clearer look at how everything comes together, let's see the base16 (hex) value of every octet,
 you can try this yourself in Python with:
 
-::Editor{lang='python'}
-<pre>>>> hex(0b1111011) # The first octet
-'0x7b'</pre>
-::
+```python
+>>> hex(0b1111011) # The first octet
+'0x7b'
+```
 
 ::CustomImage
 ---
@@ -366,30 +363,28 @@ Since they’re time-based ids, one would expect that you could sort and filter 
 
 One can naively check this:
 
-::Editor{lang='sql'}
-<pre>
+```sql
 create table t (
   real_pos integer,
   uuid generated always as gen_random_text_uuid(),
   inserted_at generated always as now()
-)</pre>
-::
+)
+```
 
 Then insert:
 
-::Editor{lang='sql'}
-<pre>insert into t22 (real_pos)
-values (1), (2), (3)... --up to 10k</pre>
-::
+```sql
+insert into t22 (real_pos)
+values (1), (2), (3)... --up to 10k
+```
 
 Trying to filter by [_id]{.h}, and [uuid]{.h} have different results than ordering by [inserted_at]{.h}:
 
-::Editor{hasResult="true" lang='sql'}
-<pre>
+```sql true
 select _id, * from t
 order by _id
-limit 10</pre>
-::
+limit 10
+```
 
 ::Sep
 ::
@@ -411,12 +406,11 @@ limit 10</pre>
 </pre>
 ::
 
-::Editor{hasResult="true" lang='sql'}
-<pre>
+```sql true
 select _id, * from t
 order by uuid
-limit 10</pre>
-::
+limit 10
+```
 
 ::Sep
 ::
@@ -438,12 +432,11 @@ limit 10</pre>
 </pre>
 ::
 
-::Editor{hasResult="true" lang='sql'}
-<pre>
+```sql
 select _id, * from t
 order by inserted_at
-limit 10</pre>
-::
+limit 10
+```
 
 ::Sep
 ::
@@ -505,8 +498,3 @@ Just two integers cobbled up together, not following the UUID rfc format.
 :Der{r="5" meta="GitHub, 2025-07-01" text="Flake: A decentralized, k-ordered id generation service in Erlang" link="https://github.com/boundary/flake"}
 :Der{r="6" meta="GitHub, 2025-07-01" text="surister sort script" link="https://github.com/surister/mylab/blob/master/crate_uuid/sort.py"}
 :Der{r="7" meta="GitHub, 2025-07-01" text="surister elasticflaketest script" link="https://github.com/surister/mylab/blob/master/crate_uuid/elasticflaketest.py"}
-
-| committed | deleted_docs | num_docs | search | shard_id |
-|-----------|--------------|----------|--------|----------| 
-| true      | 0            | 2        | true   | 2        |
-| true      | 0            | 1        | true   | 0        |
