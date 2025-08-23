@@ -203,15 +203,9 @@ ram and upload speed is very similar.
 A common idea to improve performance further is to parallelize, but how can we parallelize reading different batches? 
 
 If we look at the :alink{type="book-open-page-variant" text="parquet specification" href="https://parquet.apache.org/docs/file-format/"} we see that data
-is logically split in [Row groups]{.h} so I think we can safely read different groups of data.  
+is logically split in [Row groups]{.h} so I think we can safely read different groups of data.
 
-::CustomImage{.pt-5}
----
-"src": "/img/parquet/img.png"
-"label": "logical representation of a parquet file, omitting metadata and magic number"
-"width": "300"
----
-::
+![logical representation of a parquet file, omitting metadata and magic number](/img/parquet/img.png){width=300 .pt}
 
 The idea is to have different threads access different row groups. They're dependent on the configured
 row group size and the file size, so if we have the file split in two groups, we could only theoretically get 2x improvement.
@@ -375,12 +369,7 @@ it, but I need proper concurrency now!
 
 So how about?
 
-::CustomImage{ .mt-5 }
----
-"src": "/img/parquet/kronk.png"
-"label": "a devil, telling me what to do (it happens often)"
----
-::
+![a devil, telling me what to do (it happens often)](/img/parquet/kronk.png)
 
 It's gotta be easier, right?
 

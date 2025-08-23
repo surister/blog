@@ -35,13 +35,7 @@ searched in sequence, as each segment is its own index.
 
 A table clustered (or split) in 2 shards would look like:
 
-::CustomImage
----
-"src": "/img/partitions/node.svg"
-"label": "Table split in two shards"
-"marginTop": "15"
----
-::
+![Table split in two shards](/img/partitions/node.svg)
 
 The number of shards that a table will be divided into is calculated automatically using a simple
 formula:
@@ -99,14 +93,8 @@ Segments are merged periodically by default. In Lucene, there are other merge st
 and CrateDB might change the policy in the future.
 
 When two segments are merged, all the 'valid' records of each segment are combined into a new one.
-::CustomImage
----
-"src": "/img/partitions/segment_merge.svg"
-"label": "Merge of a segment"
-"width": 400
-"marginTop": "15"
----
-::
+
+![Merge of two segments into one](/img/partitions/segment_merge.svg){width=400}
 
 You can also manually merge the segments of a table explicitly by calling:
 
@@ -126,23 +114,11 @@ When a record is deleted, it's not really deleted, the information stays on disk
 and the record is marked as deleted/invalid, when an [IndexReader]{.h} reads from the indexes,
 it will skip these records.
 
-::CustomImage
----
-"src": "/img/partitions/record_delete.svg"
-"label": "Deletion of a record"
-"marginTop": "15"
----
-::
+![Deletion of a record](/img/partitions/record_delete.svg)
 
 When a merge occurs, the new segment will not contain the records that were marked as deleted.
 
-::CustomImage
----
-"src": "/img/partitions/node_record_deleted_merge.svg"
-"label": "Merge of segments after deletion of a record"
-"marginTop": "15"
----
-::
+![Merge of segments after deletion of a record](/img/partitions/node_record_deleted_merge.svg)
 
 ### [Updating a record]{ .text-red .text-h5}
 
@@ -153,13 +129,7 @@ and the record will show up in search results.
 Eventually, the segments will be merged and the resulting segment will be the
 same as if we had updated the original segment.
 
-::CustomImage
----
-"src": "/img/partitions/record_updated.svg"
-"label": "Merge of segments after the update of a record"
-"marginTop": "15"
----
-::
+![Merge of segments after the update of a record](/img/partitions/record_updated.svg)
 
 ### [Inserting a record (routing)]{ .text-red .text-h5}
 
@@ -226,13 +196,7 @@ as we can recover and write the new segments from it.
 When a refresh happens, the segment is created, still in memory, and it will now be available in
 search results, after that at some point the in-memory segments will be committed to disk.
 
-::CustomImage
----
-"src": "/img/partitions/insert.svg"
-"label": "Merge of segments after the update of a record"
-"marginTop": "15"
----
-::
+![Merge of segments after the update of a record](/img/partitions/insert.svg)
 
 We can see this by checking the segments system table, after inserting a new record and manually
 calling refresh:
@@ -318,13 +282,7 @@ is the maximum number of shards that table can have (without replication).
 
 The shard map of the table will look like this:
 
-::CustomImage
----
-"src": "/img/partitions/partition_tables.svg"
-"label": "Table partitioned by month"
-"marginTop": "15"
----
-::
+![Table partitioned by month](/img/partitions/partition_tables.svg)
 
 As you can see, the structure of a table doesn't really change, it is still composed of shards and
 segments, but when it has a [partition column]{.h}, the rule of creating shards and routing records
@@ -346,16 +304,10 @@ but why partitioning or specializing sets of shards to a routing column?
 Consider this situation similar to partitions in CrateDB, where we have a set of dates, grouped
 by their months:
 
-::CustomImage
----
-"src": "/img/partitions/months.svg"
-"label": "Table partitioned by month"
-"marginTop": "15"
----
-::
+![Dates grouped by month](/img/partitions/months.svg)
 
 When filtering values by month, months can be skipped to directly access the needed dates.
-For example, to get the date [1994-03-26]{.fm}, it only requires scanning one group and 4 records
+For example, to get the date [1994-03-26]{.fm .text-green}, it only requires scanning one group and 4 records
 instead of scanning 12 records if the data is not grouped by month.
 
 By grouping your data into buckets or partitions by a partition column, queries that filter

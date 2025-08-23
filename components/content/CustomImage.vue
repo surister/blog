@@ -15,6 +15,9 @@ const props = defineProps({
   marginTop: {
     type: String,
     default: '0'
+  },
+  alt:{
+    type: String
   }
 })
 </script>
@@ -26,10 +29,11 @@ const props = defineProps({
            :width="width"
            :src="src"
            :style="{'marginTop': marginTop + 'px'}"
+           :alt="alt"
            cover/>
     <v-label class="text-subtitle-2 font-italic pt-2"
              style="white-space: pre-wrap">
-      {{ label }}
+      {{ alt }}
     </v-label>
   </div>
 </template>

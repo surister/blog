@@ -242,24 +242,14 @@ look like `51000350-1197-4f2e-bcef-ca8bc5e11b51`{.h .text-subtitle-2} (UUID4).
 
 
 ### [Anatomy of an UUID]{.text-h4}
-An UUID has 128 bits.
-::CustomImage
----
-"src": "/img/uuid/128.svg"
-"label": "Bits of an UUID 4"
-"marginTop": "15"
----
-::
+
+The UUID has 128 bits.
+
+![Bits of an UUID 4](/img/uuid/128.svg)
 
 The 128 bits are grouped in 16 octets or bytes. Counting from 0 to 15.
 
-::CustomImage
----
-"src": "/img/uuid/octets.svg"
-"label": "128 bits, separated in octets"
-"marginTop": "15"
----
-::
+![128 bits, grouped in octets](/img/uuid/octets.svg)
 
 This is at the core, what an UUID is, and the different versions just dictate how we generate these octets.
 
@@ -267,10 +257,10 @@ We can represent an UUID in different data 'types', depending on the system, the
 typically be just the data represented in different numerical bases:
 
 * Base 2 (binary): See image
-* Base 10: `164584730332688677464161912706729264512`{.h}
-* Base 16: `0x7bd1ddb5b15c4b68a507fd4ceb984580`{.h}
-* Base 16 with dashes: `7bd1ddb5-b15c-4b68-a507-fd4ceb984580`{.h}
-* Base64: `e9HdtbFcS2ilB/1M65hFgA==`{.h}
+* Base 10: `164584730332688677464161912706729264512`{.fm}
+* Base 16: `0x7bd1ddb5b15c4b68a507fd4ceb984580`{.fm}
+* Base 16 with dashes: `7bd1ddb5-b15c-4b68-a507-fd4ceb984580`{.fm}
+* Base64: `e9HdtbFcS2ilB/1M65hFgA==`{.fm}
 
 What's commonly used and the default representation implementation for UUIDs is base 16 with dashes.
 
@@ -282,12 +272,7 @@ you can try this yourself in Python with:
 '0x7b'
 ```
 
-::CustomImage
----
-"src": "/img/uuid/uuid.svg"
-"marginTop": "15"
----
-::
+![](/img/uuid/uuid.svg)
 
 Now, the difference between UUID versions is what we decide what these groups of bits will be. 
 
@@ -297,12 +282,7 @@ The bits are split in groups of bits, there are common groups between versions: 
 
 [UUID4]{.h} has 5 groups of bits:
 
-::CustomImage
----
-"src": "/img/uuid/all.svg"
-"marginTop": "15"
----
-::
+![](/img/uuid/all.svg)
 
 1. [random_a]{.h} [0, 47\] is random data.
 2. [version]{.h}  [48, 51\] is the version.
@@ -312,12 +292,7 @@ The bits are split in groups of bits, there are common groups between versions: 
 
 Another simple way to visualize it, is just to paint the inclusive first bit number of every group.
 
-::CustomImage
----
-"src": "/img/uuid/groups.svg"
-"marginTop": "15"
----
-::
+![](/img/uuid/groups.svg)
 
 ## [What UUIDs is CrateDB using?]{.text-h3 .text-red}
 CrateDB; a shared-nothing distribute database in 5.10.2 uses three different kinds :Ref{r="1"} of unique IDs:
@@ -341,20 +316,14 @@ An elasticflake has 120 bits, divided in 15 octets or bytes.
 
 It's composed of a [random data]{.h} + [timestamp]{.h} + [mac address]{.h}, divided in six groups:
 
-1. [random_a]{.h} [0, 15\] is random data, the LSB and MSF of a random long.
-2. [timestamp_a]{.h} [16, 47\] is timestamp, the minutes to year part of the timestamp.
-3. [metadata_a]{.h} [48, 95\] is randomized mac address (or better put, random data which source is the mac address of the node.)
-4. [timestamp_b]{.h} [96, 103\]  the seconds part of the timestamp in millis.
-5. [random_b]{.h} [104, 111\] the middle byte of the random long.
-6. [timestamp_c]{.h} [112, 119\] the LSB byte of the timestamp in millis, the milliseconds part.
+1. [random_a]{.fm} [0, 15\] is random data, the LSB and MSF of a random long.
+2. [timestamp_a]{.fm} [16, 47\] is timestamp, the minutes to year part of the timestamp.
+3. [metadata_a]{.fm} [48, 95\] is randomized mac address (or better put, random data which source is the mac address of the node.)
+4. [timestamp_b]{.fm} [96, 103\]  the seconds part of the timestamp in millis.
+5. [random_b]{.fm} [104, 111\] the middle byte of the random long.
+6. [timestamp_c]{.fm} [112, 119\] the LSB byte of the timestamp in millis, the milliseconds part.
 
-
-::CustomImage
----
-"src": "/img/uuid/elasticflake.svg"
-"marginTop": "15"
----
-::
+![](/img/uuid/elasticflake.svg)
 
 The flake is then converted to [base64]{.h} using an alphabet that is URL safe, the default
 alphabet uses '/' as an encoding character, meaning you could not use it as an url query parameter.
