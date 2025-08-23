@@ -13,7 +13,7 @@ right now use it in some shape or form, it has become what JSON is to web dev.
 Almost all popular data manipulation and data analysis tools support it, just to name a few:
 Spark, Pandas, Polars, DuckDB, Delta lake...
 
-The format is very efficient in terms of storage, for example, this ~3M rows dataset :alink{text="Yellow taxi trip - January 2024" url="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page" .mt-1}
+The format is very efficient in terms of storage, for example, this ~3M rows dataset :alink{text="Yellow taxi trip - January 2024" href="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page" .mt-1}
 takes:
 
 * [48MiB]{.fm} in Parquet
@@ -101,7 +101,7 @@ Trying [low_memory=True]{.h} yielded the same results.
 
 ## [Polars - Lazyframe + Batched]{.text-h3}
 
-We could use a :alink{text="LazyFrame" url="https://docs.pola.rs/api/python/stable/reference/lazyframe/index.html" .text-red}
+We could use a :alink{text="LazyFrame" href="https://docs.pola.rs/api/python/stable/reference/lazyframe/index.html" .text-red}
 to use batches, so instead of loading everything to memory, we will only load smaller chunks of rows.
 
 Let's try batches of [50k]{.h} and [100k]{.h}
@@ -159,7 +159,7 @@ Batch size of [50_000:]{.h}
 
 ## [PyArrow]{.text-h3}
 
-Polars uses the Rust implementation of :alink{text="Arrow" url="https://arrow.apache.org/" slim=True .pa-1}
+Polars uses the Rust implementation of :alink{text="Arrow" href="https://arrow.apache.org/" slim=True .pa-1}
 under the hood. With [PyArrow]{.h} we can quickly try it without any additional setup. I don't expect it to be
 much faster since I do not belive that Polars overhead is significant, let's try:
 
@@ -201,7 +201,7 @@ ram and upload speed is very similar.
 
 A common idea to improve performance further is to parallelize, but how can we parallelize reading different batches? 
 
-If we look at the :alink{type="book-open-page-variant" text="parquet specification" url="https://parquet.apache.org/docs/file-format/"} we see that data
+If we look at the :alink{type="book-open-page-variant" text="parquet specification" href="https://parquet.apache.org/docs/file-format/"} we see that data
 is logically split in [Row groups]{.h} so I think we can safely read different groups of data.  
 
 ::CustomImage{.pt-5}
@@ -426,7 +426,7 @@ Results
 ::
 
 It sort of makes sense that performs well, the [insert_bulk]{.h} function overrides the actual
-function that is used to send data, and changes it to leverage the :alink{text="http bulk args" url="https://cratedb.com/docs/crate/reference/en/latest/interfaces/http.html#bulk-operations"}  option that
+function that is used to send data, and changes it to leverage the :alink{text="http bulk args" href="https://cratedb.com/docs/crate/reference/en/latest/interfaces/http.html#bulk-operations"}  option that
 CrateDB has. Unfortunately, we cannot apply this to Polars as easily as Pandas, without monkey patching.
 
 

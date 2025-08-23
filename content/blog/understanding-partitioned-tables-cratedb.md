@@ -11,7 +11,7 @@ comment_links: [ { 'name': 'reddit', 'href': 'https://www.reddit.com/r/databased
 ---
 
 Earlier this summer (2025) I was in J on the Beach having a conversation with a very charming Staff Engineer from
-:alink{text="startree" url="https://startree.ai/"} a company that builds data analytics on top of Apache Pinot.
+:alink{text="startree" href="https://startree.ai/"} a company that builds data analytics on top of Apache Pinot.
 We were talking about how sharding and partitioning worked in our respective distributed databases.
 Pretty quickly into the conversation we realized that we were talking past each other, we
 were using the same terminology (segments, shards and partitions) to describe similar concepts,
@@ -27,7 +27,7 @@ a feature that's used to maximize read operations performance.
 To understand why a partition is a [specialized]{.fm} shard, we first need to understand the storage
 model of CrateDB.
 
-:alink{text='Apache Lucene' url='https://lucene.apache.org/'} is the cornerstone of the data model.
+:alink{text='Apache Lucene' href='https://lucene.apache.org/'} is the cornerstone of the data model.
 A table is split is several chunks called [shards]{ .fm }, a shard is the same as a Lucene Index.
 Every index is composed of [segments]{.fm}, segments are immutable and
 write-only, akin to pages, and they are composed of [documents/rows]{.fm}. Segments can be
@@ -120,7 +120,7 @@ OPTIMIZE TABLE table_name WITH (max_num_segments=1)</pre>
 This often results in less disk usage and faster search operations, it's typically best to let CrateDB
 merge the segments since in some situations, mostly after heavy writes, it can be an expensive operation.
 
-Michael Mccandless as a great :alink{text='post' url='https://blog.mikemccandless.com/2011/02/visualizing-lucenes-segment-merges.html'}
+Michael McCandless as a great :alink{text='post' href='https://blog.mikemccandless.com/2011/02/visualizing-lucenes-segment-merges.html'}
 where you can visualize how merges happen with different merge policies.
 
 ### [Deleting a record]{ .text-red .text-h5 }
@@ -371,7 +371,7 @@ Choosing the [partition_column]{.fm} is critical, a badly chosen column can resu
 number of shards and most likely hit the default limit of 1000 shards per table, imagine if we chose
 [seconds]{.fm} as the partition column, if we added many timestamp records, very quickly we would
 create many partitions, hurting performance and storage. The right partition column will depend
-on the data, use case and requirements, you can read more about this :alink{text='here' url='https://cratedb.com/docs/guide/admin/sharding-partitioning.html'}.
+on the data, use case and requirements, you can read more about this :alink{text='here' href='https://cratedb.com/docs/guide/admin/sharding-partitioning.html'}.
 
 ## [Notes: Replication is turned off]{.text-red .text-h4}
 

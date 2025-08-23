@@ -1,28 +1,31 @@
 <script setup lang="ts">
 const props = defineProps({
-  type: {
-    type: String,
-  },
   text: {
     type: String
   },
-  url: {
+  href: {
     type: String
   },
   color:{
     type: String,
     default: '#F44336'
+  },
+  target:{
+    type:String,
+    default: "_blank"
   }
 })
 </script>
 
 <template>
-<a :style="{'color': color}"
-   :href="url"
-   class="a-tag text-decoration-underline"
-  target="_blank">
-  {{ text }}
-</a>
+  <NuxtLink
+      class="text-decoration-underline"
+      :style="{'color': color}"
+      :href="href"
+      :target="props.target">
+    <slot/>{{ text }}
+  </NuxtLink>
+
 </template>
 
 <style>

@@ -97,8 +97,8 @@ And some examples of uncoordinated unique ids:
 - creation timestamp (simple [created_at]{.h} field in a table)
 - random data (UUID4)
 - creation timestamp + machine id + increment
-(:alink{.fm text="Twitter's snowflake" url="https://github.com/twitter-archive/snowflake"})
-- creation timestamp + random (:alink{.fm text="Ulid" url="https://github.com/ulid/spec"})
+(:alink{.fm text="Twitter's snowflake" href="https://github.com/twitter-archive/snowflake"})
+- creation timestamp + random (:alink{.fm text="Ulid" href="https://github.com/ulid/spec"})
 
 While many engineers and companies have developed their own way of creating unique IDs, the internet 
 task force, the 'official' body that takes care of promoting and publishing RFCS (standards) have
@@ -112,7 +112,7 @@ that we lose by not being able to use a sequence, the capacity to [sort]{.fm}.
 Having a column that is sortable makes aggregations more efficient and enables 
 features like pagination, incremental queries or last-write detection. 
 
-For example :alink{.fm text="connector-x" url="https://github.com/sfu-db/connector-x"} uses a
+For example :alink{.fm text="connector-x" href="https://github.com/sfu-db/connector-x"} uses a
 sorted column to do client side query partitioning, making loading data from a database to
 a dataframe very fast. More specifically, it works by issuing [SELECT MIN(field), MAX(field) FROM table]{.h},
 and computing different 'buckets.' It then issues several queries in different threads concurrently.
@@ -233,7 +233,7 @@ If you understand them at a fundamental level, you will pretty much understand e
 IDs there is, it's all very similar at the core.
 
 ### [Understanding UUIDs]{.text-h4}
-There are eight versions of UUIDs, in May 2024 we finally got published the :alink{text="last stable version" url="https://www.rfc-editor.org/rfc/rfc9562.html"}
+There are eight versions of UUIDs, in May 2024 we finally got published the :alink{text="last stable version" href="https://www.rfc-editor.org/rfc/rfc9562.html"}
 where version 7 and 8 were added, every version creates the UUID differently, and each version has different
 use cases.
 
@@ -505,3 +505,8 @@ Just two integers cobbled up together, not following the UUID rfc format.
 :Der{r="5" meta="GitHub, 2025-07-01" text="Flake: A decentralized, k-ordered id generation service in Erlang" link="https://github.com/boundary/flake"}
 :Der{r="6" meta="GitHub, 2025-07-01" text="surister sort script" link="https://github.com/surister/mylab/blob/master/crate_uuid/sort.py"}
 :Der{r="7" meta="GitHub, 2025-07-01" text="surister elasticflaketest script" link="https://github.com/surister/mylab/blob/master/crate_uuid/elasticflaketest.py"}
+
+| committed | deleted_docs | num_docs | search | shard_id |
+|-----------|--------------|----------|--------|----------| 
+| true      | 0            | 2        | true   | 2        |
+| true      | 0            | 1        | true   | 0        |
