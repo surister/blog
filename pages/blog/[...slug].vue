@@ -201,6 +201,10 @@ div + h2 {
 }
 
 div + h3 {
+  margin-top: 2em
+}
+
+h3 + div {
   margin-top: .8em
 }
 
