@@ -3,7 +3,9 @@
 </script>
 
 <template>
-<CustomImage/>
+  <span class="font-weight-medium">
+    <slot/>
+  </span>
 </template>
 
 <style scoped>
