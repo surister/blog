@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 const slots = useSlots();
 const value = slots.default()[0].children.default()[0].children;
 const props = defineProps({
@@ -7,17 +7,42 @@ const props = defineProps({
     default: "text"
   },
   hasTop: {
-    type: Boolean,
-    default: false
+    type: String,
+    default: "false"
   },
   hasBottom: {
-    type: Boolean,
-    default: false
+    type: String,
+    default: "false"
+  },
+
+  maxHeight: {
+    type: Number,
+    default: 500
+  },
+
+  rowHighlight: {
+    type: Array,
+    default: []
+    // Example: [
+    // {from: 1, to: 2, color: "green"},
+    // {from: 2, to: 3, color: "blue"}
+    // ]
   }
 })
+
+function is_row_highlighted(row_number) {
+  for (const row_rules of props.rowHighlight) {
+    if (row_number >= row_rules.from - 1 && row_number < row_rules.to) {
+      return row_rules.color
+    }
+  }
+  return ""
+}
+
 function unpack_row(row){
   return row.split("\n")[0].split("|").map((v) => v.trim()).filter((v) => v !== "")
 }
+
 function get_rows(){
   return value.split("\n").splice(2).map(unpack_row)
 }
@@ -28,10 +53,11 @@ function get_rows(){
     <pre>{{ value }}</pre>
   </template>
   <template v-else-if="type === 'table'">
-    <div style="height: 13px; background: #EF5350" v-if="hasTop"></div>
-    <v-table style="max-height: 500px"
-             :class="[hasBottom ? 'rounded-b-lg' : '']"
+    <v-table :style="{'max-height': maxHeight + 'px'}"
+             :class="[hasBottom === 'true' ? 'rounded-b-lg' : '', hasTop === 'true' ? 'rounded-t-lg' : '']"
              density="compact"
+             striped="even"
+             :hover="true"
              fixed-header>
       <thead>
       <tr>
@@ -41,7 +67,7 @@ function get_rows(){
       </tr>
       </thead>
       <tbody>
-      <tr v-for="row in get_rows()">
+      <tr v-for="(row, index) in get_rows()" :style="{backgroundColor: is_row_highlighted(index)}">
         <td v-for="element in row">
           {{ element }}
         </td>
@@ -52,7 +78,6 @@ function get_rows(){
   <template v-else>
     <h1 style="background-color: red">Table of type "{{ type }}" is not supported</h1>
   </template>
-
 </template>
 
 <style scoped>
