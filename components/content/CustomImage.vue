@@ -7,10 +7,10 @@ const props = defineProps({
     type: String
   },
   height: {
-    type: String
+    type: Number
   },
   width: {
-    type: String
+    type: Number
   },
   marginTop: {
     type: String,
