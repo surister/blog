@@ -625,9 +625,6 @@ deeper look at how we build clients to said software.
 
 Here is a table with every result compiled:
 
-
-::MarkdownTable{type="table"}
-<pre>
 | method                   | time (s) | rows/s | avg upload speed (MiB) | Avg mem (GiB) |
 |--------------------------|----------|--------|------------------------|---------------|
 | polars                   | 316.90   | 9355   | 1.93                   | 6.3           |
@@ -640,8 +637,6 @@ Here is a table with every result compiled:
 | tokio                    | 60.07    | 49352  | 5.65                   | 1.08          |
 | rayon                    | 34.54    | 85825  | 8.54                   | 1.95          |
 | rayon_fancy              | 36.56    | 81097  | 11.58                  | 1.89          |
-</pre>
-::
 
 If you are curious about how far CrateDB can go, these are the results of rayon with
 a couple of smaller tweaks, these tweaks are on the server side, we disabled replicas and set refresh
