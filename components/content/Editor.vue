@@ -10,11 +10,13 @@ import python from 'highlight.js/lib/languages/python'
 import rust from 'highlight.js/lib/languages/rust'
 import shell from 'highlight.js/lib/languages/shell'
 import sql from 'highlight.js/lib/languages/sql'
+import javascript from 'highlight.js/lib/languages/javascript'
 
 hljs.registerLanguage('python', python)
 hljs.registerLanguage('rust', rust)
 hljs.registerLanguage('shell', shell)
 hljs.registerLanguage('sql', sql)
+hljs.registerLanguage('js', javascript)
 
 const props = defineProps(
     {
