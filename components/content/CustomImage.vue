@@ -12,6 +12,9 @@ const props = defineProps({
   width: {
     type: Number
   },
+  maxwidth: {
+    type: Number
+  },
   marginTop: {
     type: String,
     default: '0'
@@ -27,6 +30,7 @@ const props = defineProps({
     <v-img aspect-ratio="16/9"
            :height="height"
            :width="width"
+           :max-width="maxwidth"
            :src="src"
            :style="{'marginTop': marginTop + 'px'}"
            :alt="alt"
