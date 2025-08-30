@@ -9,7 +9,6 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
-import {color} from 'chart.js/helpers';
 import {Line} from 'vue-chartjs'
 
 ChartJS.register(
@@ -62,22 +61,22 @@ let config = {
 </script>
 
 <template>
-  <div>
-    <v-dialog max-width="70%">
+    <v-dialog max-width="80%">
       <template v-slot:activator="{ props: activatorProps }">
         <v-btn v-bind="activatorProps"
                class="my-2"
-               color="surface-variant"
                text="Expand"
                size="small"
                variant="outlined"/>
       </template>
 
       <template v-slot:default="{ isActive }">
-        <v-card color="red">
+        <v-card>
           <Line :data="config.chartData"
                 :options="config.chartOptions"
-                :plugins="config.plugins"/>
+                :plugins="config.plugins"
+                class="ma-2"
+          />
 
           <v-card-actions>
             <v-btn @click="isActive.value = false"
@@ -91,7 +90,7 @@ let config = {
     <Line :data="config.chartData"
           :options="config.chartOptions"
           :plugins="config.plugins"/>
-  </div>
+
 
 </template>
 
