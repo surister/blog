@@ -10,7 +10,7 @@ const props = defineProps({
 
 <template>
   <v-card
-      prepend-avatar="https://media.licdn.com/dms/image/v2/D4D03AQEFN72iCT02Yw/profile-displayphoto-shrink_200_200/B4DZdGYtEPHkAY-/0/1749232571270?e=1756339200&v=beta&t=8OM7RaXEKs9JklGIojmwIFkghOQi8aXyyin91Vjileg"
+      prepend-avatar="https://media.licdn.com/dms/image/v2/D4D03AQEFN72iCT02Yw/profile-displayphoto-shrink_200_200/B4DZdGYtEPHkAY-/0/1749232571270?e=1759363200&v=beta&t=_Ij-RlV1mAGzU3MO4TNTsUlte6GPJIPduJeB3Yi2njs"
       class="mx-auto"
       rel="noopener"
       target="_blank"
