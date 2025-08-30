@@ -4,7 +4,7 @@ const value = slots.default()[0].children.default()[0].children;
 const props = defineProps({
   type: {
     type: String,
-    default: "text"
+    default: "table"
   },
   hasTop: {
     type: String,
@@ -31,6 +31,8 @@ const props = defineProps({
 })
 
 function is_row_highlighted(row_number) {
+  console.log(props.rowHighlight)
+  console.log(typeof props.rowHighlight)
   for (const row_rules of props.rowHighlight) {
     if (row_number >= row_rules.from - 1 && row_number < row_rules.to) {
       return row_rules.color
@@ -54,7 +56,7 @@ function get_rows(){
   </template>
   <template v-else-if="type === 'table'">
     <v-table :style="{'max-height': maxHeight + 'px'}"
-             :class="[hasBottom === 'true' ? 'rounded-b-lg' : '', hasTop === 'true' ? 'rounded-t-lg' : '']"
+             :class="[hasBottom === 'true' ? '' : 'rounded-b-lg', hasTop === 'true' ? '' : 'rounded-t-lg']"
              density="compact"
              striped="even"
              :hover="true"
