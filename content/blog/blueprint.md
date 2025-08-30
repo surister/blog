@@ -227,11 +227,8 @@ WHERE
   table_name = 't'
 ORDER BY id
 ```
-
-::Sep
-::
-
-::MarkdownTable{type="table"  hasBottom=true}
+---
+::MarkdownTable{type="table"  hasTop=true}
 <pre>
 |id|num_docs|path|
  |-|-|-| 
