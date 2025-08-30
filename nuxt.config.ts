@@ -2,8 +2,17 @@
 import path from "node:path";
 
 export default defineNuxtConfig({
+  app: {
+    head: {
+      link: [{
+        rel: 'icon',
+        type: 'image/x-icon',
+        href: import.meta.dev ? '/favicon_dev.ico': '/favicon.ico'
+      }]
+    }
+  },
   compatibilityDate: '2024-04-03',
-  devtools: { enabled: false },
+  devtools: {enabled: false},
   nitro: {
     output: {
       publicDir: path.join(__dirname, 'deploy/.dist'),
