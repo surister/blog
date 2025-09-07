@@ -94,7 +94,7 @@ and CrateDB might change the policy in the future.
 
 When two segments are merged, all the 'valid' records of each segment are combined into a new one.
 
-![Merge of two segments into one](/img/partitions/segment_merge.svg){width=400}
+![Merge of two segments into one](/img/partitions/segment_merge.svg){maxwidth=600}
 
 You can also manually merge the segments of a table explicitly by calling:
 
