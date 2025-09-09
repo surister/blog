@@ -34,7 +34,7 @@ export default defineNuxtConfig({
   ],
   umami: {
     id: 'b52fc512-6ecd-4be3-bdd5-39d566b4229d',
-    host: 'https://surister.dev',
+    host: 'https://cloud.umami.is',
     autoTrack: true,
   },
   vuetify: {
