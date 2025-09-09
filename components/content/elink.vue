@@ -9,7 +9,7 @@ const props = defineProps({
   url: {
     type: String
   },
-  color:{
+  color: {
     type: String,
     default: 'red'
   }
