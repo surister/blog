@@ -29,8 +29,14 @@ export default defineNuxtConfig({
     'vuetify-nuxt-module',
     '@nuxt/fonts',
     '@nuxt/image',
-    'nuxt-toc'
+    'nuxt-toc',
+    'nuxt-umami'
   ],
+  umami: {
+    id: 'b52fc512-6ecd-4be3-bdd5-39d566b4229d',
+    host: 'https://surister.dev',
+    autoTrack: true,
+  },
   vuetify: {
     vuetifyOptions: {
       theme: {
