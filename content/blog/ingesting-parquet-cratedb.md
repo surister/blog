@@ -4,7 +4,7 @@ image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-pho
 description: 'Investigating how to ingest parquet to CrateDB as efficiently as possible optimizing the client.'
 authors: [ { 'name': 'Ivan', 'job_title': 'Database Environment Engineer' } ]
 published: true
-published_date: '2025-07-18'
+date: '2025-07-18'
 tags: [ 'python', 'rust', 'software', 'optimization', 'CrateDB' ]
 ---
 Parquet has become the main format for modern data engineering; I would even argue that most companies

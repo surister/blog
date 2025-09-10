@@ -21,12 +21,12 @@ let cratedb_blogs = [
       <v-col>
         <h2>Last entries</h2>
 
-        <ContentList v-slot="{ list }">
+        <ContentList v-slot="{ list }" :query="{sort: [{date: -1}]}">
           <div v-for="article in list">
             <template v-if="article.published || article.show_preview">
               <div class="my-1">
                 <span class="text-red text-subtitle-1 ml-1">
-                {{ article.published_date || new Date().toISOString().slice(0, 10) }}
+                {{ article.date || new Date().toISOString().slice(0, 10) }}
               </span>
                 <a :href="article._path"
                    class="font-weight-bold text-decoration-none text-white">

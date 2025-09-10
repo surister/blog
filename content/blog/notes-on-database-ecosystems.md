@@ -7,7 +7,7 @@ authors: [{'name': 'Ivan', 'job_title': 'Database Ecosystem Engineer'}, {'name':
 comment_links: [{'name': 'reddit', 'href': ''}, {'name': 'hacker news', 'href': ''}]
 published: false
 show_preview: false
-date: "2025/01/01"
+date: "2025-01-01"
 ---
 
 Databases are among one of the most complex pieces of software to develop, they overlap many

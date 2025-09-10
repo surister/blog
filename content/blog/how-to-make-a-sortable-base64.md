@@ -6,7 +6,7 @@ tags: [ 'base64', 'encoding', 'databases', 'python', 'tutorial', 'order' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Database Environment Engineer' } ]
 show_preview: false
 published: true
-published_date: '2025-09-09'
+date: '2025-09-09'
 ---
 
 ## Introduction
