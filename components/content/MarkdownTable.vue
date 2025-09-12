@@ -31,8 +31,6 @@ const props = defineProps({
 })
 
 function is_row_highlighted(row_number) {
-  console.log(props.rowHighlight)
-  console.log(typeof props.rowHighlight)
   for (const row_rules of props.rowHighlight) {
     if (row_number >= row_rules.from - 1 && row_number < row_rules.to) {
       return row_rules.color

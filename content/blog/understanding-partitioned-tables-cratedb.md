@@ -66,7 +66,7 @@ ORDER BY id
 ::Sep
 ::
 
-::MarkdownTable{type="table"  hasBottom=true}
+::MarkdownTable{type="table" hasTop=true}
 <pre>
 |id|num_docs|path|
  |-|-|-| 
@@ -162,7 +162,7 @@ ORDER BY
 ::Sep
 ::
 
-::MarkdownTable{type="table"  hasBottom=true}
+::MarkdownTable{type="table" hasTop=true}
 <pre>
 |shard_id|num_docs|
  |-|-| 
@@ -176,7 +176,7 @@ After another insert:
 
 
 
-::MarkdownTable{type="table" hasBottom=true hasTop=true}
+::MarkdownTable{type="table"}
 <pre>
 |shard_id|num_docs|
  |-|-| 
@@ -216,7 +216,7 @@ WHERE
 ::Sep
 ::
 
-::MarkdownTable{type="table" hasBottom=true}
+::MarkdownTable{type="table" hasTop=true}
 <pre>
 |committed|deleted_docs|num_docs|search|shard_id|
  |-|-|-|-|-| 
@@ -229,7 +229,7 @@ WHERE
 There are three segments, each with one record, all available for search, and the newly added
 segment is still not committed to disk. If we call optimize to forcibly merge the segments:
 
-::MarkdownTable{type="table" hasBottom=true hasTop=true}
+::MarkdownTable{type="table"}
 <pre>
 |committed|deleted_docs|num_docs|search|shard_id|
  |-|-|-|-|-| 
