@@ -10,7 +10,7 @@ const props = defineProps(['doc'])
     <v-row class="bottom-0 mt-5">
       <v-col cols="auto">
         <span class="text-subtitle-1 font-weight-bold text-grey-lighten-1">
-          {{ doc.published_date || 'date_unpublished' }}
+          {{ doc.date || 'date_unpublished' }}
         </span>
         <span class="pl-1" v-if="doc.comment_links">·</span>
         <elink type="comment"
