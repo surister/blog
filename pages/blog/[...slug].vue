@@ -25,16 +25,16 @@ onMounted(() => {
         <v-row justify="center"
                no-gutters>
 
-          <!--  TABLE OF CONTENTS  -->
+          <!-- Table of contents -->
           <div style="
                position: fixed;
                animation: ease;
                transition: all .5s;
-               left: 50px;
+               left: 25px;
                z-index: 1000;"
                :style="{top: isTocFixed ? '100px' : '300px'}"
                ref="toc"
-               class="hidden-md hidden-sm hidden-xs">
+               class="hidden-md-and-down">
             <Toc></Toc>
           </div>
 
@@ -53,7 +53,8 @@ onMounted(() => {
                        title="Warning: This is a work in progress and is not yet published."
                        type="warning"/>
 
-              <div class="mt-8 hidden-lg hidden-xl">
+              <!-- Mobile table of contents -->
+              <div class="my-8 hidden-lg-and-up">
                 <Toc class="text-h1"></Toc>
               </div>
 
