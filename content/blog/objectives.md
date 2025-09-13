@@ -2,7 +2,7 @@
 title: 'Objectives for 2025'
 image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-photo-of-a-cat-sitting-on-top-of-some-rocks.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
 description: 'My personal study objectives for 2025'
-show_preview: true
+show_preview: false
 tags: [ 'python', 'Antlr4', 'software' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Monologue Expert' } ]
 ---
