@@ -1,7 +1,7 @@
 ---
 title: 'Unique identifiers in distributed databases'
 image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-photo-of-a-cat-sitting-on-top-of-some-rocks.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-description: 'Blueprint showcasing available components'
+description: 'In this post, we will explore some properties of unique identifiers in Distribute databases, use cases, how the most popular unique id: UUID is created.'
 tags: [ 'UUID', 'Distributed Databases', 'Databases', 'CrateDB' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Database Environment Engineer' }, ]
 show_preview: true
@@ -9,20 +9,17 @@ published: false
 #comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
 ---
 
-
 ## [Introduction]
 In this post, we will explore some properties of unique identifiers in Distribute databases, use cases,
-how the most popular unique id: [UUID]{.font-weight-medium} is composed and what CrateDB; a distributed
-shared-nothing database uses.
-
+how the most popular unique id: [UUID]{.font-weight-medium} is created.
 
 ## [About databases]
 One challenge of distributed databases (specifically those with shared-nothing architecture) 
 is data consistency, keeping all data consistent while staying performant is hard,
 since insert/updates can happen at different rates in different nodes. 
 
-One effect of this is the lack of monotonically increasing ids, commonly known as 
-[AUTO-INCREMENT]{.font-weight-medium}; that is a table's column which every time a new row is
+One consequence of this is the lack of monotonically increasing ids, commonly known as 
+[AUTO-INCREMENT]{.font-weight-medium}; that is a column where every time a new row is
 inserted, the column's value gets incremented monotonically (usually by 1).
 
 One example you might be familiar with is the [SERIAL]{.fm} datatype in postgres:
@@ -31,43 +28,45 @@ One example you might be familiar with is the [SERIAL]{.fm} datatype in postgres
 CREATE TABLE mytable
 (
     id    serial primary key,
-    data  VARCHAR(128) not null
+    data  VARCHAR(128)
 );
 
-insert into mytable (data) values ('some data');
-insert into mytable (data) values ('some data x2');
+INSERT INTO mytable (data) VALUES ('some data');
+INSERT INTO mytable (data) VALUES ('some data x2');
 ```
 
 ```sql true
 SELECT * FROM sometable
 ```
 
-::Sep
-::
+---
 
-::MarkdownTable{type="table"  hasBottom=true}
+::MarkdownTable{type="table" hasTop="true"}
 <pre>
-| id | table_name        | 
-|----|-------------------| 
-| 1  | "what is this"    | 
-| 2  | "what is this x2" |
+| id | data           |
+|----|----------------|
+| 1  | "some data"    |
+| 2  | "some data x2" |
 </pre>
 ::
 
-As you can see, [id]{.h} was incremented by one every time we inserted a row.
+The [id]{.h} volume was incremented by one every time we inserted a row.
+
 This is possible because the database keeps track of the count with a counter
-(called sequences in Postgres). This is effectively a unique id, [within]{.fm} the table,
+(called sequences in Postgres). This is effectively a unique id (within the table)
 and is commonly used as a primary key.
 
 But in our distributed world every insert has to be executed in every node or instance of the database,
-in order for the nodes to increase the id correctly; they would need to communicate to keep their
-counters in sync, in a read-heavy scenario this would mean massive inter-node communication, locking
-and decrease of write performance, defeating one of the nice characteristics of distributed databases.
+in order for the nodes to increase the id correctly they would need to communicate to keep their
+counters in sync, in a read-heavy scenario this would mean massive internode communication, locking
+and a consequent decrease in write performance, defeating one of the nice traits of 
+distributed databases. That's why all if not all distributed databases don't usually implement
+AUTO-INCREMENT columns.
 
 ### [The need for uniqueness]
-In databases, we often need to uniquely identify rows. [Primary keys]{.fm} are used for that.
-By definition, primary keys need to be unique and not null, and most distributed databases choose
-not to implement auto-increment sequences. What should be used then?
+In databases, we need to uniquely identify rows. **Primary keys** are used for that.
+By definition, primary keys need to be unique and not null, auto-increment are usually 
+not to implement auto-increment. What should be used then?
 
 Well, there are two different flavors to create ids, [coordinated]{.fm}; the one we said it is not usually
 implemented in distribute databases, because coordination is expensive, and [uncoordinated]{.fm}.
@@ -76,16 +75,16 @@ without talking to others, [without collisions]{.fm}, and that's one of the chal
 the same id again, otherwise it wouldn't be unique.
 
 We could create a massive blob of pseudo-random data that would assure us it would never be generated again
-in the lifespan of the universe; avoiding collisions, but that'd be not efficient. 
-Imagine generating a 1GB unique id for every row in your database, it's just not feasible. Like in 
-encryption, there is a careful balance between how much uniqueness we want and how much we pay for it.
+in the lifespan of the universe; avoiding collisions, but that'd be not efficient.
+Imagine generating a 1GB unique id for every row in your database, it's just not feasible.
+Like in encryption, there is a careful balance between how much uniqueness we want and how much we pay for it.
 
 That's why there is not a single way of creating an uncoordinated identifier, and depending on its
 components and how its created, it will have different uniqueness guarantees, and other properties.
 
 Some common components are:
 
-- just pseudo-random data
+- pseudo-random data
 - timestamps
 - metadata (thread number, MAC address, process id)
 - counters
@@ -358,22 +357,37 @@ limit 10
 ::Sep
 ::
 
-::MarkdownTable{type="table"  hasBottom=true}
-<pre>
-|_id|real_pos|inserted_at|uuid|
- |-|-|-|-| 
-|"-1FXkZUBNha00pvZ-xcJ"|641|1741900217097|"_VFXkZUBNha00pvZ-xcJ"|
-|"-1FXkZUBNha00pvZ9BRZ"|177|1741900215385|"_VFXkZUBNha00pvZ9BRZ"|
-|"-1FXkZUBNha00pvZ_RgJ"|789|1741900217609|"_VFXkZUBNha00pvZ_RgJ"|
-|"-1FXkZUBNha00pvZ_xlf"|955|1741900218207|"6xFXkZUBiP2zR8B6_9Bf"|
-|"-1FYkZUBNha00pvZ03Ht"|14491|1741900272621|"V4xYkZUB5Zpn6aZb0y3u"|
-|"-1FYkZUBNha00pvZ13Jm"|14653|1741900273511|"-YxYkZUB5Zpn6aZb1y1n"|
-|"-1FYkZUBNha00pvZ2nNJ"|14809|1741900274250|"g4xYkZUB5Zpn6aZb2i5K"|
-|"-1FYkZUBNha00pvZ3HRq"|14939|1741900274794|"44xYkZUB5Zpn6aZb3C5q"|
-|"-1FYkZUBNha00pvZ63rJ"|15861|1741900278729|"f4xYkZUB5Zpn6aZb6zLJ"|
-|"-1FYkZUBNha00pvZ6nkO"|15705|1741900278287|"74xYkZUB5Zpn6aZb6jEP"|
-</pre>
-::
+[//]: # (::MarkdownTable{type="table"  hasBottom=true})
+
+[//]: # (<pre>)
+
+[//]: # (|_id|real_pos|inserted_at|uuid|)
+
+[//]: # ( |-|-|-|-| )
+
+[//]: # (|"-1FXkZUBNha00pvZ-xcJ"|641|1741900217097|"_VFXkZUBNha00pvZ-xcJ"|)
+
+[//]: # (|"-1FXkZUBNha00pvZ9BRZ"|177|1741900215385|"_VFXkZUBNha00pvZ9BRZ"|)
+
+[//]: # (|"-1FXkZUBNha00pvZ_RgJ"|789|1741900217609|"_VFXkZUBNha00pvZ_RgJ"|)
+
+[//]: # (|"-1FXkZUBNha00pvZ_xlf"|955|1741900218207|"6xFXkZUBiP2zR8B6_9Bf"|)
+
+[//]: # (|"-1FYkZUBNha00pvZ03Ht"|14491|1741900272621|"V4xYkZUB5Zpn6aZb0y3u"|)
+
+[//]: # (|"-1FYkZUBNha00pvZ13Jm"|14653|1741900273511|"-YxYkZUB5Zpn6aZb1y1n"|)
+
+[//]: # (|"-1FYkZUBNha00pvZ2nNJ"|14809|1741900274250|"g4xYkZUB5Zpn6aZb2i5K"|)
+
+[//]: # (|"-1FYkZUBNha00pvZ3HRq"|14939|1741900274794|"44xYkZUB5Zpn6aZb3C5q"|)
+
+[//]: # (|"-1FYkZUBNha00pvZ63rJ"|15861|1741900278729|"f4xYkZUB5Zpn6aZb6zLJ"|)
+
+[//]: # (|"-1FYkZUBNha00pvZ6nkO"|15705|1741900278287|"74xYkZUB5Zpn6aZb6jEP"|)
+
+[//]: # (</pre>)
+
+[//]: # (::)
 
 ```sql true
 select _id, * from t
@@ -385,9 +399,11 @@ limit 10
 ::
 
 ::MarkdownTable{type="table"  hasBottom=true}
+
 <pre>
+
 |_id|real_pos|inserted_at|uuid|
- |-|-|-|-| 
+ |-|-|-|-|
 |"-VFXkZUBNha00pvZ-RYI"|495|1741900216585|"-1FXkZUBNha00pvZ-RYJ"|
 |"-VFXkZUBNha00pvZ8RNV"|11|1741900214613|"-1FXkZUBNha00pvZ8RNV"|
 |"-VFXkZUBNha00pvZ9hXX"|343|1741900216023|"-1FXkZUBNha00pvZ9hXX"|
@@ -398,7 +414,9 @@ limit 10
 |"-VFYkZUBNha00pvZ53hl"|15549|1741900277605|"-1FYkZUBNha00pvZ53hl"|
 |"-VFYkZUBNha00pvZ5Xdp"|15401|1741900277097|"-1FYkZUBNha00pvZ5Xdp"|
 |"-VFYkZUBNha00pvZ8HyN"|16171|1741900279949|"-1FYkZUBNha00pvZ8HyN"|
+
 </pre>
+
 ::
 
 ```sql
@@ -410,22 +428,37 @@ limit 10
 ::Sep
 ::
 
-::MarkdownTable{type="table"  hasBottom=true}
-<pre>
-|_id|real_pos|inserted_at|uuid|
- |-|-|-|-| 
-|"6FFXkZUBNha00pvZ8RMV"|0|1741900214550|"gYtXkZUB5Zpn6aZb8fQW"|
-|"6VFXkZUBNha00pvZ8RMc"|1|1741900214556|"61FXkZUBNha00pvZ8RMc"|
-|"7FFXkZUBNha00pvZ8RMh"|2|1741900214562|"g4tXkZUB5Zpn6aZb8fQi"|
-|"7VFXkZUBNha00pvZ8RMm"|3|1741900214566|"hYtXkZUB5Zpn6aZb8fQn"|
-|"7lFXkZUBNha00pvZ8RMt"|4|1741900214573|"8FFXkZUBNha00pvZ8RMt"|
-|"8VFXkZUBNha00pvZ8RM0"|5|1741900214580|"h4tXkZUB5Zpn6aZb8fQ0"|
-|"8lFXkZUBNha00pvZ8RM6"|6|1741900214586|"9FFXkZUBNha00pvZ8RM6"|
-|"9VFXkZUBNha00pvZ8RM-"|7|1741900214591|"iYtXkZUB5Zpn6aZb8fQ_"|
-|"9lFXkZUBNha00pvZ8RNE"|8|1741900214596|"i4tXkZUB5Zpn6aZb8fRF"|
-|"91FXkZUBNha00pvZ8RNJ"|9|1741900214601|"jYtXkZUB5Zpn6aZb8fRK"|
-</pre>
-::
+[//]: # (::MarkdownTable{type="table"  hasBottom=true})
+
+[//]: # (<pre>)
+
+[//]: # (|_id|real_pos|inserted_at|uuid|)
+
+[//]: # ( |-|-|-|-| )
+
+[//]: # (|"6FFXkZUBNha00pvZ8RMV"|0|1741900214550|"gYtXkZUB5Zpn6aZb8fQW"|)
+
+[//]: # (|"6VFXkZUBNha00pvZ8RMc"|1|1741900214556|"61FXkZUBNha00pvZ8RMc"|)
+
+[//]: # (|"7FFXkZUBNha00pvZ8RMh"|2|1741900214562|"g4tXkZUB5Zpn6aZb8fQi"|)
+
+[//]: # (|"7VFXkZUBNha00pvZ8RMm"|3|1741900214566|"hYtXkZUB5Zpn6aZb8fQn"|)
+
+[//]: # (|"7lFXkZUBNha00pvZ8RMt"|4|1741900214573|"8FFXkZUBNha00pvZ8RMt"|)
+
+[//]: # (|"8VFXkZUBNha00pvZ8RM0"|5|1741900214580|"h4tXkZUB5Zpn6aZb8fQ0"|)
+
+[//]: # (|"8lFXkZUBNha00pvZ8RM6"|6|1741900214586|"9FFXkZUBNha00pvZ8RM6"|)
+
+[//]: # (|"9VFXkZUBNha00pvZ8RM-"|7|1741900214591|"iYtXkZUB5Zpn6aZb8fQ_"|)
+
+[//]: # (|"9lFXkZUBNha00pvZ8RNE"|8|1741900214596|"i4tXkZUB5Zpn6aZb8fRF"|)
+
+[//]: # (|"91FXkZUBNha00pvZ8RNJ"|9|1741900214601|"jYtXkZUB5Zpn6aZb8fRK"|)
+
+[//]: # (</pre>)
+
+[//]: # (::)
 
 [inserted_at]{.h} returns the correct results, this is also observable in filtering as expected.
 
@@ -462,7 +495,7 @@ Just two integers cobbled up together, not following the UUID rfc format.
 
 :Der{r="1" meta="GitHub, 2025-07-01" text="CrateDB UUIDs class" link="https://github.com/crate/crate/blob/master/server/src/main/java/org/elasticsearch/common/UUIDs.java"}
 :Der{r="2" meta="Elastic blog." link="https://www.elastic.co/blog/elasticsearch-is-open-source-again" text="Elasticsearch Is Open Source. Again!"}
-:Der{r="3" meta="GitHub, 2025-07-01" text="CrateDB Id class" link="https://github.com/crate/crate/blob/79ff2217dde45d6a748b0f31b36c95a7b252878c/server/src/main/java/io/crate/analyze/Id.java#L48"}
+:Der{r="3" meta="GitHub, 2025-07-01" text="CrateDB ID class" link="https://github.com/crate/crate/blob/79ff2217dde45d6a748b0f31b36c95a7b252878c/server/src/main/java/io/crate/analyze/Id.java#L48"}
 :Der{r="4" meta="GitHub, 2025-07-01" text="CrateDB GenRandomTextUUIDFunction class" link="https://github.com/crate/crate/blob/master/server/src/main/java/io/crate/expression/scalar/GenRandomTextUUIDFunction.java"}
 :Der{r="5" meta="GitHub, 2025-07-01" text="Flake: A decentralized, k-ordered id generation service in Erlang" link="https://github.com/boundary/flake"}
 :Der{r="6" meta="GitHub, 2025-07-01" text="surister sort script" link="https://github.com/surister/mylab/blob/master/crate_uuid/sort.py"}
