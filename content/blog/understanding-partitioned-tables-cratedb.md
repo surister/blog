@@ -121,11 +121,11 @@ When a merge occurs, the new segment will not contain the records that were mark
 
 ### [Updating a record]
 
-When a record is updated, it's marked as deleted in its original segment, and the newly updated record
-is written to a new segment. After a refresh, the [IndexReader]{.h} will be aware of the new segment
-and the record will show up in search results. 
+When a record is updated, a new segment with the updated record(s) is created, where the previous
+version of the document(s) is marked as deleted.
 
-Eventually, the segments will be merged and the resulting segment will be the
+After a refresh, the [IndexReader]{.h} will be aware of the new segment and the record will show
+up in search results.Eventually, the segments will be merged and the resulting segment will be the
 same as if we had updated the original segment.
 
 ![Merge of segments after the update of a record](/img/partitions/record_updated.svg)
@@ -282,7 +282,7 @@ is the maximum number of shards that table can have (without replication).
 The shard map of the table will look like this:
 
 ![Table partitioned by month](/img/partitions/partition_tables.svg)
-
+ 
 As you can see, the structure of a table doesn't really change, it is still composed of shards and
 segments, but when it has a [partition column]{.h}, the rule of creating shards and routing records
 depends on that partition column.
