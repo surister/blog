@@ -26,18 +26,16 @@ onMounted(() => {
                no-gutters>
 
           <!-- Table of contents -->
-          <div style="
-               position: fixed;
-               animation: ease;
-               transition: all .5s;
-               left: 25px;
-               z-index: 1000;"
-               :style="{top: isTocFixed ? '100px' : '300px'}"
-               ref="toc"
-               class="hidden-md-and-down">
-            <Toc></Toc>
-          </div>
 
+          <v-col>
+            <v-btn variant="outlined"
+                   size="x-large"
+                   prepend-icon="mdi-arrow-left"
+                   href="/">
+              back to index
+            </v-btn>
+
+          </v-col>
           <!--  CONTENT  -->
           <v-col cols="auto">
 
@@ -65,7 +63,19 @@ onMounted(() => {
             </div>
 
           </v-col>
-
+          <v-col>
+            <div style="
+               position: sticky;
+               animation: ease;
+               transition: all .5s;
+               margin-left: 100px;
+               z-index: 1000;"
+                 :style="{top: isTocFixed ? '100px' : '300px'}"
+                 ref="toc"
+                 class="hidden-md-and-down">
+              <Toc></Toc>
+            </div>
+          </v-col>
         </v-row>
       </v-container>
     </article>
