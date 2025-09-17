@@ -64,17 +64,16 @@ function copyToClipboard(text) {
               :header-text="filename"
               highlight-row-background-color="red"
               background-color="#212121"
-              padding-bottom="10"
-              padding-top="16"
+              padding-bottom="12"
+              padding-top="12"
               code-font-size="16"
               read-only
-              :prepend-inline="true"
-              :highlight="(text) => hljs.highlight(text, {language: language}).value">
+              :highlight="(t) => hljs.highlight(t, {language: language}).value">
     <template #appendText>
       <v-btn variant="outlined"
              :color="copied ? 'success' : ''"
-             style="border-radius: 5px"
              :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
+             style="border-radius: 5px"
              size="x-small"
              @click="copyToClipboard(code)">
       </v-btn>
