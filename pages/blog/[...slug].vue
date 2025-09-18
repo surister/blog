@@ -2,7 +2,7 @@
 import Header from "~/components/slug/Header.vue";
 
 const scrollTop = () => {
-  window.scrollTo({top: 0,})
+  window.scrollTo({top: 0})
 }
 let showScrollUp = ref(false)
 let isTocFixed = ref(false)
@@ -70,7 +70,7 @@ onMounted(() => {
                transition: all .5s;
                margin-left: 100px;
                z-index: 1000;"
-                 :style="{top: isTocFixed ? '100px' : '300px'}"
+                 :style="{top: isTocFixed ? '30px' : '200px'}"
                  ref="toc"
                  class="hidden-md-and-down">
               <Toc></Toc>
