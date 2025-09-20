@@ -19,7 +19,7 @@ is data consistency, keeping all data consistent while staying performant is har
 since insert/updates can happen at different rates in different nodes. 
 
 One consequence of this is the lack of monotonically increasing ids, commonly known as 
-[AUTO-INCREMENT]{.font-weight-medium}; that is a column where every time a new row is
+[auto incremental]{.font-weight-medium}; that is a column where every time a new row is
 inserted, the column's value gets incremented monotonically (usually by 1).
 
 One example you might be familiar with is the [SERIAL]{.fm} datatype in postgres:
@@ -50,103 +50,69 @@ SELECT * FROM sometable
 </pre>
 ::
 
-The [id]{.h} volume was incremented by one every time we inserted a row.
+The [id]{.h} value was incremented by one every time we inserted a row.
 
-This is possible because the database keeps track of the count with a counter
+This is possible because the database keeps track of the count with a **counter**
 (called sequences in Postgres). This is effectively a unique id (within the table)
 and is commonly used as a primary key.
 
-But in our distributed world every insert has to be executed in every node or instance of the database,
-in order for the nodes to increase the id correctly they would need to communicate to keep their
-counters in sync, in a read-heavy scenario this would mean massive internode communication, locking
-and a consequent decrease in write performance, defeating one of the nice traits of 
-distributed databases. That's why all if not all distributed databases don't usually implement
-AUTO-INCREMENT columns.
+But in our distributed world every insert has to be executed in every node or instance of the
+database, in order for the nodes to increase the id correctly they would need to communicate to
+keep their counters in sync, in a read-heavy scenario this would mean massive internode 
+communication, locking and a consequent decrease in write performance, defeating one of the nice
+traits of distributed databases. That's why all if not all distributed databases don't usually
+implement auto-incremental columns.
 
-### [The need for uniqueness]
-In databases, we need to uniquely identify rows. **Primary keys** are used for that.
-By definition, primary keys need to be unique and not null, auto-increment are usually 
-not to implement auto-increment. What should be used then?
+### The need for uniqueness
+In databases, we need to uniquely identify rows. **Primary keys** are used for that. If you don't
+define a primary key, database systems usually create one internal unique identifier for you.
 
-Well, there are two different flavors to create ids, [coordinated]{.fm}; the one we said it is not usually
-implemented in distribute databases, because coordination is expensive, and [uncoordinated]{.fm}.
-Uncoordinated means that any database instance or node should be able to generate valid ids 
-without talking to others, [without collisions]{.fm}, and that's one of the challenges: Not creating
+By definition, primary keys need to be unique and not null, as we explained earlier, most distributed
+databases don't implement **auto-incremental** columns, so what do we use instead?
+
+There are two different flavors to create ids: **coordinated**, like auto-incremental 
+columns and **uncoordinated**.
+
+Uncoordinated means that any database instance or node should be able to generate a valid id
+without talking to others, [without collisions]{.fm}, and that's another of the challenges: Not creating
 the same id again, otherwise it wouldn't be unique.
 
 We could create a massive blob of pseudo-random data that would assure us it would never be generated again
-in the lifespan of the universe; avoiding collisions, but that'd be not efficient.
+in the lifespan of the universe and thus avoiding collisions, but that'd be not efficient.
 Imagine generating a 1GB unique id for every row in your database, it's just not feasible.
 Like in encryption, there is a careful balance between how much uniqueness we want and how much we pay for it.
 
-That's why there is not a single way of creating an uncoordinated identifier, and depending on its
+That's why there is **not a single way of** creating an uncoordinated identifier, and depending on its
 components and how its created, it will have different uniqueness guarantees, and other properties.
 
 Some common components are:
 
-- pseudo-random data
-- timestamps
-- metadata (thread number, MAC address, process id)
-- counters
+- **pseudo-random data**
+- **timestamps**
+- **metadata (thread number, MAC address, process id)**
+- **counters**
 
 And some examples of uncoordinated unique ids:
 
-- creation timestamp (simple [created_at]{.h} field in a table)
-- random data (UUID4)
-- creation timestamp + machine id + increment
-(:alink{.fm text="Twitter's snowflake" href="https://github.com/twitter-archive/snowflake"})
-- creation timestamp + random (:alink{.fm text="Ulid" href="https://github.com/ulid/spec"})
-
-While many engineers and companies have developed their own way of creating unique IDs, the internet 
-task force, the 'official' body that takes care of promoting and publishing RFCS (standards) have
-their take on it: [UUID]{.h} (Universally Unique Identifier).
+- **creation timestamp** (simple [created_at]{.h} field in a table)
+- **UUID4**
+- [**Twitter snowflake**](https://github.com/twitter-archive/snowflake"}) (creation timestamp + machine id + increment)
+- [**Ulid**](https://github.com/ulid/spec) (creation timestamp + random)
 
 
-### [Sortable Ids are amazing]
+### Sortable Ids are amazing
 Being unique is the bare minimum requirement for a primary key, but there is another property
-that we lose by not being able to use a sequence, the capacity to [sort]{.fm}.
+that we lose by not being able to use a sequence, the ability to [sort]{.fm}.
 
 Having a column that is sortable makes aggregations more efficient and enables 
 features like pagination, incremental queries or last-write detection. 
 
-For example :alink{.fm text="connector-x" href="https://github.com/sfu-db/connector-x"} uses a
-sorted column to do client side query partitioning, making loading data from a database to
-a dataframe very fast. More specifically, it works by issuing [SELECT MIN(field), MAX(field) FROM table]{.h},
-and computing different 'buckets.' It then issues several queries in different threads concurrently.
+For example, [**connector-x**](https://github.com/sfu-db/connector-x) uses a sorted column to do
+client side query partitioning, making loading data from a database to a dataframe very fast.
+More specifically, it works by issuing [SELECT MIN(field), MAX(field) FROM table]{.h}, and 
+computing different 'buckets'. It then issues several queries in different threads concurrently.
 
-This is an example of a partition planner that I created in rust similar to connector-x's:
-
-```rust
-PartitionPlan(
-    min_value=1,
-    max_value=1200000,
-    count=1199969,
-    metadata_query='...omitted...',
-    query_data=[
-    'select * from (select l_orderkey from lineitem)'
-    'where l_orderkey >= 1 and l_orderkey < 600001',
-    'select * from (select l_orderkey from lineitem)'
-    'where l_orderkey >= 600001 and l_orderkey < 1200000'],
-    partition_config=PartitionConfig(
-        queries=['select l_orderkey 'from lineitem'],
-        partition_on='l_orderkey',
-        partition_num=2,
-        partition_range=None,
-        needed_metadata_from_source='CountAndMinMax',
-        query_partition_mode='OnePartitionedQuery')
-    )
-)
-```
-
-The original query is [select l_orderkey from lineitem]{.h} and we split the query in two:
-
-[select l_orderkey from lineitem where l_orderkey >= 1 and l_orderkey < 600001]{.h}
-
-and
-
-[select l_orderkey from lineitem where l_orderkey >= 600001 and l_orderkey < 1200000]{.h}
-
-But this only works if [l_orderkey]{.h} is of a datatype that can be sorted and therefore filtered.
+But this only works if we can create buckets or partitions on a column that can be sorted.
 We can use the same technique to create a client side pseudo-paginator for any table,
 which can be useful when batch-processing large tables.
 
@@ -216,12 +182,29 @@ if __name__ == '__main__':
     ...
 ```
 
-[table]{.h} will exhaust the whole table without hitting an [out of memory]{.h} error on large tables.
+[table]{.h} will exhaust the whole table without hitting an [out of memory]{.h} error on large tables,
+again, all of this depends on a [sortable]{.h} id.
 
-All of this depend on a [sortable]{.h} id, achieving maximum efficiency when the ids are monotonically
-increased by 1.
+[//]: # (KEEP GOING FROM HERE DOWN)
 
-## [About unique IDs]
+That's why some forms of uncoordinated ids that can be sorted, where created, 
+usually if they contain a timestamp or a counter. Examples of this are **ULID** and **UUID7**
+
+### Re-cap
+
+To re-cap, in databases we need to uniquely identify rows, a common technique is using an auto incremental
+column like **SERIAL** in postgres, but in distributed databases we don't typically have this option,
+due to architectural constraints, so we resort to creating uncoordinated ids using random data.
+
+Generating random data to create a collision-free column usually works,
+but some use cases require the identifier to also be sortable.
+
+## About unique UUID
+
+While many engineers and companies have developed their own way of creating unique IDs, the internet 
+task force, the 'official' body that takes care of promoting and publishing RFCS (standards) have
+published several standards: [UUID]{.h} (Universally Unique Identifier).
+
 Now we have more context of uniquely identifying rows in distributed databases. 
 Let's try to understand the most popular and used ones [UUIDs]{.h}.
 
@@ -229,7 +212,8 @@ If you understand them at a fundamental level, you will pretty much understand e
 IDs there is, it's all very similar at the core.
 
 ### [Understanding UUIDs]
-There are eight versions of UUIDs, in May 2024 we finally got published the :alink{text="last stable version" href="https://www.rfc-editor.org/rfc/rfc9562.html"}
+There are eight versions of UUIDs, in May 2024 we finally got published the 
+:alink{text="last stable version" href="https://www.rfc-editor.org/rfc/rfc9562.html"}
 where version 7 and 8 were added, every version creates the UUID differently, and each version has different
 use cases.
 
