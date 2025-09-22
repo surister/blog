@@ -20,11 +20,11 @@ const value = slots.default()[0].children.default()[0].children;
 </script>
 
 <template>
-  <span class="bg-gray rounded-b-lg">
+  <div class="bg-gray rounded-b-lg">
          <code><pre class="pa-4 rounded-b-lg" style="overflow: scroll"><span
              v-html="hasSyntaxHighlighting ? hljs.highlight(value, {language: 'bash'}).value : value"></span></pre>
          </code>
-  </span>
+  </div>
 </template>
 
 <style>
