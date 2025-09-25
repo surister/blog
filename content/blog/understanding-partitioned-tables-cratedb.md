@@ -245,11 +245,10 @@ segments belong to a shard, the merged segments were from the shard nº2.
 
 ::Alert
 ---
-"alert_type": "success"
+"type": "info"
 "icon": "mdi-lightbulb"
+"title": "Remember what we said earlier"
 "text": "In CrateDB a partition is the specialization of a shard(s), by specifying a 'rule' (partition column) that dictates record routing and shard creation."
-"alert_bd_color": "white"
-"lines": 2
 ---
 ::
 

@@ -135,33 +135,43 @@ I'm on a strike! :Ref{r="4"}
 
 ::Alert
 ---
-"alert_type": "info"
+"type": "info"
 "icon": "mdi-format-quote-close"
-"author": "@ritchie46"
-"text": "...I would advice against using multiprocessing for this. Polars already paralellizes the work for you. Trying to parallelize more would hurt Polars' performance."
+"title": "Quote"
+"text": "'Polars already paralellizes the work for you...' - Author"
 "src": "https://github.com/pola-rs/polars/issues/14219#issuecomment-1925326705"
-"alert_bd_color": "white"
 ---
 ::
 
+<br>
+
 ::Alert
 ---
-"alert_type": "warning"
-"icon": "mdi-format-quote-close"
-"author": "@ritchie46"
+"type": "warning"
+"icon": "mdi-alert-circle"
 "text": "...I would advice against using multiprocessing for this."
-"src": "https://github.com/pola-rs/polars/issues/14219#issuecomment-1925326705"
-"alert_bd_color": "white"
+"title": ""
 ---
 ::
 
+<br>
 
 ::Alert
 ---
-"alert_type": "success"
-"icon": "mdi-lightbulb"
+"type": "success"
+"icon": "mdi-note"
 "text": "Don't let the end of the world mess with your sprint."
-"alert_bd_color": "white"
+---
+::
+
+<br>
+
+::Alert
+---
+"type": "danger"
+"icon": "mdi-thermometer-alert"
+"title": "Temperature alert"
+"text": "This code might be too how for you to handle!"
 ---
 ::
 

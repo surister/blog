@@ -203,7 +203,7 @@ p + div {
   margin-top: .8em
 }
 
-h2 + h3 {
+h2 + h3, h2 + div {
   margin-top: .8em
 }
 
