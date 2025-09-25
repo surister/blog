@@ -53,6 +53,7 @@ const largerThanSm = breakpoints.greater('sm')
                 <v-img aspect-ratio="16/9"
                        :src="src"
                        :alt="alt"
+                       class="border-sm"
                        cover/>
               </v-col>
             </v-row>
