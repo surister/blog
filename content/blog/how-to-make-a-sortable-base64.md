@@ -163,8 +163,8 @@ print(to_base64n((1).to_bytes()) > to_base64n((255).to_bytes()))
 
 Now it orders correctly!
 
-In other languages doing this is trivial, for example in Rust the  cargo package [base64](https://docs.rs/base64/latest/base64/) supports
-arbitrary customization:
+Overriding or choosing the alphabet is trivial in other languages like Rust, where 
+the cargo package [base64](https://docs.rs/base64/latest/base64/) supports arbitrary customization.
 
 ```rust
 use base64::{engine, alphabet, Engine as _};
