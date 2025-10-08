@@ -19,7 +19,7 @@ There are many ways of sorting things: by size, weight, numerical order, lexicog
 random order, etc. When we say that lexicographical order is not kept, we actually mean
 that the **numerical order and lexicographical order** of the same set of things **are different**.
 
-To visualize this, consider these two numbers: **1** and **255**.
+To visualize this, consider these two numbers: **1** and **255** (that are in **BASE10**).
 
 If we order them numerically, the order is **{1, 255}**, because 1 < 255, but in **BASE64** the result
 is **different**, let's see why.
@@ -28,12 +28,12 @@ First, we encode the two numbers:
 
 ![](/img/base64_ordered/base64_1.svg){maxwidth=400}
 
-When comparing strings, we compare the **value** of each character,
+Now we have strings, not numbers. When comparing strings, we compare the **value** of each character,
 and the value of one character is the **Unicode code point**.
 
 ![](/img/base64_ordered/base64_2.svg){maxwidth=600}
 
-Looking at the first character, the value of **'A'** is **65** and the value of **'/'** is **47**.
+Looking at the first character, the value of **'A'** is **64** and the value of **'/'** is **47**.
 
 Since 64 > 47: [base64(1)]{.h} > [base64(255)]{.h}, which is the complete opposite of numerical ordering.
 
@@ -58,12 +58,12 @@ meaning that we would not be able to filter or sort on that id, that happens at 
 every row has an internal [_id]{.h} column :Ref{r="1"}, for example: [rzgvqZgBaSrfdxrm5nDA]{.h} which is a k-ordered (time-based)
 unique id, inherited from Elasticsearch.
 If the encoding maintained order and some other implementation details changed, we wouldn't need to
-have columns like [created_at]{.h}, which are typical in time-series use cases. Also some indexing 
-mechanism could be more efficient.
+have columns like [created_at]{.h}, which are typical in time-series use cases. Also, indexing and
+filtering are typically on orderable datasets.
 
 ## Why does it happen?
 As we saw in the introduction, the core of the issue is the Unicode code point of the characters
-that the encoding spouts, because the code points of **alphabet** used in RFC4648 are **not ordered**.
+that the encoding spouts, because the code points of the **alphabet** as defined in RFC4648 are **not ordered**.
 
 This is the default alphabet :ref{r=2}: [ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/]{.h} 
 
@@ -71,7 +71,8 @@ If we compute every Unicode value:
 
 [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 47]{.h}
 
-See how it is not ordered?
+We can see that it's not ordered, at the tail of the list there are values that are smaller
+than the head's.
 
 ## Creating a sortable BASE64 encoding
 Creating a BASE64 that maintains order is not hard, as you might already imagine, just pick an 
@@ -112,8 +113,8 @@ You cannot override the alphabet used in BASE64, since the actual implementation
 the [base64._b32hexalphabet]{.h} and [base64._b32alphabet]{.h} variables since they are implemented
 in Python, not C :Ref{r="5"}.
 
-We have two options: to use [maketrans]{.h} to translate between characters of different alphabets,
-which would be a performance nightmare or implement base64 encoding ourselves:
+In Python, we are left with two options: to use [maketrans]{.h} to translate between characters of
+different alphabets, which would be a performance nightmare or implement base64 encoding ourselves:
 
 ```python
 def to_base64n(input: bytes,
@@ -197,5 +198,5 @@ that could haunt your application for years to come, you don't want to get it wr
 :Der{r="1" link="https://cratedb.com/docs/crate/reference/en/5.10/general/ddl/system-columns.html" text="System columns" meta="CrateDB documentation, version 5.10"}
 :Der{r="2" link="https://datatracker.ietf.org/doc/html/rfc4648#section-4" text="Table 1: The Base 64 Alphabet" meta="RFC4648 section-4, 2006"}
 :Der{r="3" link="https://en.wikipedia.org/wiki/Base64#Applications_not_compatible_with_RFC_4648_Base64" text="Applications not compatible with RFC 4648 Base64" meta="Wikipedia, Base64"}
-:Der{r="4" link="https://github.com/python/cpython/blob/6b7b9d00a9dd9cf66e3ec38b4c4b8a385b16b453/Modules/binascii.c#L104" text="binascii.c" meta="Github, Python repository binascii module"}
-:Der{r="5" link="https://github.com/python/cpython/blob/6b7b9d00a9dd9cf66e3ec38b4c4b8a385b16b453/Lib/base64.py#L159" text="base64.py" meta="Github, Python repository base64 module"}
+:Der{r="4" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Modules/binascii.c#L104" text="binascii.c" meta="Github, Python repository, 3.14, binascii.c, L104"}
+:Der{r="5" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Lib/base64.py#L159" text="base64.py" meta="Github, Python repository, 3.14, base64.py, L159"}
