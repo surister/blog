@@ -26,16 +26,12 @@
     <p class="text-h5 pt-5">
       He loves Software Engineering and enjoys diving deep into the details of things, he has worked
       in web development, backend, mobile development and data engineering, spanning multiple
-      languages, frameworks and techniques. His favourite youtuber is 3Blue1Brown and
-      favourite programming language is Python, even though he also enjoys writing Rust, Javascript
-      or Dart.
+      languages, frameworks and techniques.
     </p>
 
     <p class="text-h5 pt-5">
-      He worked previously in Open Science as Senior Software Engineer
-      @<a href="https://www.frontiersin.org/" style="color: navajowhite;">Frontiers</a>
-      and currently works in Open-source as a Database Environment Engineer
-      @<a href="https://cratedb.com//" style="color: navajowhite;">CrateDB</a>
+      He is currently neck-deep in the database world working as a Database Environment Engineer
+      @<a href="https://cratedb.com//" style="color: navajowhite;">CrateDB</a>, an open-source distributed SQL database.
     </p>
 
   </v-container>
