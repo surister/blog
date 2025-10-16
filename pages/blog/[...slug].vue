@@ -121,7 +121,7 @@ onMounted(() => {
 .h {
   font-size: 1.188rem !important;
   background: rgb(33, 33, 33);
-  padding: .2em .4em;
+  padding: .15em .4em;
   border-radius: 4px;
   font-weight: 400;
   word-wrap: break-word;
