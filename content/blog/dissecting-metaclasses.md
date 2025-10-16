@@ -4,7 +4,7 @@ image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-pho
 description: 'no way'
 tags: [ 'python', 'pycones', 'software', 'talk', 'metaclasses', 'django' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Database Environment Engineer' }]
-show_preview: true
+show_preview: false
 published: true
 date: '2025-10-16'
 ---
