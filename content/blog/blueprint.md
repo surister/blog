@@ -6,7 +6,7 @@ tags: [ 'python', 'Antlr4', 'software' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Monologue Expert' }, { 'name': 'Anon' } ]
 show_preview: false
 published: false
-published_date: '2025-06-23'
+date: '2025-06-23'
 comment_links: [ { 'name': 'reddit', 'href': '' }, { 'name': 'hacker news', 'href': '' } ]
 ---
 
