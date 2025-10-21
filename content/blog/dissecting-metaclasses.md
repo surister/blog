@@ -302,7 +302,7 @@ class SqlDict(MutableMapping):
     def __init__(
             self,
             name: str,
-            conn_str: str = 'crate://localhost:4200'
+            conn_str: str = 'localhost:4200'
     ):
         self.table_name = name
         self.cursor = client.connect(conn_str).cursor()
