@@ -109,7 +109,7 @@ The real challenge is implementing this in the target language, most if not all 
 have already a builtin BASE64 implementation, and in some of these you cannot trivially change the
 alphabet. For example, in Python, the package that implements several encodings is [base64]{.h}.
 You cannot override the alphabet used in BASE64, since the actual implementation is hidden behind
-[binascii]{.h} C api :ref{r="4"} for performance reasons. Ironically, you could override 
+[binascii]{.h} C api :ref{r="4"} for performance reasons. Ironically, you could override
 the [base64._b32hexalphabet]{.h} and [base64._b32alphabet]{.h} variables since they are implemented
 in Python, not C :Ref{r="5"}.
 
@@ -194,9 +194,9 @@ Then think about the supply chain of your encode/decode code, the repercussions 
 Once you have all of these figured out, **think again**, this is one 'small' system design detail 
 that could haunt your application for years to come, you don't want to get it wrong.
 
-## Rereferences
+## References
 :Der{r="1" link="https://cratedb.com/docs/crate/reference/en/5.10/general/ddl/system-columns.html" text="System columns" meta="CrateDB documentation, version 5.10"}
 :Der{r="2" link="https://datatracker.ietf.org/doc/html/rfc4648#section-4" text="Table 1: The Base 64 Alphabet" meta="RFC4648 section-4, 2006"}
 :Der{r="3" link="https://en.wikipedia.org/wiki/Base64#Applications_not_compatible_with_RFC_4648_Base64" text="Applications not compatible with RFC 4648 Base64" meta="Wikipedia, Base64"}
-:Der{r="4" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Modules/binascii.c#L104" text="binascii.c" meta="Github, Python repository, 3.14, binascii.c, L104"}
-:Der{r="5" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Lib/base64.py#L159" text="base64.py" meta="Github, Python repository, 3.14, base64.py, L159"}
+:Der{r="4" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Modules/binascii.c#L104" text="binascii.c" meta="Github, CPython repository, 3.14, binascii.c, L104"}
+:Der{r="5" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Lib/base64.py#L159" text="base64.py" meta="Github, CPython repository, 3.14, base64.py, L159"}
