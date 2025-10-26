@@ -21,8 +21,16 @@ const props = defineProps({
     type: String,
     default: '0'
   },
-  alt:{
+  alt: {
     type: String
+  },
+  roundedTop: {
+    type: String,
+    default: 'false'
+  },
+  roundedBottom: {
+    type: String,
+    default: 'false'
   }
 })
 const breakpoints = useBreakpoints(breakpointsVuetifyV3)
@@ -30,51 +38,17 @@ const largerThanSm = breakpoints.greater('sm')
 </script>
 
 <template>
-  <v-dialog max-width="80%" class="padding-0 ma-0" v-if="largerThanSm">
-    <template v-slot:activator="{ props: activatorProps }">
-      <v-img aspect-ratio="16/9"
-             class="cursor-pointer"
-             v-bind="activatorProps"
-             :height="height"
-             :width="width"
-             :max-width="maxwidth"
-             :src="src"
-             :style="{'marginTop': marginTop + 'px'}"
-             :alt="alt"
-             cover/>
-    </template>
-
-    <template v-slot:default="{ isActive }">
-      <v-expand-transition>
-        <v-card>
-          <v-card-text>
-            <v-row justify="center" no-gutters>
-              <v-col cols="8">
-                <v-img aspect-ratio="16/9"
-                       :src="src"
-                       :alt="alt"
-                       class="border-sm"
-                       cover/>
-              </v-col>
-            </v-row>
-
-          </v-card-text>
-
-
-        </v-card>
-      </v-expand-transition>
-    </template>
-  </v-dialog>
-  <template v-else>
-    <v-img aspect-ratio="16/9"
-           :height="height"
-           :width="width"
-           :max-width="maxwidth"
-           :src="src"
-           :style="{'marginTop': marginTop + 'px'}"
-           :alt="alt"
-           cover/>
-  </template>
+  <v-img aspect-ratio="16/9"
+         :class="[roundedTop === 'true' ? 'rounded-t-lg':
+              '',
+             roundedBottom === 'true' ? 'rounded-b-lg': '']"
+         :height="height"
+         :width="width"
+         :max-width="maxwidth"
+         :src="src"
+         :style="{'marginTop': marginTop + 'px'}"
+         :alt="alt"
+         cover/>
   <v-label class="text-subtitle-2 font-italic pt-2"
            style="white-space: pre-wrap">
     {{ alt }}
