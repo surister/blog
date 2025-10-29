@@ -56,12 +56,23 @@ function copyToClipboard(text) {
 </script>
 
 <template>
+<!--  This is a hack to modify only the top border radius, since the property
+ :radius of the CodeEditor component applies it to the whole thing,
+ unfortunately.
+
+:border-radius="meta === 'true' ? '8':'8'"
+:style="{borderRadius: meta === 'true' ? 0: null}"
+-->
+
+
 <!--  We remove the last character of code, because for some reason a \n is added, don't know why -->
   <CodeEditor :text="code.substring(0, code.length - 1)"
               :show-line-number="false"
               :class="['mt-5', 'rounded-t-lg', meta === 'true' ? '' : 'rounded-b-lg']"
               :show-header="filename !== ''"
               :header-text="filename"
+              :border-radius="meta === 'true' ? '8':'8'"
+              :style="{borderRadius: meta === 'true' ? 0: null}"
               highlight-row-background-color="red"
               background-color="#212121"
               padding-bottom="12"
