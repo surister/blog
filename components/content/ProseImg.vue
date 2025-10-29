@@ -3,7 +3,7 @@
 </script>
 
 <template>
-<CustomImage/>
+<v-img></v-img>
 </template>
 
 <style scoped>
