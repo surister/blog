@@ -51,9 +51,7 @@ Different encodings can have different order properties depending on the chosen 
 implementation details.
 
 ## Why do we care?
-If you are reading this, you may have your reasons to care.
-
-In my case, I care because if we create k-ordered unique ids and encode them with BASE64, we would lose order,
+If you are reading this, you may have your reasons to care. In my case, I care because if we create k-ordered unique ids and encode them with BASE64, we would lose order,
 meaning that we would not be able to filter or sort on that id, that happens at CrateDB where
 every row has an internal [_id]{.h} column :Ref{r="1"}, for example: [rzgvqZgBaSrfdxrm5nDA]{.h} which is a k-ordered (time-based)
 unique id, inherited from Elasticsearch.

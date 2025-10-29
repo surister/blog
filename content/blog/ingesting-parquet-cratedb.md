@@ -52,8 +52,9 @@ data integrity using a custom Python script :Ref{r="3"}
 * Benchmarking is hard :Ref{r="4"}.
 * I'm going to run everything a few times and post one result, not the averages.
 
-ALso, I'm going to try to solve this problem as I write this post, so new ideas will appear.
-I might not find the most efficient solution right now.
+Also, I'm going to try to solve this problem as I write this post, so new 
+ideas will appear.
+I might not find the most efficient solution right away.
 
 ## Polars
 The first thing that comes to my mind is to use Polars, which is very straight forward:
@@ -659,8 +660,7 @@ Results
 
 ## References
 
-::divider{.my-6}
-::
+:divider{.mb-4}
 :Der{r="1" link="https://cratedb.com/docs/guide/performance/index.html" text="Performance Guides" meta="CrateDB documentation, 2025"}
 :Der{r="2" link="https://cratedb.com/blog/how-we-scaled-ingestion-to-one-million-rows-per-second" text="How we scaled ingestion to one million rows per second" meta="CrateDB blog, 2023-08-02"}
 :Der{r="3" link="https://github.com/surister/mylab/blob/master/code/stats.py" text="mylab/blob/master/code/stats.py" meta="GitHub, surister/mylab"}
