@@ -219,6 +219,13 @@ h3 + div {
   margin-top: .8em
 }
 
+canvas + p {
+  margin-top: .8em
+}
+
+canvas + h1, h2, h3 {
+  margin-top: 1em;
+}
 /* Table of contents styling */
 #toc-container {
   margin-left: 20px;
