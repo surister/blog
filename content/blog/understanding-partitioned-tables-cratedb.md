@@ -40,7 +40,14 @@ A table clustered (or split) in 2 shards would look like:
 The number of shards that a table will be divided into is calculated automatically using a simple
 formula:
 
-[max(4, num_data_nodes * 2)]{.h}
+:MaT{text="\textcolor{#6A5ACD}{\text{max\_number\_shards}}
+=
+\max\!\left(
+\textcolor{#4682B4}{4},\;
+\textcolor{#2E8B57}{\text{num\_data\_nodes}}
+\times
+\textcolor{#4682B4}{2}
+\right)"}
 
 Alternatively, you can manually set in the DDL query how many shards a table will be split into:
 
@@ -137,7 +144,12 @@ shard imbalance could degrade performance.
 
 This is the used formula:
 
-[shard number = hash(routing column) % total primary shards]{.h}
+:MaT{text="\textcolor{#6A5ACD}{\text{shard\_number}} 
+= 
+\text{hash}\!\left(\textcolor{#4682B4}{\text{routing\_column}}\right)
+\bmod 
+\textcolor{#DAA520}{\text{total\_primary\_shards}}
+" .mt-5}
 
 If a primary key exists, that will be used as the routing column. The user can also specify an
 explicit routing column with [CRATE TABLE t (a integer, b text) CLUSTERED BY (a)]{.h}, if no
@@ -168,8 +180,7 @@ ORDER BY
  |-|-| 
 |0|1|
 |1|0|
-|2|0|
-</pre>
+|2|0|</pre>
 ::
 
 After another insert:
@@ -182,8 +193,7 @@ After another insert:
  |-|-| 
 |0|1|
 |1|0|
-|2|1|
-</pre>
+|2|1|</pre>
 ::
 
 ### [Inserting a record (segments)]
@@ -222,8 +232,7 @@ WHERE
  |-|-|-|-|-| 
 |true|0|1|true|2|
 |false|0|1|true|2|
-|true|0|1|true|0|
-</pre>
+|true|0|1|true|0|</pre>
 ::
 
 There are three segments, each with one record, all available for search, and the newly added
@@ -234,8 +243,7 @@ segment is still not committed to disk. If we call optimize to forcibly merge th
 |committed|deleted_docs|num_docs|search|shard_id|
  |-|-|-|-|-| 
 |true|0|2|true|2|
-|true|0|1|true|0|
-</pre>
+|true|0|1|true|0|</pre>
 ::
 
 Segments are now merged, if you are wondering why there are two instead of one, remember that the
