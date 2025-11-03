@@ -44,7 +44,7 @@ const largerThanSm = breakpoints.greater('sm')
              roundedBottom === 'true' ? 'rounded-b-lg': '']"
          :height="height"
          :width="width"
-         :max-width="maxwidth"
+         :max-width="maxwidth + 'px'"
          :src="src"
          :style="{'marginTop': marginTop + 'px'}"
          :alt="alt"

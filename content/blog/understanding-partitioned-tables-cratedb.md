@@ -84,8 +84,7 @@ ORDER BY id
  |-|-|-| 
 |0|0|"/data/data/nodes/0/indices/woQjAWZHRLWO9hF17812ew/0"|
 |1|0|"/data/data/nodes/0/indices/woQjAWZHRLWO9hF17812ew/1"|
-|2|0|"/data/data/nodes/0/indices/woQjAWZHRLWO9hF17812ew/2"|
-</pre>
+|2|0|"/data/data/nodes/0/indices/woQjAWZHRLWO9hF17812ew/2"|</pre>
 ::
 
 An index has a path because it's a file, as we said before, composed of immutable segments, this 
@@ -333,7 +332,7 @@ create many partitions, hurting performance and storage. The right partition col
 on the data, use case and requirements, you can read more about this in
 [sharding and partitioning guide](https://cratedb.com/docs/guide/admin/sharding-partitioning.html).
 
-## [Notes: Replication is turned off]
+## [Note: Replication is turned off]
 
 Sharding a table is part of the fundamental structure of the data model in CrateDB, another fundamental aspect
 is [replication]{.fm}.
