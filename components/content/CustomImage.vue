@@ -38,21 +38,23 @@ const largerThanSm = breakpoints.greater('sm')
 </script>
 
 <template>
-  <v-img aspect-ratio="16/9"
-         :class="[roundedTop === 'true' ? 'rounded-t-lg':
+  <div>
+    <v-img aspect-ratio="16/9"
+           :class="[roundedTop === 'true' ? 'rounded-t-lg':
               '',
              roundedBottom === 'true' ? 'rounded-b-lg': '']"
-         :height="height"
-         :width="width"
-         :max-width="maxwidth + 'px'"
-         :src="src"
-         :style="{'marginTop': marginTop + 'px'}"
-         :alt="alt"
-         cover/>
-  <v-label class="text-subtitle-2 font-italic pt-2"
-           style="white-space: pre-wrap">
-    {{ alt }}
-  </v-label>
+           :height="height"
+           :width="width"
+           :max-width="maxwidth + 'px'"
+           :src="src"
+           :style="{'marginTop': marginTop + 'px'}"
+           :alt="alt"
+           cover/>
+    <v-label class="text-subtitle-2 font-italic pt-2"
+             style="white-space: pre-wrap">
+      {{ alt }}
+    </v-label>
+  </div>
 </template>
 
 <style scoped>

@@ -4,14 +4,13 @@ image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-pho
 description: 'Blueprint showcasing available components'
 tags: [ 'python', 'debugging', 'remote_exec', 'live debugging', 'python 3.14' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Database Ecosystem Engineer' } ]
-show_preview: true
-published: false
-date: '2025-06-23'
-comment_links: [  ]
+show_preview: false
+published: true
+date: '2025-11-03'
 ---
 
-Debugging a live Python process just got incredibly easier, but
-when I read the [Python 3.14 notes](https://docs.python.org/3/whatsnew/3.14.html)
+Debugging a live Python process just got incredibly easier in Python 3.14, but
+when I read the [release notes](https://docs.python.org/3/whatsnew/3.14.html)
 I didn't pay much attention to [PEP 768: Safe external debugger interface for 
 CPython](https://peps.python.org/pep-0768/), not every PEP sparks enough
 interest to me to spend 1-2 days going pep-deep, and I was honestly eclipsed
@@ -23,16 +22,17 @@ of PEP's authors live at PyConES that I understood the importance of this,
 since it changes the way we will be debugging Python.
 
 _Maybe_ in the future we will not be debugging as I show you in this 
-post, since the ergonomics is a bit raw, but it'll definitely be the
-foundation into which Python debuggers will work.
+post, since the ergonomics are a bit raw, but it'll definitely be the
+foundation of live Python debuggers.
 
 
 ## How bad was it before?
 
 Before Python 3.14, there was not a standard way of accessing a Python process' memory.
-You can, of course, read the memory of any given process if you have the necessary permissions.
-For example, on Linux you can inspect /proc/[{pid}]/mem to read the process’s memory,
-but this is os-dependant; painful. Then you have to locate where the current
+You could, of course, read the memory of any given process if you have the 
+necessary permissions.
+For example, on Linux you can inspect [/proc/[{pid}]/mem]{.h} to read a 
+process’s memory, but this is os-dependant; painful. Then you have to locate where the current
 state of the interpreter ([PyRuntime]{.h}) is, and the actual parts of the state that 
 you want to access. Then you have to somehow run your code in a safe place, running
 it in the middle of critical operations like memory allocation or reference counting
@@ -45,16 +45,19 @@ in production not for the faint of heart.
 
 With the new PEP, this risk is pretty much gone, since now we'll be debugging
 with the interpreter and not against it. Without going into details (that you can 
-read in the PEP), the complications of reading a CPython memory is now outsourced 
+read in the PEP), the complications of reading a CPython process memory is now 
+outsourced 
 to Pablo's and the CPython's team coffe machines and Friday nights, new structs
-have been added that store more meta information about debugging state and
+have been added to Python that store more meta information about debugging 
+state and
 locations of critical internal structures (offsets) and now part of the CPython 
 execution loop is to check whether there is a pending debugging piece of code
-to execute, as this is checked in a consistent state, running it is also safe.
+to execute, and because this is checked in a consistent state, running it is 
+also safe.
 
 ## How to debug a process.
 
-For us pythoners-code-debuggers it's all just an API change (addition).
+For us pythonistas, it's all just an API change (addition).
 We have a new function in the sys module: [sys.remote_exec(pid, path)]{.h}
 where [pid]{.h} is the id of the process we want to debug, and [path]{.h}
 is the file name of the debugging script. Both Python versions have to be
@@ -63,7 +66,7 @@ the same.
 When you run [remote_exec]{.h} it will load the file, send it to the target 
  process, and at some point, when it's deemed safe, it'll be executed.
 
-:CustomImage{src="/img/debug/remote_exec.svg"}
+:CustomImage{src="/img/debug/remote_exec.svg" alt="Diagram of sys. remote_exec workflow"}
 
 Let's see a practical example, we'll debug a simple script that
 increases a counter inside an infinite loop, when the counter
@@ -203,4 +206,76 @@ sudo python -m pdb -p 194725
 
 ## Debugging the CrateDB driver
 
-Now we can write different 
+We can write debugging scripts that target specific programs,
+for example, we could write a script that prints the current state
+of a script sending data to a CrateDB server.
+
+```python true [crate_debugger.py]
+import __main__ as current
+import pprint
+import datetime
+
+start = datetime.datetime.now()
+
+def debug_connection(connection):
+    client_keys = [
+        'ssl_relax_minimum_version', 'username', 'schema'
+    ]
+    print('Active servers', connection.client.active_servers)
+    print('Inactive servers: ', connection.client._inactive_servers)
+    print('Client configuration: ', end='')
+    pprint.pp(dict(filter(lambda k: k[0] in client_keys,
+                          connection.client.__dict__.items())))
+
+
+def debug_cursor(cursor):
+    print("Cursor", '❌ closed' if cursor._closed else '✅ open')
+    print("Last result: ", end='')
+    pprint.pprint(cursor._result)
+    print('Cursor timezone:', cursor.time_zone)
+    print('Last query duration(ms):', cursor.duration)
+    if hasattr(cursor, '_debug_query_count'):
+        print("Queries sent since starting debugging",
+              cursor._debug_query_count)
+        print('Queries per seconds:', cursor._debug_query_count / (
+            datetime.datetime.now() - current._debug_started_at).seconds)
+
+print(("=" * 10) + 'DEBUGGING INFO' + ("=" * 10))
+print(f'Debugging module at: {current}')
+
+debug_connection(current.conn)
+
+# Monkey patches 'execute' to count queries.
+if not hasattr(current.cursor, '_debug_query_count'):
+    current.cursor._debug_query_count = 0
+    def debug_execute(*args, **kwargs):
+        current.cursor._debug_query_count += 1
+        return exec_f(*args, **kwargs)
+    exec_f = current.cursor.execute
+    current.cursor.execute = debug_execute
+
+if not hasattr(current, '_debug_started_at'):
+    current._debug_started_at = datetime.datetime.now()
+
+debug_cursor(current.cursor)
+
+print("=" * 33 + '\n')
+```
+---
+:CustomImage{src="/img/debug/seventh.gif" roundedBottom='true'}
+
+In this case, we monkey patch some attributes to start counting things
+that we could not count before but other than that, it's pretty straight forward
+if you know what it's inside [`__main__`]{.h} just access whatever attributes
+you need to start debugging.
+
+## Conclusion
+
+Debugging live Python programs is easier and safer than ever, just remember
+that you need to have access to the same machine it's running, have admin 
+privileges and that the process has to be running version >=3.14. The overhead 
+is minimal, and it's turned on by default.
+
+You can start writing a library of debugging scripts, share them with your
+co-workers, test them, and more importantly, re-use them specifically 
+targeting your programs.
