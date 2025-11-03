@@ -40,14 +40,19 @@ A table clustered (or split) in 2 shards would look like:
 The number of shards that a table will be divided into is calculated automatically using a simple
 formula:
 
-:MaT{text="\textcolor{#6A5ACD}{\text{max\_number\_shards}}
+::Mathshy
+<pre>
+\textcolor{#6A5ACD}{\text{max\_number\_shards}}
 =
 \max\!\left(
 \textcolor{#4682B4}{4},\;
 \textcolor{#2E8B57}{\text{num\_data\_nodes}}
 \times
 \textcolor{#4682B4}{2}
-\right)"}
+\right)
+</pre>
+::
+
 
 Alternatively, you can manually set in the DDL query how many shards a table will be split into:
 
