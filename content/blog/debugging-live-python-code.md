@@ -9,6 +9,8 @@ published: true
 date: '2025-11-03'
 ---
 
+## Introduction
+
 Debugging a live Python process just got incredibly easier in Python 3.14, but
 when I read the [release notes](https://docs.python.org/3/whatsnew/3.14.html)
 I didn't pay much attention to [PEP 768: Safe external debugger interface for 
