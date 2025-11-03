@@ -7,6 +7,7 @@ authors: [ { 'name': 'Ivan', 'job_title': 'Database Ecosystem Engineer' } ]
 show_preview: false
 published: true
 date: '2025-11-03'
+comment_links: [ { 'name': 'reddit', 'href': 'https://www.reddit.com/r/Python/comments/1on9xtt/debugging_live_code_with_cpython_314/' } ]
 ---
 
 ## Introduction
