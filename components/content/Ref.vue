@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import {useRoute} from "vue-router";
-
 const props = defineProps({
   r: {
     type: String
@@ -12,7 +10,7 @@ const props = defineProps({
 
 <template>
   <a :href="`#${r}`" :id="`${r}-ref`">
-    <sup class="text-subtitle-2 text-red">[{{ r }}]</sup>
+    <span class="text-red">[{{ r }}]</span>
   </a>
 </template>
 

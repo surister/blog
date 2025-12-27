@@ -26,12 +26,12 @@ is **different**, let's see why.
 
 First, we encode the two numbers:
 
-![](/img/base64_ordered/base64_1.svg){maxwidth=400}
+![](/img/base64_ordered/base64_1.svg){max_width=400}
 
 Now we have strings, not numbers. When comparing strings, we compare the **value** of each character,
 and the value of one character is the **Unicode code point**.
 
-![](/img/base64_ordered/base64_2.svg){maxwidth=600}
+![](/img/base64_ordered/base64_2.svg){max_width=600}
 
 Looking at the first character, the value of **'A'** is **64** and the value of **'/'** is **47**.
 
@@ -63,7 +63,7 @@ filtering are typically on orderable datasets.
 As we saw in the introduction, the core of the issue is the Unicode code point of the characters
 that the encoding spouts, because the code points of the **alphabet** as defined in RFC4648 are **not ordered**.
 
-This is the default alphabet :ref{r=2}: [ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/]{.h} 
+This is the default alphabet as shown in Table 1 of Section 4 in RFC 4648 :ref{r=2} [ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/]{.h .text-green} 
 
 If we compute every Unicode value: 
 
@@ -193,8 +193,10 @@ Once you have all of these figured out, **think again**, this is one 'small' sys
 that could haunt your application for years to come, you don't want to get it wrong.
 
 ## References
-:Der{r="1" link="https://cratedb.com/docs/crate/reference/en/5.10/general/ddl/system-columns.html" text="System columns" meta="CrateDB documentation, version 5.10"}
-:Der{r="2" link="https://datatracker.ietf.org/doc/html/rfc4648#section-4" text="Table 1: The Base 64 Alphabet" meta="RFC4648 section-4, 2006"}
-:Der{r="3" link="https://en.wikipedia.org/wiki/Base64#Applications_not_compatible_with_RFC_4648_Base64" text="Applications not compatible with RFC 4648 Base64" meta="Wikipedia, Base64"}
-:Der{r="4" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Modules/binascii.c#L104" text="binascii.c" meta="Github, CPython repository, 3.14, binascii.c, L104"}
-:Der{r="5" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Lib/base64.py#L159" text="base64.py" meta="Github, CPython repository, 3.14, base64.py, L159"}
+
+:Der{r="1" link="https://cratedb.com/docs/crate/reference/en/5.10/general/ddl/system-columns.html" authors="CrateDB" pageTitle="System columns." websiteTitle="CrateDB Reference" dateAccessed="Sept. 1, 2025"}
+:Der{r="2" link="https://datatracker.ietf.org/doc/html/rfc4648#section-4" authors="S. Josefsson" pageTitle="The Base16, Base32, and Base64 Data Encodings." websiteTitle="RFC 4648" publicationDate="Oct, 2006"}
+:Der{r="3" link="https://en.wikipedia.org/wiki/Base64#Applications_not_compatible_with_RFC_4648_Base64" authors="N. H. F. Beebe" pageTitle="xxencode and xxdecode programs" websiteTitle="Center for Scientific Computing, Dept. of Mathematics, Univ. of Utah"}
+:Der{r="4" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Modules/binascii.c#L104" authors="Python Software Foundation" pageTitle="Modules/binascii.c at commit c625839237b85b16f6e6d00d0af5e50849003706." websiteTitle="CPython, GitHub repository"}
+:Der{r="5" link="https://github.com/python/cpython/blob/c625839237b85b16f6e6d00d0af5e50849003706/Lib/base64.py#L159" authors="Python Software Foundation" pageTitle="Lib/base64.py at commit c625839237b85b16f6e6d00d0af5e50849003706." websiteTitle="CPython, GitHub repository"}
+

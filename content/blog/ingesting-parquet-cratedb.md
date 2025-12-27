@@ -660,8 +660,7 @@ Results
 
 ## References
 
-:divider{.mb-4}
-:Der{r="1" link="https://cratedb.com/docs/guide/performance/index.html" text="Performance Guides" meta="CrateDB documentation, 2025"}
-:Der{r="2" link="https://cratedb.com/blog/how-we-scaled-ingestion-to-one-million-rows-per-second" text="How we scaled ingestion to one million rows per second" meta="CrateDB blog, 2023-08-02"}
-:Der{r="3" link="https://github.com/surister/mylab/blob/master/code/stats.py" text="mylab/blob/master/code/stats.py" meta="GitHub, surister/mylab"}
-:Der{r="4" link="https://hannes.muehleisen.org/publications/DBTEST2018-performance-testing.pdf" text="Mark Raasveldt, Pedro Holanda, Tim Gubner & Hannes Mühleisen. Fair Benchmarking Considered Difficult: Common Pitfalls In Database Performance Testing" meta="Website, hannes.muehleisen.org/publications/DBTEST2018 2025"}
+:Der{r="1" link="https://cratedb.com/docs/guide/performance/index.html" authors="CrateDB developers" pageTitle="Performance" websiteTitle="CrateDB documentation"}
+:Der{r="2" link="https://cratedb.com/blog/how-we-scaled-ingestion-to-one-million-rows-per-second" authors="N. Schmidtmer." pageTitle="How we scaled ingestion to one million rows per second," websiteTitle="CrateDB Blog" dateAccessed="Jun. 22, 2025."}
+:Der{r="3" link="https://github.com/surister/mylab/blob/master/code/stats.py" authors="surister," pageTitle="mylab/code/stats.py at master," websiteTitle="GitHub repository *surister/mylab*." dateAccessed="Jun. 27, 2025."}
+:Der{r="4" authors="M. Raasveldt, P. Holanda, T. Gubner, and H. Mühleisen," pageTitle="Fair benchmarking considered difficult: Common pitfalls in database performance testing," websiteTitle="in *Proc. Workshop on Testing Database Systems (DBTest ’18)*, Houston, TX, USA, 2018, pp. 1–6, doi: 10.1145/3209950.3209955."}

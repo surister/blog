@@ -13,11 +13,11 @@ const props = defineProps({
   },
   width: {
     type: [String, Number],
-    default: undefined
+    default: null
   },
   height: {
     type: [String, Number],
-    default: undefined
+    default: null
   },
   max_width:{
     type: Number,
@@ -31,12 +31,12 @@ const props = defineProps({
   <component
       is="img"
       :src="src"
-      :alt="props.alt"
+      :alt="alt"
       :style="{
-        maxWidth: props.max_width + 'px',
-        height: props.height + 'px',
-        width:props.width + 'px'
-      }"
+          maxWidth: max_width ? max_width + 'px' : undefined,
+          width: width ? width + 'px' : undefined,
+          height: height ? height + 'px' : undefined
+  }"
   />
 </template>
 
