@@ -18,7 +18,14 @@ const props = defineProps(['doc'])
                :text="link.name"
                class="mb-1"
                v-for="link in doc.comment_links"/>
+                 <span class="text-subtitle-1 font-weight-bold text-grey-lighten-1">
+          <v-btn variant="text" class="text-red" href="/about#human">
+            🌍🌳🧑 Humanely sourced
+          </v-btn>
+        </span>
+
       </v-col>
+
     </v-row>
 
     <v-row>
