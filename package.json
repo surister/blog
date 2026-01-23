@@ -15,11 +15,11 @@
     "@nuxt/image": "^1.7.1",
     "chart.js": "^4.5.0",
     "highlight.js": "^11.10.0",
-    "katex": "^0.16.22",
+    "katex": "^0.16.27",
     "magic-code-editor": "^0.0.4",
-    "nuxt": "^3.19.2",
+    "nuxt": "^4.3.0",
     "nuxt-toc": "^2.7.2",
-    "nuxt-umami": "^3.2.0",
+    "nuxt-umami": "^3.2.1",
     "vue": "latest",
     "vue-chartjs": "^5.3.2",
     "vue3-katex": "^0.7.0",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@types/katex": "^0.16.7",
+    "baseline-browser-mapping": "^2.9.17",
     "vuetify": "3.10.2"
   }
 }
