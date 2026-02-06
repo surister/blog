@@ -30,19 +30,26 @@ export default defineNuxtConfig({
       whitespace: "preserve"
     }
   },
-   content: {
+  content: {
     build: {
       markdown: {
         highlight: false
       }
     }
   },
+  fonts: {
+    families: [
+      {
+        name: 'Rubik',
+        weights: [300, 400, 500, 700], // this is Rubik Light
+      },
+    ],
+  },
   modules: [
     '@nuxt/content',
     'vuetify-nuxt-module',
     '@nuxt/fonts',
     '@nuxt/image',
-    'nuxt-toc',
     'nuxt-umami'
   ],
   umami: {
