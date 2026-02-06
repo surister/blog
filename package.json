@@ -13,6 +13,7 @@
     "@nuxt/content": "^3.0.0",
     "@nuxt/fonts": "^0.7.2",
     "@nuxt/image": "^1.7.1",
+    "@vueuse/core": "^14.2.0",
     "better-sqlite3": "^12.6.2",
     "chart.js": "^4.5.0",
     "highlight.js": "^11.10.0",
