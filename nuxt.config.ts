@@ -4,11 +4,17 @@ import path from "node:path";
 export default defineNuxtConfig({
   app: {
     head: {
-      link: [{
-        rel: 'icon',
-        type: 'image/x-icon',
-        href: import.meta.dev ? '/favicon_dev.ico': '/favicon.ico'
-      }]
+      link: [
+        {
+          rel: 'icon',
+          type: 'image/x-icon',
+          href: import.meta.dev ? '/favicon_dev.ico' : '/favicon.ico'
+        },
+        {
+          rel: 'stylesheet',
+          href: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css'
+        }
+      ]
     }
   },
   compatibilityDate: '2024-04-03',
@@ -22,6 +28,13 @@ export default defineNuxtConfig({
   vue: {
     compilerOptions: {
       whitespace: "preserve"
+    }
+  },
+   content: {
+    build: {
+      markdown: {
+        highlight: false
+      }
     }
   },
   modules: [

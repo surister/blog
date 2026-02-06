@@ -91,7 +91,3 @@ function copyToClipboard(text) {
     </template>
   </CodeEditor>
 </template>
-
-<style scoped>
-@import 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css';
-</style>
