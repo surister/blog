@@ -27,7 +27,7 @@ function de(s) {
         color="red"></v-alert>
     <h2 class="pt-4 text-red mt-2">Contact</h2>
     <v-divider/>
-    <p>
+    <p class="mt-2">
       You can contact me at linkedin:
     </p>
     <v-btn class="my-3 text-red" size="small" variant="text" @click="showText=!showText">show url</v-btn>
