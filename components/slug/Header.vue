@@ -10,7 +10,7 @@ const props = defineProps(['doc'])
     <v-row class="bottom-0 mt-5">
       <v-col cols="auto">
         <span class="text-subtitle-1 font-weight-bold text-grey-lighten-1">
-          {{ doc.date || 'date_unpublished' }}
+          {{ doc.meta.date ||'date_unpublished' }}
         </span>
         <span class="pl-1" v-if="doc.comment_links">·</span>
         <elink type="comment"
@@ -35,7 +35,7 @@ const props = defineProps(['doc'])
     </v-row>
 
     <v-row justify="start">
-      <template v-for="author in doc.authors">
+      <template v-for="author in doc.meta.authors">
         <v-col cols="auto">
           <PersonCard :title="author.name" :subtitle="author.job_title"/>
         </v-col>

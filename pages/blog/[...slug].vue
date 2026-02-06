@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import Header from "~/components/slug/Header.vue";
 
+const route = useRoute()
+const {data: doc} = await useAsyncData(route.path, () => {
+  return queryCollection('content').path(route.path).first()
+})
 const scrollTop = () => {
   window.scrollTo({top: 0})
 }
@@ -19,7 +23,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <ContentDoc v-slot="{ doc }">
+  <div v-if="doc">
     <article>
       <v-container fluid>
         <v-row justify="center"
@@ -44,7 +48,7 @@ onMounted(() => {
               <!--  BLOG HEADER  -->
               <Header :doc="doc" class="my-6"/>
 
-              <v-alert v-if="!doc.published"
+              <v-alert v-if="!doc.meta.published"
                        class="my-5"
                        density="compact"
                        text="This article is incomplete, it will most likely contain wrong data, typos, lack of references and/or unfinished paragraphs."
@@ -53,7 +57,8 @@ onMounted(() => {
 
               <!-- Mobile table of contents -->
               <div class="my-8 hidden-lg-and-up">
-                <Toc class="text-h1"></Toc>
+
+                <TableOfContents :toc="doc.body.toc"/>
               </div>
 
               <main ref="main">
@@ -73,7 +78,7 @@ onMounted(() => {
                  :style="{top: isTocFixed ? '30px' : '200px'}"
                  ref="toc"
                  class="hidden-md-and-down">
-              <Toc></Toc>
+              <TableOfContents :toc="doc.body.toc"/>
             </div>
           </v-col>
         </v-row>
@@ -99,8 +104,18 @@ onMounted(() => {
            icon="mdi-arrow-up"
            v-if="showScrollUp">
     </v-btn>
-  </ContentDoc>
-
+  </div>
+  <div v-else>
+    <v-container>
+      <v-row class="mt-10">
+        <v-col class="text-center">
+          <h1 class="text-h1 font-weight-bold">404</h1>
+          <p class="text-subtitle-1">Is this the page you were looking for?
+          </p>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <style>
@@ -226,6 +241,7 @@ canvas + p {
 canvas + h1, h2, h3 {
   margin-top: 1em;
 }
+
 /* Table of contents styling */
 #toc-container {
   margin-left: 20px;
