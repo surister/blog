@@ -25,7 +25,7 @@
     "vue": "latest",
     "vue-chartjs": "^5.3.2",
     "vue3-katex": "^0.7.0",
-    "vuetify-nuxt-module": "^0.17.1"
+    "vuetify-nuxt-module": "^0.19.5"
   },
   "devDependencies": {
     "@types/katex": "^0.16.7",
