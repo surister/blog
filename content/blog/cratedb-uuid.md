@@ -4,9 +4,9 @@ image: 'https://images.pexels.com/photos/15587985/pexels-photo-15587985/free-pho
 description: 'Explanation of all different unique ids that are used in CrateDB'
 tags: [ 'CrateDB', 'UUID', 'software engineering' ]
 authors: [ { 'name': 'Ivan', 'job_title': 'Database Environment Engineer' } ]
-show_preview: true
-published: false
-published_date: '2025-06-23'
+show_preview: false
+published: true
+published_date: '2026-01-07'
 comment_links: [ ]
 ---
 
