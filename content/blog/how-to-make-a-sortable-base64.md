@@ -16,8 +16,8 @@ lexicographical order, meaning that we cannot correctly sort text encoded in BAS
 the closest encodings that do keep order are base32hex and base16.
 
 There are many ways of sorting things: by size, weight, numerical order, lexicographical order, 
-random order, etc. When we say that lexicographical order is not kept, we actually mean
-that the **numerical order and lexicographical order** of the same set of things **are different**.
+random order, etc. When we say that lexicographical order is not kept, it actually means
+that the **numerical order and lexicographical order** of the same set of things **is different**.
 
 To visualize this, consider these two numbers: **1** and **255** (that are in **BASE10**).
 
@@ -57,11 +57,12 @@ every row has an internal [_id]{.h} column :Ref{r="1"}, for example: [rzgvqZgBaS
 unique id, inherited from Elasticsearch.
 If the encoding maintained order and some other implementation details changed, we wouldn't need to
 have columns like [created_at]{.h}, which are typical in time-series use cases. Also, indexing and
-filtering are typically on orderable datasets.
+filtering are typically more performant on orderable datasets.
 
-## Why does it happen?
-As we saw in the introduction, the core of the issue is the Unicode code point of the characters
-that the encoding spouts, because the code points of the **alphabet** as defined in RFC4648 are **not ordered**.
+## Why is BASE64 not sortable?
+As we saw in the introduction, the core of the issue is the Unicode code point 
+of the characters that the encoding produces, because the code points of 
+the **alphabet** as defined in RFC4648 are **not ordered**.
 
 This is the default alphabet as shown in Table 1 of Section 4 in RFC 4648 :ref{r=2} [ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/]{.h .text-green} 
 
