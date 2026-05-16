@@ -50,11 +50,13 @@ const bind = computed(() => katex.renderToString(value.value, {throwOnError: fal
 </script>
 
 <template>
-  <div>
-    <span v-html="bind"></span>
+  <div class="text-h5">
+    <span v-html="bind"/>
   </div>
 </template>
 
 <style scoped>
-
+.mathshy {
+  font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.8rem);
+}
 </style>

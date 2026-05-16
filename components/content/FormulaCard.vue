@@ -132,7 +132,7 @@ const toneMap = {
   display: flex;
   width: fit-content;
   max-width: 100%;
-  overflow-x: auto;
+  overflow-y: hidden;
   padding: 0.35rem 0;
   font-size: clamp(1.1rem, 1rem + 0.65vw, 1.55rem);
 }
