@@ -13,38 +13,70 @@ https://www.bytedrum.com/posts/bloom-filters/
 Much has been already been written about bloom filters for example this very practical high quality 
 [blog post](https://www.bytedrum.com/posts/bloom-filters/) 
 
+A bloom filter is a probabilistic data structure that can tell you whether a 
+given element has been seen or not _probabilistically_.
 
-A bloom filter is a probabilistic data structure that answers whether a given element has been seen or not.
+It tells you if it has not seen an element **deterministically**, and if 
+it has seen it **probabilistically**. This means it should only be 
+used in cases where false positives are tolerated and false negatives are not.
 
-It answers that it has not seen an element **deterministically**, and answers that it has seen an element
-**probabilistically**. This means it should only be used in cases where false positives are tolerated 
-and false negatives are not tolerated.
+![someimage](/img/bloom/timmy.svg)
 
-A good use case is optimizing data fetching in databases. If we had a database that stores rows of data 
-in pages, a Bloom filter for each page could be built, and for a one point query like `SELECT * FROM table WHERE id = 28272831`{.h},
-it could check whether the id might exist in a page without actually loading the page into memory.
+A good use case is optimizing data fetching in databases. Databases typically 
+store data in smaller structures called pages, when a query with a filter
+is issued, like `SELECT * FROM table WHERE id = 28272831`{.h}, the database
+needs to check every page. If a Bloom filter for each page or group of pages 
+was built, we could ask if a value _might exist_ in a page without actually 
+loading it into memory. If the Bloom filter returns a positive result, the page would be loaded and 
+checked again. Remember that the value could still not be there (false 
+positive). This could allow to skip unnecessary disk reads and scan for values
+more efficiently and is specially useful when typical data structures like
+b-trees become too expensive or when loading data from disk is very expensive.
+This example is of course very simplified, actual use-cases and implementations
+vary from database to database.
 
-If the Bloom filter returns a positive result, the page would be loaded and checked again. This allows to skip
-unnecessary disk reads and scan for values more efficiently and is specially useful when typical data structures like
-b-trees become too expensive in large amounts of data or when loading data from disk is very expensive. 
-
-The latter is the case of TimescaleDB, where data is split into batches and batches are further compressed.
-Searching for a particular value is expensive (also common in other OLTP systems), as the batches needs to be loaded
-into memory and decompressed.
-
-TimescaleDB stores Bloom filters per compressed batch, for selected columns, so it can skip decompressing 
-batches that definitely do not contain the searched value. which for some queries can yield
-up to 6x improvement :Ref{r="1"}.
+To give you a real world example, in TimescaleDB, searching for a particular 
+value can be expensive. Data is split into batches and batches are compressed.
+When searching values batches need to be loaded into memory and decompressed.
+TimescaleDB builds Bloom filters per compressed batch, for specified columns,
+so it can skip decompressing batches that definitely do not contain the searched
+value, which for some queries can yield up to 6x improvement :Ref{r="1"}.
 
 ## The anatomy of a bloom filter
 
-At heart, a bloom filter is just a bitarray, 
+At heart, a Bloom filter is just a bitarray,
 
-![someimage](/img/bloom/bloom.svg)
+The structure is very simple, the array has a size of `m` bits and every 
+value can only be 0 or 1. 
+
+![Anatomy of bloom filter](/img/bloom/bloom_2.svg)
+
+To insert a new value, we hash the value with a hash function and apply the
+modulus operator with the length `m`, that will give us a value between 0 
+and `m`. Interpreting that as the position of a bit in the array, we turn that
+to 1. 
+
+![Anatomy of bloom filter](/img/bloom/bloom_insert.svg)
+
+To look for a value, we obtain the position again and check whether it's 0 or
+1.
+
+When a Bloom filter has all bits set to 1, it's saturated or poisoned, as it'll 
+never be able to tell us _no_; false positives are maximized in this state. 
+
+In an unsaturated Bloom filter, to minimize false positives, we can apply 
+several hash functions `k`, and check that all bits (one per function) are 1,
+this also lets us share bit positions for different values. This is often
+done in most implementations.
+
+When implementing Bloom filters it's very important to tweak its size `m`
+and the number of hash functions `k`, depending on the use-case optimal values
+will differ, but can be calculated using Math.
 
 ## Math
 
-To start gently, let us first consider a perfect square dice, it has six possible values, from 1 to 6.
+To start gently, let us first consider a perfect square dice,
+it has six possible values, from 1 to 6.
 
 ![someimage](/img/bloom/dice.svg)
 
@@ -67,7 +99,7 @@ p =
 ::
 
 Considering that every throw is an unrelated event,
-36 is obtained by multiplying all possible values (6) by every throw.
+36 is obtained by multiplying all possible values (6) at every throw.
 
 ::Mathshy{}
 <pre>
@@ -83,12 +115,13 @@ P(n) = \left(\frac{1}{6}\right)^n
 </pre>
 ::
 
-Where [n]{.h} is the number of times a dice is thrown.
+Where [n]{.h} is the number of times a die is thrown.
 
 ### Probability of a bit being 0
 
-Rolling a dice and bloom filters share some similarities, every time a dice is rolled is like inserting a new value, and
-the size of the bloom filter is its length a.k.a. the number of bits it can hold.
+Rolling a die and bloom filters share some similarities, every time a die is 
+rolled is like inserting a new value, and the size of the filter is all the 
+possible values of the die.
 
 The probability of hitting any bit after an insertion is:
 
@@ -96,7 +129,8 @@ The probability of hitting any bit after an insertion is:
 p = \frac{1}{m}
 ::
 
-If the probability of something **not** happening is 25%, the probability of it happening is:
+If the probability of something **not** happening is 25%, the probability
+of it happening is:
 
 ::Mathshy
 <pre>
@@ -112,7 +146,8 @@ p_0 = 1 - \frac{1}{m}
 </pre>
 ::
 
-Now, not only one insertion happens per value, there are [k * n]{.h} insertions, where [k]{.h} is the number
+Now, as it was discussed earlier there can be different hash functions applied,
+meaning that there are [k * n]{.h} insertions, where [k]{.h} is the number
 of hash functions and [n]{.h} the number of insertions.
 
 ::FormulaCard{title="Probability of a bit being 0 after k*n insertions"}
@@ -121,7 +156,8 @@ p_0 = \left(1 - \frac{1}{m}\right)^{kn}
 </pre>
 ::
 
-Applying the same rule, the probability that a bit **is** 1 after [n]{.h} insertions is:
+Applying the same rule, the probability that a bit **is** 1 after [k*n]{.h} 
+insertions is:
 
 ::Mathshy
 <pre>
@@ -129,15 +165,14 @@ p_1 = 1 - \left(1 - \frac{1}{m}\right)^{kn}
 </pre>
 ::
 
-
 The probability of having an empty bit can be further refined, by studying its limit.
 
-There is a well known characterization of the exponential function that tells us that for big [m]{.h} values, it approximates
-to [e]{.h}
+There is a well known characterization of the exponential function that tells 
+us that for big values of [m]{.h}, it approximates to [e]{.h}
 
 ::Mathshy
 <pre>
-\displaystyle \lim_{m \to \infty}\left(1 - \frac{x}{m}\right)^m = {e}^m
+\displaystyle \lim_{m \to \infty}\left(1 + \frac{x}{m}\right)^m = {e}^x
 </pre>
 ::
 
@@ -145,11 +180,14 @@ It looks particularly similar to the [p0]{.h} function, we can obtain an [e]{.h}
 
 ::Mathshy
 <pre>
+
 \begin{aligned}
 p_0
   &= \left(1 - \frac{1}{m}\right)^{kn} \\
   &= \left(\left(1 - \frac{1}{m}\right)^m\right)^{\frac{kn}{m}} \\
-  &\approx e^{-kn/m}
+  &= \left(\left(1 + \frac{-1}{m}\right)^m\right)^{\frac{kn}{m}} \\
+  &\approx \left(e^{-1}\right)^{\frac{kn}{m}} \\
+  &= e^{-kn/m}
 \end{aligned}
 </pre>
 ::
@@ -268,7 +306,7 @@ the symmetry can be seen:
 
 ![someimage](/img/bloom/symmetrical.png)
 
-Therefore:
+We could have also obtained 1/2 by solving:
 
 ::Mathshy
 <pre>
